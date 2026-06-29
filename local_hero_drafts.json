@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "tag": "HASTE SLOGAN / BRAND IDENTITY",
+    "slogan": "공간을 완성하는 황금빛 가치, 헤이스트 시그니처 브랜드 마크",
+    "subtext": "네이비 벽 위에서 빛나는 로고 아래, 헤이스트만의 남다른 공간 철학이 시작됩니다",
+    "bg_image": "https://fuzhdcsdfblwcgwfylsx.supabase.co/storage/v1/object/public/cafehaste-bucket/draft/HERO_DRAFT_20260605_171820.jpg",
+    "description": "Luxurious corporate showroom design with sleek navy wall and glowing gold chevron emblem."
+  },
+  {
+    "id": 2,
+    "tag": "SPECIALTY ROASTING / MASTER BEANS",
+    "slogan": "아로마를 깨우는 1초의 미학, 최고 등급의 마스터 골든 싱글 원두",
+    "subtext": "산지의 싱그러움과 황금빛 크레마를 온전히 보존한 스페셜 로스팅 랩",
+    "bg_image": "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&q=80&w=1200",
+    "description": "Artisan coffee beans freshly roasted inside a glistening brass roaster drum."
+  },
+  {
+    "id": 3,
+    "tag": "INSTAGRAM TREND / FACADE & EXTERIOR",
+    "slogan": "도심 속 시선을 사로잡는 랜드마크 파사드, 감성적인 핫플레이스",
+    "subtext": "지나치는 걸음마저 머물게 하는 따뜻한 노을빛 아래의 시그니처 뷰",
+    "bg_image": "https://fuzhdcsdfblwcgwfylsx.supabase.co/storage/v1/object/public/cafehaste-bucket/draft/HERO_DRAFT_20260605_171847.jpg",
+    "description": "Modern facade of an upscale cafe with giant glass windows glowing warmly at dusk."
+  },
+  {
+    "id": 4,
+    "tag": "The Choice of Premium",
+    "slogan": "세계적 인프라로 엄선하는 최고 등급 스페셜티 단일 원산지 생두",
+    "subtext": "절대 품질의 아라비카 소싱과 신선함이 보증하는 원두 셀렉션",
+    "bg_image": "https://fuzhdcsdfblwcgwfylsx.supabase.co/storage/v1/object/public/cafehaste-bucket/draft/HERO_DRAFT_20260605_171937.jpg",
+    "description": "Luxury macro photography of freshly roasted, glossy premium coffee beans cascading from a sleek, branded canvas sack with \"HAIST Special Selection\" printed on it. Deep golden hour light highlighting the rich texture of the beans, revealing an absolute focus on high-end specialty coffee quality. Commercial advertising style."
+  },
+  {
+    "id": 5,
+    "tag": "GREEN HEALING / SANCTUARY ATHRIUM",
+    "slogan": "싱그러운 식물의 숨결로 머무는 안식, 그리너리 힐링 아틀리에 정원",
+    "subtext": "복잡한 도시의 소음을 잠시 내려두고 온전히 마주하는 나만의 안식처",
+    "bg_image": "https://fuzhdcsdfblwcgwfylsx.supabase.co/storage/v1/object/public/cafehaste-bucket/draft/HERO_DRAFT_20260605_171703.jpg",
+    "description": "Sunlit greenhouse interior filled with green plants and cozy Scandinavian seating."
+  },
+  {
+    "id": 6,
+    "tag": "FOCUS ZONE / The Owner's Freedom",
+    "slogan": "점주에게 선사하는 경영의 여유, 신뢰할 수 있는 스마트 오토 시스템",
+    "subtext": "지능형 매장이 일하는 동안 점주님은 삶의 품격과 여유로운 자유를 누립니다",
+    "bg_image": "https://images.unsplash.com/photo-1484981138541-3d074aa97716?auto=format&fit=crop&q=80&w=1200",
+    "description": "A sophisticated and confident café franchise owner relaxing comfortably at a beautiful lounge table in a sunlit corner of the café. They are smiling, enjoying a premium latte, while the automated smart systems smoothly run the store in the background. Peaceful, successful entrepreneur mood, cinematic soft focus, photorealistic."
+  },
+  {
+    "id": 7,
+    "tag": "COOP PARTNERSHIP / DIRECT SOURCING",
+    "slogan": "아늑한 햇살 아래 깊어지는 향기, 헤이스트 시그니처 아메리카노",
+    "subtext": "테이블 위를 채우는 엄선된 원두와 갓 추출한 아메리카노의 여유를 즐겨보세요",
+    "bg_image": "https://fuzhdcsdfblwcgwfylsx.supabase.co/storage/v1/object/public/cafehaste-bucket/draft/HERO_DRAFT_20260605_172046.jpg",
+    "description": "Warm sunlit cafe table with roasted specialty coffee beans and a fresh hot cup of signature Americano."
+  },
+  {
+    "id": 8,
+    "tag": "SWEET VELVET ART / BARISTA MASTER",
+    "slogan": "실크처럼 부드럽게 감싸는 벨벳 라떼 폼, 바리스타의 정성 어린 드로잉",
+    "subtext": "정밀한 온도와 압력으로 구현한 최상의 벨벳 밀크 폼 라떼 아트",
+    "bg_image": "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=1200",
+    "description": "Perfect creamy flat white latte art resting on a warm rustic solid wood saucer."
+  },
+  {
+    "id": 9,
+    "tag": "COZY AMBIENT / GOLDEN HOUR REST",
+    "slogan": "창가로 스며드는 따뜻한 노을빛, 온기가 가득한 모던 라운지",
+    "subtext": "결이 살아있는 내추럴 원목 테이블에서 나누는 아늑한 소통의 시간",
+    "bg_image": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&q=80&w=1200",
+    "description": "Warm retro ambient cafe interior with sunset light streaming through giant glass pane."
+  },
+  {
+    "id": 10,
+    "tag": "The Perfect Extraction",
+    "slogan": "황금빛 에스프레소 크레마에 깃든 초정밀 추출의 과학",
+    "subtext": "어느 매장에서나 한결같은 추출 압력과 매끄러운 바디감 보장",
+    "bg_image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=1200",
+    "description": "A cinematic close-up shot of rich, golden-brown espresso crema beautifully flowing into a sophisticated designer porcelain cup. The sleek, matte-black automated extraction nozzle works with micro-precision. Steam rises gently, artistic lighting, premium beverage commercial aesthetic, high contrast, mesmerizing detail."
+  }
+]

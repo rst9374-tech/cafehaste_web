@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "keyword": "세척",
+    "titleTemplate": "커피머신 정기 세척 노하우",
+    "isActive": true
+  },
+  {
+    "id": 2,
+    "keyword": "청소",
+    "titleTemplate": "매장 마감 청소 및 위생 가이드",
+    "isActive": true
+  },
+  {
+    "id": 3,
+    "keyword": "에러",
+    "titleTemplate": "머신 에러 코드 조치 방법",
+    "isActive": true
+  },
+  {
+    "id": 4,
+    "keyword": "호스",
+    "titleTemplate": "급배수 호스 꼬임 방지 팁",
+    "isActive": true
+  },
+  {
+    "id": 5,
+    "keyword": "필터",
+    "titleTemplate": "정수 필터 교환 자가 조치",
+    "isActive": true
+  },
+  {
+    "id": 6,
+    "keyword": "냄새",
+    "titleTemplate": "배수구 악취 방지 팁",
+    "isActive": true
+  },
+  {
+    "id": 7,
+    "keyword": "교체",
+    "titleTemplate": "마모 소모품 자가 교체 노하우",
+    "isActive": true
+  },
+  {
+    "id": 8,
+    "keyword": "에이드",
+    "titleTemplate": "아이스 음료 탄산 주입 팁",
+    "isActive": true
+  },
+  {
+    "id": 9,
+    "keyword": "초코",
+    "titleTemplate": "초코 파우더 뭉침 해결 방안",
+    "isActive": true
+  },
+  {
+    "id": 10,
+    "keyword": "칼리브레이션",
+    "titleTemplate": "에스프레소 추출 칼리브레이션 세팅 가이드",
+    "isActive": true
+  },
+  {
+    "id": 11,
+    "keyword": "분쇄도",
+    "titleTemplate": "그라인더 원두 분쇄도 조절법 및 팁",
+    "isActive": true
+  },
+  {
+    "id": 12,
+    "keyword": "원두",
+    "titleTemplate": "원두 보관법 및 선도 유지 노하우",
+    "isActive": true
+  },
+  {
+    "id": 13,
+    "keyword": "커피",
+    "titleTemplate": "스페셜티 커피 추출 비율 및 세팅 팁",
+    "isActive": true
+  },
+  {
+    "id": 14,
+    "keyword": "카페",
+    "titleTemplate": "개인 카페 매장 운영 효율화 가이드",
+    "isActive": true
+  },
+  {
+    "id": 15,
+    "keyword": "손님",
+    "titleTemplate": "카페 단골 손님 확보 및 고객 응대 매뉴얼",
+    "isActive": true
+  }
+]

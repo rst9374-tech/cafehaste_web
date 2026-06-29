@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "비 내리는 오후의 센티멘탈 재즈 (Rainy Day Lofi Jazz)",
+    "artist": "헤이스트 어쿠스틱 오케스트라",
+    "desc": "빗방울이 유리창을 노크할 때 커피 브루잉 세레모니의 감미로움을 더해주는 따뜻한 아날로그 재즈 선율입니다.",
+    "genre": "재즈",
+    "mood": "비",
+    "soundUrl": "https://www.youtube.com/watch?v=5qap5aO4i9A",
+    "coverUrl": "https://images.unsplash.com/photo-1485550409059-9afb054cada4?auto=format&fit=crop&q=80&w=120",
+    "lyrics": "[Inst.] (이 곡은 잔잔한 재즈 연주곡으로, 빗소리와 함께 감상하기에 가장 알맞은 선율을 선사합니다.)",
+    "ownerPick": true
+  },
+  {
+    "id": 2,
+    "title": "선샤인 모닝 보사노바 (Sunshine Morning Bossa)",
+    "artist": "Bossa Rio Club",
+    "desc": "오픈 아침 시간에 매장 내부의 차가운 기운을 녹여주는 싱그럽고 따뜻한 골드 원두 추출 세레모니 BGM.",
+    "genre": "보사노바",
+    "mood": "활기찬",
+    "soundUrl": "https://www.youtube.com/watch?v=g6B9m6M1G3s",
+    "coverUrl": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=120",
+    "lyrics": "오오 아침을 여는 따스한 해살 아래로\n향긋하게 흩날리는 에스프레소 향기\n오늘 하루도 너와 함께 시작할 수 있어서\n이 따스함 속에 미소가 가득 차올라\n\n기분 좋은 바람이 불어오는 골목길\n우리의 발걸음은 보사노바 리듬을 타며\n가벼운 마음으로 문을 열어요",
+    "ownerPick": true
+  },
+  {
+    "id": 3,
+    "title": "벽난로 곁의 어쿠스틱 포크 기타 (Cozy Hearth Acoustic)",
+    "artist": "Stone Hill Guitar Duo",
+    "desc": "나른한 오후 3시, 베테랑 점주들이 강력히 추천하는 마음이 편안해지는 정적인 우드 피아노 & 통기타 조화.",
+    "genre": "어쿠스틱",
+    "mood": "나른",
+    "soundUrl": "https://www.youtube.com/watch?v=hZJ5Q1G6a0E",
+    "coverUrl": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=120",
+    "lyrics": "[Inst.] (어쿠스틱 기타 두 대의 듀오 연주곡입니다. 벽난로 가에서 포근함을 느끼며 커피 한 잔의 정취를 즐겨보세요.)",
+    "ownerPick": false
+  },
+  {
+    "id": 4,
+    "title": "새벽을 깨우는 로파이 비트 (Midnight Shop Lo-Fi)",
+    "artist": "Lofi Beats Lab",
+    "desc": "집중이 필요한 사장님 라운지 시간이나 밤 마감 서정적인 에스프레소 머신 백그라운드 노이즈 극복 믹스.",
+    "genre": "Lo-Fi",
+    "mood": "집중",
+    "soundUrl": "https://www.youtube.com/watch?v=8p_hL921Rso",
+    "coverUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=120",
+    "lyrics": "[Lofi Beat] (가사 없음. 늦은 밤 집중과 마감을 위한 차분한 로파이 비트 비디오 연동입니다.)",
+    "ownerPick": true
+  },
+  {
+    "id": 5,
+    "title": "로맨틱 선셋 보르도 피아노 (Sunset Bordeaux Piano)",
+    "artist": "루이 발렌타인",
+    "desc": "노을 지는 해변가 테라스 카페에서 와인 같은 커피 한 잔을 할 때 흐르는 부드러운 하이엔드 건반 플레이.",
+    "genre": "인디팝",
+    "mood": "로맨틱",
+    "soundUrl": "https://www.youtube.com/watch?v=K3QZZD-eK1E",
+    "coverUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=120",
+    "lyrics": "붉게 물든 보르도 빛깔 저 하늘 끝자락에\n너의 고운 미소가 조금씩 피어나고\n커피 향기 속에 머금은 오래된 추억들이\n피아노 선율을 따라서 내 맘에 녹아드네\n\n가지 마오 이 밤이 다 가기 전에\n달콤한 미소만을 가득 남겨둔 채로",
+    "ownerPick": false
+  }
+]

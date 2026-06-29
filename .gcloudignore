@@ -1,0 +1,40 @@
+# [gcloud ignore rule] 로컬 무거운 모듈 및 임시 디렉토리 업로드 차단
+.gcloudignore
+.git
+.gitignore
+node_modules/
+uploads/
+external_uploads/
+*.log
+*.ps1
+*.py
+*.js
+scratch/
+.gemini/
+brain/
+.agents/
+logs/
+.env*
+local_*.json
+build_error_*.log
+!dist/
+!dist/**/*.js
+!dist/**/*.css
+!dist/**/*.html
+!dist/**/*.svg
+!dist/**/*.jpg
+!dist/**/*.png
+
+# Exclude source code and configurations not needed on Cloud Run runtime
+src/
+.github/
+scripts/
+README.md
+RELEASES.md
+WIKI_CONVERSATIONS.md
+prohibited_words_guideline.md
+board_post_guideline.md
+
+# Exclude heavy kakao talk raw resources from Google Cloud Run deployments
+kakao/
+

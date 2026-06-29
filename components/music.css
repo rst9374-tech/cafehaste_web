@@ -1,0 +1,91 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+/* Music Standalone App Theme Variables */
+:root {
+  --music-bg: #070708;
+  --music-red: #ef4444;
+  --music-red-hover: #dc2626;
+  --music-red-bg: rgba(239, 68, 68, 0.1);
+  --music-border: rgba(239, 68, 68, 0.15);
+  --music-text-primary: #ffffff;
+  --music-text-secondary: #a8a29e;
+  --music-text-muted: #57534e;
+  --music-card-bg: rgba(15, 15, 18, 0.6);
+  --music-card-hover-bg: rgba(25, 25, 30, 0.85);
+}
+
+/* Base Body Styles for /music route */
+.music-theme-body {
+  background-color: var(--music-bg) !important;
+  color: var(--music-text-primary) !important;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
+  min-height: 100vh;
+}
+
+/* Global Font Utilities */
+.music-title-main {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--music-text-primary);
+}
+
+.music-body-text {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--music-text-secondary);
+}
+
+/* Custom Haste Music Layout Cards */
+.music-card {
+  background: var(--music-card-bg);
+  border: 1px solid var(--music-border);
+  backdrop-filter: blur(12px);
+  border-radius: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.music-card:hover {
+  background: var(--music-card-hover-bg);
+  border-color: var(--music-red);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -10px rgba(239, 68, 68, 0.15);
+}
+
+/* Play buttons & Badges */
+.music-primary-btn {
+  background-color: var(--music-red);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.music-primary-btn:hover {
+  background-color: var(--music-red-hover);
+  transform: scale(1.02);
+}
+
+.music-badge-red {
+  background-color: var(--music-red-bg);
+  color: var(--music-red);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-weight: 800;
+  font-size: 9px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+}
+
+/* Custom Scrollbar for ambient vibe text area */
+.music-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.music-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+.music-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--music-red);
+  border-radius: 10px;
+}

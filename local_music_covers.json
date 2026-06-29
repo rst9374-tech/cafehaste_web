@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "title": "비 내리는 유리창 (Rainy Day Ambient)",
+    "desc": "빗방울이 유리창을 따라 흘러내리는 아늑하고 서정적인 4K 루프 비디오",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-rain-drops-on-a-window-pane-1410-large.mp4",
+    "weather": "비",
+    "visible": true,
+    "orderIndex": 1
+  },
+  {
+    "id": 2,
+    "title": "아늑한 벽난로 (Cozy Fireplace Warmth)",
+    "desc": "타오르는 장작 소리가 느껴지는 나른하고 편안한 오후용 벽난로 루프 비디오",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-fire-in-a-fireplace-close-up-42413-large.mp4",
+    "weather": "나른",
+    "visible": true,
+    "orderIndex": 2
+  },
+  {
+    "id": 3,
+    "title": "오션 뷰 석양 (Cinematic Sunset Ocean)",
+    "desc": "노을이 붉게 물드는 해변 테라스 풍경의 로맨틱 루프 비디오",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-dramatic-sunset-over-the-ocean-4006-large.mp4",
+    "weather": "노을",
+    "visible": true,
+    "orderIndex": 3
+  },
+  {
+    "id": 4,
+    "title": "심야의 네온 라이트 (Midnight Neon Cafe)",
+    "desc": "도시의 밤을 밝히는 은은하고 감각적인 네온사인 루프 비디오",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-neon-light-from-a-shop-window-at-night-42217-large.mp4",
+    "weather": "집중",
+    "visible": true,
+    "orderIndex": 4
+  },
+  {
+    "id": 5,
+    "title": "맑은 하늘과 구름 (Sunny Day Sky)",
+    "desc": "푸른 하늘을 가로지르는 하얀 구름의 활기찬 낮 시간용 루프 비디오",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-clouds-moving-quickly-across-the-sky-34190-large.mp4",
+    "weather": "맑음",
+    "visible": true,
+    "orderIndex": 5
+  }
+]

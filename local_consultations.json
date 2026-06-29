@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "region_name": "서울 강남구 도곡동 인근",
+    "owner_name": "최민우",
+    "phone": "010-5555-6666",
+    "email": "min@haste.cafe",
+    "capital": "5000",
+    "has_store": "없음",
+    "inquiry_path": "인터넷 검색",
+    "content": "가맹 창업 상담 희망합니다. 도곡동 역세권 입지 조건이 맞는지 검토받고 싶습니다.",
+    "created_at": "2026-06-05T05:14:12.482Z",
+    "approval_status": "요청",
+    "signup_path": "창업문의"
+  },
+  {
+    "id": 2,
+    "region_name": "경기 성남시 분당구 인근",
+    "owner_name": "김지혜",
+    "phone": "010-7777-8888",
+    "email": "jihye@haste.cafe",
+    "capital": "8000",
+    "has_store": "있음",
+    "inquiry_path": "지인 소개",
+    "content": "상가 분양을 받았는데 카페 헤이스트 브랜드의 경쟁력이 타사 대비 어떠한지 궁금해서 상담 요청합니다.",
+    "created_at": "2026-06-05T05:14:12.482Z",
+    "approval_status": "요청",
+    "signup_path": "창업문의"
+  }
+]

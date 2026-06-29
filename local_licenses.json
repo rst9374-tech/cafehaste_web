@@ -1,0 +1,588 @@
+[
+  {
+    "id": 1,
+    "storeName": "헤이스트 강남점 (샘플)",
+    "storeId": "HST-M001",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM"
+  },
+  {
+    "id": 2,
+    "storeName": "헤이스트 홍대점 (샘플)",
+    "storeId": "HST-M002",
+    "licenseStartDate": "2026-05-01",
+    "licenseEndDate": "2026-06-01",
+    "isApproved": 0,
+    "storeGrade": "STANDARD"
+  },
+  {
+    "id": 3,
+    "storeName": "헤이스트 신도림점 (샘플)",
+    "storeId": "HST-M003",
+    "licenseStartDate": "2026-06-05",
+    "licenseEndDate": "2026-07-05",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM"
+  },
+  {
+    "id": 4,
+    "storeName": "김포운양역점",
+    "storeId": "store075575",
+    "licenseStartDate": "2026-06-12",
+    "licenseEndDate": "2027-06-12",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM"
+  },
+  {
+    "id": 10,
+    "storeName": "테스트헤이스트 1006호점",
+    "storeId": "store100006",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 11,
+    "storeName": "테스트헤이스트 1007호점",
+    "storeId": "store100007",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 12,
+    "storeName": "테스트헤이스트 1008호점",
+    "storeId": "store100008",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 13,
+    "storeName": "테스트헤이스트 1009호점",
+    "storeId": "store100009",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 14,
+    "storeName": "테스트헤이스트 1010호점",
+    "storeId": "store100010",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 15,
+    "storeName": "테스트헤이스트 1011호점",
+    "storeId": "store100011",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 16,
+    "storeName": "테스트헤이스트 1012호점",
+    "storeId": "store100012",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 17,
+    "storeName": "테스트헤이스트 1013호점",
+    "storeId": "store100013",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 18,
+    "storeName": "테스트헤이스트 1014호점",
+    "storeId": "store100014",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 19,
+    "storeName": "테스트헤이스트 1015호점",
+    "storeId": "store100015",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 20,
+    "storeName": "테스트헤이스트 1016호점",
+    "storeId": "store100016",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 21,
+    "storeName": "테스트헤이스트 1017호점",
+    "storeId": "store100017",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 22,
+    "storeName": "테스트헤이스트 1018호점",
+    "storeId": "store100018",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 23,
+    "storeName": "테스트헤이스트 1019호점",
+    "storeId": "store100019",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 24,
+    "storeName": "테스트헤이스트 1020호점",
+    "storeId": "store100020",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 25,
+    "storeName": "테스트헤이스트 1021호점",
+    "storeId": "store100021",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 26,
+    "storeName": "테스트헤이스트 1022호점",
+    "storeId": "store100022",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 27,
+    "storeName": "테스트헤이스트 1023호점",
+    "storeId": "store100023",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 28,
+    "storeName": "테스트헤이스트 1024호점",
+    "storeId": "store100024",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 29,
+    "storeName": "테스트헤이스트 1025호점",
+    "storeId": "store100025",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 30,
+    "storeName": "테스트헤이스트 1026호점",
+    "storeId": "store100026",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 31,
+    "storeName": "테스트헤이스트 1027호점",
+    "storeId": "store100027",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 32,
+    "storeName": "테스트헤이스트 1028호점",
+    "storeId": "store100028",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 33,
+    "storeName": "테스트헤이스트 1029호점",
+    "storeId": "store100029",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 34,
+    "storeName": "테스트헤이스트 1030호점",
+    "storeId": "store100030",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 35,
+    "storeName": "테스트헤이스트 1031호점",
+    "storeId": "store100031",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 36,
+    "storeName": "테스트헤이스트 1032호점",
+    "storeId": "store100032",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 37,
+    "storeName": "테스트헤이스트 1033호점",
+    "storeId": "store100033",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 38,
+    "storeName": "테스트헤이스트 1034호점",
+    "storeId": "store100034",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 39,
+    "storeName": "테스트헤이스트 1035호점",
+    "storeId": "store100035",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 40,
+    "storeName": "테스트헤이스트 1036호점",
+    "storeId": "store100036",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 41,
+    "storeName": "테스트헤이스트 1037호점",
+    "storeId": "store100037",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 42,
+    "storeName": "테스트헤이스트 1038호점",
+    "storeId": "store100038",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 43,
+    "storeName": "테스트헤이스트 1039호점",
+    "storeId": "store100039",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 44,
+    "storeName": "테스트헤이스트 1040호점",
+    "storeId": "store100040",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 45,
+    "storeName": "테스트헤이스트 1041호점",
+    "storeId": "store100041",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 46,
+    "storeName": "테스트헤이스트 1042호점",
+    "storeId": "store100042",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 47,
+    "storeName": "테스트헤이스트 1043호점",
+    "storeId": "store100043",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 48,
+    "storeName": "테스트헤이스트 1044호점",
+    "storeId": "store100044",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 49,
+    "storeName": "테스트헤이스트 1045호점",
+    "storeId": "store100045",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2026-07-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 50,
+    "storeName": "테스트헤이스트 1046호점",
+    "storeId": "store100046",
+    "licenseStartDate": "2026-05-01",
+    "licenseEndDate": "2026-06-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 51,
+    "storeName": "테스트헤이스트 1047호점",
+    "storeId": "store100047",
+    "licenseStartDate": "2026-05-01",
+    "licenseEndDate": "2026-06-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 52,
+    "storeName": "테스트헤이스트 1048호점",
+    "storeId": "store100048",
+    "licenseStartDate": "2026-05-01",
+    "licenseEndDate": "2026-06-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 53,
+    "storeName": "테스트헤이스트 1049호점",
+    "storeId": "store100049",
+    "licenseStartDate": "2026-05-01",
+    "licenseEndDate": "2026-06-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 54,
+    "storeName": "테스트헤이스트 1050호점",
+    "storeId": "store100050",
+    "licenseStartDate": "2026-05-01",
+    "licenseEndDate": "2026-06-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 55,
+    "storeName": "강남본점",
+    "storeId": "store123456",
+    "licenseStartDate": "2026-01-01",
+    "licenseEndDate": "2026-12-31",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 56,
+    "storeName": "역삼지점",
+    "storeId": "store123457",
+    "licenseStartDate": "2026-02-15",
+    "licenseEndDate": "2026-08-15",
+    "isApproved": 1,
+    "storeGrade": "STANDARD",
+    "password": "1234"
+  },
+  {
+    "id": 57,
+    "storeName": "홍대입구역점",
+    "storeId": "store123458",
+    "licenseStartDate": "2025-05-01",
+    "licenseEndDate": "2026-05-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 58,
+    "storeName": "부산서면점",
+    "storeId": "store123459",
+    "licenseStartDate": "2026-03-01",
+    "licenseEndDate": "2027-03-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 59,
+    "storeName": "신규가맹점",
+    "storeId": "store123460",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2027-06-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 60,
+    "storeName": "강남본점",
+    "storeId": "store123456",
+    "licenseStartDate": "2026-01-01",
+    "licenseEndDate": "2026-12-31",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 61,
+    "storeName": "역삼지점",
+    "storeId": "store123457",
+    "licenseStartDate": "2026-02-15",
+    "licenseEndDate": "2026-08-15",
+    "isApproved": 1,
+    "storeGrade": "STANDARD",
+    "password": "1234"
+  },
+  {
+    "id": 62,
+    "storeName": "홍대입구역점",
+    "storeId": "store123458",
+    "licenseStartDate": "2025-05-01",
+    "licenseEndDate": "2026-05-01",
+    "isApproved": 1,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 63,
+    "storeName": "부산서면점",
+    "storeId": "store123459",
+    "licenseStartDate": "2026-03-01",
+    "licenseEndDate": "2027-03-01",
+    "isApproved": 0,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  },
+  {
+    "id": 64,
+    "storeName": "신규가맹점",
+    "storeId": "store123460",
+    "licenseStartDate": "2026-06-01",
+    "licenseEndDate": "2027-06-01",
+    "isApproved": 2,
+    "storeGrade": "PREMIUM",
+    "password": "1234"
+  }
+]

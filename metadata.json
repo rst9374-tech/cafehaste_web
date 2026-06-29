@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Cafe Haste Webpage Superdb 0604",
+  "description": "성공을 향한 기분 좋은 가속, Cafe Haste",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
