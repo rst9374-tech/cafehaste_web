@@ -478,19 +478,20 @@ router.get('/api/menu-bulk', async (req, res) => {
       categories = rows || [];
     }
     
-    // 2) Items (100% Decoupled Static 266 items)
-    const items = STATIC_MENU_ITEMS.map((item, idx) => ({
-      ...item,
-      order_index: idx,
-      orderIndex: idx,
-      visible: 1
-    }));
+    // 2) Items (DB Live Load)
+    let items: any[] = [];
+    if (dbPool.isFallback) {
+      items = STATIC_MENU_ITEMS;
+    } else {
+      const [rows]: any = await dbPool.query('SELECT * FROM web_menu_items_all WHERE visible = true');
+      items = rows || [];
+    }
     
     res.json({
       success: true,
       categories,
       items,
-      source: 'STATIC_STATIC_SPEC'
+      source: 'DATABASE_LIVE_BULK'
     });
   } catch (err: any) {
     console.error('Unified menu bulk fetch error:', err);
