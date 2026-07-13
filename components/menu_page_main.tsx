@@ -93,7 +93,7 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
   }, [catFilteredItems, selectedBean, selectedCategory]);
 
   const beanAllCount = catFilteredItems.length;
-  const beanSCount = catFilteredItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE')).length;
+  const beanSCount = catFilteredItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE' && selectedCategory === 'ALL')).length;
   const beanDCount = catFilteredItems.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D').length;
   const beanPCount = catFilteredItems.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P').length;
 
