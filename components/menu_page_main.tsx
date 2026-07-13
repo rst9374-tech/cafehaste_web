@@ -145,7 +145,7 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
             onClick={() => setSelectedCategory('ALL')}
             className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all tracking-wider cursor-pointer whitespace-nowrap ${ selectedCategory === 'ALL' ? 'bg-stone-900 text-[#C5A059] shadow-md' : 'bg-white hover:bg-stone-50 border border-stone-200 haste-body-text-2 !font-bold' }`}
           >
-            전체 메뉴 ({searchFilteredItems.length})
+            전체 메뉴 ({menuItems.length})
           </button>
 
           {/* Bean filter buttons - permanently fixed and visible */}
