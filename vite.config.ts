@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        watch: {
+          ignored: ['**/*.zip', '**/cafehaste_menu_images_korean/**', '**/cafehaste_menu_images_2026-07-12/**']
+        }
       },
       plugins: [react()],
       define: {
