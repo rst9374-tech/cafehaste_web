@@ -157,7 +157,7 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
                 : 'text-stone-400 border-transparent hover:text-white'
             }`}
           >
-            전체 원두 ({beanAllCount})
+            전체 원두
           </button>
           <button
             onClick={() => setSelectedBean('S')}
