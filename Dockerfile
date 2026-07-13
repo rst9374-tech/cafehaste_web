@@ -1,0 +1,9 @@
+FROM node:22-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY dist ./dist
+RUN mkdir -p uploads external_uploads
+EXPOSE 8080
+ENV NODE_ENV=production
+CMD ["npm", "start"]

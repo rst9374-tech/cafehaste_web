@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>헤이스트에이아이</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path d=%22M 10 15 L 28 15 L 53 50 L 28 85 L 10 85 L 35 50 Z%22 fill=%22%23C5A059%22/><path d=%22M 46 15 L 64 15 L 89 50 L 64 85 L 46 85 L 71 50 Z%22 fill=%22%23C5A059%22/></svg>">
+    <script>
+      (function() {
+        const suppressKeywords = [
+          'cdn.tailwindcss.com',
+          'contentscript.js',
+          'chrome-extension://',
+          'extension',
+          'React DevTools',
+          'react-devtools'
+        ];
+        
+        function shouldSuppress(args) {
+          try {
+            // 1. Check message arguments
+            for (let i = 0; i < args.length; i++) {
+              const arg = args[i];
+              if (arg && typeof arg === 'string') {
+                for (let j = 0; j < suppressKeywords.length; j++) {
+                  if (arg.includes(suppressKeywords[j])) return true;
+                }
+              }
+            }
+            // 2. Check caller stack trace (crucial for finding contentscript.js origin)
+            const stack = new Error().stack;
+            if (stack) {
+              for (let k = 0; k < suppressKeywords.length; k++) {
+                if (stack.includes(suppressKeywords[k])) return true;
+              }
+            }
+          } catch (e) {}
+          return false;
+        }
+
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+          if (shouldSuppress(args)) return;
+          originalWarn.apply(console, args);
+        };
+
+        const originalError = console.error;
+        console.error = function(...args) {
+          if (shouldSuppress(args)) return;
+          originalError.apply(console, args);
+        };
+
+        const originalLog = console.log;
+        console.log = function(...args) {
+          if (shouldSuppress(args)) return;
+          originalLog.apply(console, args);
+        };
+      })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              serif: ['"Pretendard Var"', '"Pretendard"', '"Inter"', 'sans-serif'],
+              sans: ['"Pretendard Var"', '"Pretendard"', '"Inter"', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+            },
+            colors: {
+              nobel: {
+                gold: '#C5A059',
+                dark: '#1a1a1a',
+                cream: 'var(--haste-body-bg)',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 100px;
+      }
+      body {
+        background-color: var(--haste-body-bg);
+        color: #1a1a1a;
+      }
+      @media print {
+        nav, footer, button {
+          display: none !important;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.0/",
+    "react/": "https://esm.sh/react@^19.2.0/",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber@^9.4.0",
+    "@react-three/drei": "https://esm.sh/@react-three/drei@^10.7.7",
+    "three": "https://esm.sh/three@^0.181.1",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.24",
+    "lucide-react": "https://esm.sh/lucide-react@^0.553.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

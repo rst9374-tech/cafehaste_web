@@ -1,0 +1,1299 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap');
+
+:root {
+  --haste-body-bg: #F4ECE1;
+  --haste-footer-bg: #4A3525;
+}
+
+@theme {
+  --font-sans: "Pretendard Variable", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Pretendard Variable", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+body, button, input, select, textarea {
+  font-family: "Pretendard Variable", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+}
+
+[contenteditable][data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #a8a29e;
+  cursor: text;
+}
+
+.font-sans {
+  font-family: "Pretendard Variable", "Pretendard", ui-sans-serif, system-ui, sans-serif !important;
+}
+
+.font-serif {
+  font-family: "Pretendard Variable", "Pretendard", ui-sans-serif, system-ui, sans-serif !important;
+}
+
+.font-mono {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace !important;
+}
+
+/* Custom Scrollbar styled for HASTE design */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--haste-body-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E5E5E0;
+  border-radius: 99px;
+  border: 2px solid var(--haste-body-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C5A059;
+}
+
+/* Dark mode custom scrollbars */
+.dark-scroll::-webkit-scrollbar-track {
+  background: #15141E;
+}
+.dark-scroll::-webkit-scrollbar-thumb {
+  background: #333;
+  border: 2px solid #15141E;
+}
+.dark-scroll::-webkit-scrollbar-thumb:hover {
+  background: #C5A059;
+}
+
+/* Pulse Glow Effects */
+.lightning-glow {
+  filter: drop-shadow(0 0 10px rgba(197, 160, 89, 0.45));
+}
+
+.glow-button {
+  box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
+  transition: all 0.30s ease;
+}
+
+.glow-button:hover {
+  box-shadow: 0 0 25px rgba(197, 160, 89, 0.45);
+}
+
+/* Paper Receipt style effect jagged borders */
+.receipt-paper {
+  background-color: #FFFFFF;
+  position: relative;
+}
+
+.receipt-paper::before,
+.receipt-paper::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background-size: 16px 16px;
+}
+
+.receipt-paper::before {
+  top: -8px;
+  background-image: linear-gradient(135deg, #FFFFFF 25%, transparent 25%), 
+                    linear-gradient(225deg, #FFFFFF 25%, transparent 25%);
+}
+
+.receipt-paper::after {
+  bottom: -8px;
+  background-image: linear-gradient(45deg, #FFFFFF 25%, transparent 25%), 
+                    linear-gradient(315deg, #FFFFFF 25%, transparent 25%);
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 12px rgba(197, 160, 89, 0.5));
+  }
+  50% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 4px rgba(197, 160, 89, 0.15));
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+/* Local Dev-mode drag enabler overriding select-none classes */
+body.dev-mode, body.dev-mode * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* ==========================================================================
+   HASTE Typography Design System & Main Page Font Classes
+   ========================================================================== */
+
+/* 7대 표준 규격 컴포넌트 클래스 */
+.haste-page-title {
+  font-family: var(--font-sans) !important;
+  font-size: 1.125rem !important; /* text-lg (모바일 축소) */
+  line-height: 1.25 !important;
+  color: #1c1917 !important; /* text-stone-900 */
+  letter-spacing: -0.025em !important; /* tracking-tight */
+  font-weight: 400 !important; /* font-normal */
+}
+@media (min-width: 768px) {
+  .haste-page-title {
+    font-size: 2.25rem !important; /* text-4xl */
+  }
+}
+
+.haste-title-main {
+  font-family: var(--font-sans) !important;
+  font-size: 1.125rem !important; /* text-lg (모바일 축소) */
+  line-height: 1.25 !important; /* leading-tight */
+  color: #1c1917 !important; /* text-stone-900 */
+  letter-spacing: -0.025em !important; /* tracking-tight */
+  font-weight: 400 !important; /* font-normal */
+  margin-bottom: 0.75rem !important; /* mb-3 (모바일 축소) */
+}
+@media (min-width: 768px) {
+  .haste-title-main {
+    font-size: 3rem !important; /* text-5xl */
+    margin-bottom: 2rem !important; /* mb-8 */
+  }
+}
+.haste-section-title-1 {
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important; /* font-bold */
+  color: #1c1917 !important; /* text-stone-900 */
+  font-size: 1.125rem !important; /* text-lg (모바일 축소) */
+}
+@media (min-width: 768px) {
+  .haste-section-title-1 {
+    font-size: 1.875rem !important; /* text-3xl */
+  }
+}
+
+.haste-section-title-2 {
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important; /* font-bold */
+  color: #1c1917 !important; /* text-stone-900 */
+  font-size: 1rem !important; /* text-base (모바일 축소, 1단계 상향) */
+}
+@media (min-width: 768px) {
+  .haste-section-title-2 {
+    font-size: 1.5rem !important; /* text-2xl (1단계 상향) */
+  }
+}
+
+.haste-section-title-3 {
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important; /* font-bold */
+  color: #1c1917 !important; /* text-stone-900 */
+  font-size: 1rem !important; /* text-base (2단계 상향) */
+}
+
+.haste-section-title-4 {
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important; /* font-bold */
+  color: #1c1917 !important; /* text-stone-900 */
+  font-size: 0.75rem !important; /* text-xs (타이틀3보다 2단계 하향) */
+}
+
+
+.haste-category-label-en {
+  font-size: 9px !important; /* 모바일 축소 */
+  font-family: var(--font-mono) !important;
+  font-weight: 700 !important; /* font-bold */
+  color: #C5A059 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important; /* mb-2 (모바일 축소) */
+}
+
+.haste-category-label-ko {
+  font-size: 9px !important; /* 모바일 축소 */
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important; /* font-bold */
+  color: #C5A059 !important;
+  letter-spacing: 0.15em !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important; /* mb-2 (모바일 축소) */
+}
+
+.haste-body-text-1 {
+  color: #57534e !important; /* text-stone-650/600 */
+  font-family: var(--font-sans) !important;
+  font-weight: 400 !important; /* font-normal */
+  font-size: 0.6875rem !important; /* 11px (바디1에서 1단계 축소) */
+  line-height: 1.625 !important; /* leading-relaxed */
+  letter-spacing: -0.02em !important; /* tracking-tight */
+}
+@media (min-width: 768px) {
+  .haste-body-text-1 {
+    font-size: 0.9375rem !important; /* 15px (바디1에서 1단계 축소) */
+  }
+}
+
+.haste-body-text-1-5 {
+  color: #57534e !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important; /* Bold 기본 탑재 */
+  font-size: 0.625rem !important; /* 10px (바디1.5) */
+  line-height: 1.625 !important;
+  letter-spacing: -0.02em !important;
+}
+@media (min-width: 768px) {
+  .haste-body-text-1-5 {
+    font-size: 0.875rem !important; /* 14px (바디1.5) */
+  }
+}
+
+.haste-body-text-2 {
+  color: #57534e !important; /* text-stone-650/600 */
+  font-family: var(--font-sans) !important;
+  font-weight: 400 !important; /* font-normal */
+  font-size: 0.5625rem !important; /* text-[9px] (1단계 하향) */
+  line-height: 1.625 !important; /* leading-relaxed */
+  letter-spacing: -0.02em !important; /* tracking-tight */
+}
+@media (min-width: 768px) {
+  .haste-body-text-2 {
+    font-size: 0.8125rem !important; /* text-[13px] (1단계 하향) */
+  }
+}
+
+.haste-body-text-2-3 {
+  color: #78716c !important; /* text-stone-500 */
+  font-family: var(--font-sans) !important;
+  font-weight: 400 !important; /* font-normal */
+  font-size: 0.5625rem !important; /* text-[9px] */
+  line-height: 1.625 !important; /* leading-relaxed */
+  letter-spacing: -0.02em !important; /* tracking-tight */
+}
+@media (min-width: 768px) {
+  .haste-body-text-2-3 {
+    font-size: 0.8125rem !important; /* text-[13px] */
+  }
+}
+
+.haste-body-text-3 {
+  color: #1c1917 !important; /* text-stone-900 */
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important; /* font-semibold */
+  font-size: 0.6875rem !important; /* text-[11px] (1단계 상향) */
+  line-height: 1.25 !important; /* leading-tight */
+  letter-spacing: -0.01em !important;
+}
+
+.haste-body-text-4 {
+  font-family: var(--font-sans) !important;
+  font-size: 8px !important; /* 모바일 축소 */
+  color: #78716c !important; /* text-stone-500 */
+  line-height: 1.375 !important; /* leading-snug */
+  font-weight: 400 !important;
+}
+
+.haste-primary-btn {
+  background-color: #1c1917 !important; /* bg-stone-900 */
+  color: #C5A059 !important;
+  font-weight: 700 !important;
+  padding: 0.625rem 1.125rem !important; /* py-2.5 px-4.5 (모바일 축소) */
+  border-radius: 0.875rem !important; /* rounded-xl (모바일 축소) */
+  border: 1px solid #292524 !important; /* border-stone-800 */
+  transition: all 0.2s !important;
+  font-size: 0.6875rem !important; /* text-[11px] (모바일 축소) */
+}
+.haste-primary-btn:hover {
+  background-color: #292524 !important; /* bg-stone-850 */
+}
+@media (min-width: 768px) {
+  .haste-primary-btn {
+    font-size: 0.875rem !important; /* text-sm */
+    padding: 0.875rem 1.5rem !important; /* py-3.5 px-6 */
+    border-radius: 1rem !important; /* rounded-2xl */
+  }
+}
+
+.haste-dark-btn {
+  background-color: #1c1917 !important;
+  border: 1px solid #C5A059 !important;
+  color: #C5A059 !important;
+  transition: all 0.3s ease-in-out !important;
+  font-size: 0.6875rem !important; /* 모바일 축소 */
+  font-weight: 800 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  white-space: nowrap !important;
+  border-radius: 0.625rem !important; /* 모바일 축소 */
+  padding: 0.375rem 0.75rem !important; /* 모바일 축소 */
+}
+.haste-dark-btn:hover {
+  background-color: #292524 !important;
+  color: #FFD8A3 !important;
+  transform: scale(1.05) !important;
+}
+.haste-dark-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.haste-dark-mini-btn {
+  background-color: #1c1917 !important;
+  color: #C5A059 !important;
+  font-size: 8px !important; /* 모바일 축소 */
+  font-weight: 700 !important;
+  padding: 0.25rem 0.5rem !important; /* 모바일 축소 */
+  border-radius: 0.375rem !important; /* 모바일 축소 */
+  border: 1px solid #292524 !important;
+  transition: all 0.2s !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+.haste-dark-mini-btn:hover {
+  background-color: #292524 !important;
+}
+.haste-dark-mini-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.haste-action-tab-btn {
+  color: #78716c !important;
+  padding: 0.45rem 0.9rem !important; /* 모바일 축소 */
+  border-radius: 0.375rem !important; /* 모바일 축소 */
+  font-size: 0.75rem !important; /* 1단계 상향 */
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  transition: all 0.2s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  cursor: pointer !important;
+}
+.haste-action-tab-btn:hover {
+  color: #1c1917 !important;
+  background-color: rgba(245, 245, 244, 0.6) !important;
+}
+
+.haste-sub-tab-btn {
+  flex: 1 1 0% !important;
+  text-align: center !important;
+  padding: 0.25rem 0.625rem !important; /* 모바일 축소 */
+  font-size: 0.75rem !important; /* 1단계 상향 */
+  font-weight: 700 !important;
+  transition: all 0.2s !important;
+  border-radius: 0.375rem !important; /* 모바일 축소 */
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  color: #78716c !important;
+}
+.haste-sub-tab-btn:hover {
+  color: #1c1917 !important;
+  background-color: rgba(231, 229, 228, 0.4) !important;
+}
+.haste-sub-tab-btn.active {
+  background-color: #1c1917 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  font-weight: 800 !important;
+}
+
+.haste-secondary-btn {
+  background-color: #FAF9F6 !important;
+  color: #44403c !important; /* text-stone-700 */
+  font-weight: 500 !important;
+  padding: 0.55rem 1.125rem !important; /* 모바일 축소 */
+  border-radius: 0.875rem !important; /* rounded-xl (모바일 축소) */
+  border: 1px solid #d6d3d1 !important; /* border-stone-300 */
+  transition: all 0.2s !important;
+  font-size: 0.6875rem !important; /* text-[11px] (모바일 축소) */
+}
+.haste-secondary-btn:hover {
+  background-color: #F2F0E8 !important;
+}
+@media (min-width: 768px) {
+  .haste-secondary-btn {
+    font-size: 0.875rem !important; /* text-sm */
+    padding: 0.75rem 1.5rem !important; /* py-3 px-6 */
+    border-radius: 1rem !important; /* rounded-2xl */
+  }
+}
+
+.haste-status-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.15rem 0.5rem !important; /* 모바일 축소 */
+  border-radius: 0.375rem !important;
+  font-size: 0.625rem !important; /* 모바일 축소 */
+  font-weight: 700 !important;
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.02em !important;
+  border: 1px solid transparent !important;
+}
+@media (min-width: 768px) {
+  .haste-status-badge {
+    font-size: 0.6875rem !important;
+    padding: 0.2rem 0.625rem !important;
+  }
+}
+
+/* 1. 인증 완료 - 골드 테마 */
+.haste-status-badge.approved {
+  color: #C5A059 !important;
+  background-color: rgba(197, 160, 89, 0.1) !important;
+  border-color: rgba(197, 160, 89, 0.3) !important;
+}
+
+/* 1-2. 인증 완료 (그린) - 구독 활성화용 */
+.haste-status-badge.approved-green {
+  color: #059669 !important;
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+/* 2. 인증 대기 - 스톤 라이트 그레이 */
+.haste-status-badge.waiting {
+  color: #78716c !important;
+  background-color: #f5f5f4 !important;
+  border-color: #e7e5e4 !important;
+}
+
+/* 3. 기간 만료 - 로즈 옅은 배경 */
+.haste-status-badge.expired {
+  color: #e11d48 !important;
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+}
+
+/* 4. 가동 정지 - 로즈 테두리 강조 */
+.haste-status-badge.suspended {
+  color: #e11d48 !important;
+  background-color: #fff1f2 !important;
+  border-color: #f43f5e !important;
+}
+
+
+/* 상단메뉴 신설 전역 클래스 */
+.haste-topmenu {
+  position: relative !important;
+  padding: 0.625rem 1rem !important; /* px-4 py-2.5 */
+  border-radius: 0.75rem !important; /* rounded-xl */
+  cursor: pointer !important;
+  transition: all 0.3s ease-out !important;
+  user-select: none !important;
+  white-space: nowrap !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+}
+
+.haste-topmenu.light {
+  color: #44403c !important; /* text-stone-700 */
+}
+
+.haste-topmenu.dark {
+  color: #d6d3d1 !important; /* text-stone-300 */
+}
+
+.haste-topmenu.scrolled {
+  color: #4A3525 !important;
+}
+
+.haste-topmenu.film {
+  color: #ffffff !important;
+}
+
+.haste-topmenu.active {
+  color: #C5A059 !important;
+}
+
+.haste-topmenu:hover {
+  color: #C5A059 !important;
+}
+
+.haste-topmenu.special-film {
+  background-color: #0c0a09 !important; /* bg-stone-950 */
+  color: #C5A059 !important;
+  border: 1px solid rgba(197, 160, 89, 0.4) !important; /* border-[#C5A059]/40 */
+  font-weight: 800 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.haste-topmenu.special-film:hover {
+  background-color: #1c1917 !important; /* bg-stone-900 */
+}
+
+/* 메인페이지 Hero 전용 타이포그래피 */
+.haste-hero-tag {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important; /* 모바일 축소 */
+  letter-spacing: 0.22em !important;
+  color: #C5A059 !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+}
+
+.haste-hero-title-giant {
+  font-family: var(--font-serif) !important;
+  font-size: 3rem !important; /* 모바일 축소 해제 및 최적화 */
+  letter-spacing: 0.06em !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  color: rgba(250, 249, 246, 0.5) !important;
+  line-height: 1 !important;
+}
+@media (min-width: 768px) {
+  .haste-hero-title-giant {
+    font-size: 5rem !important;
+  }
+}
+@media (min-width: 1024px) {
+  .haste-hero-title-giant {
+    font-size: 6.5rem !important;
+  }
+}
+
+.haste-hero-slogan {
+  font-family: var(--font-serif) !important;
+  font-size: 1.125rem !important; /* 모바일 크기 상향 조정 */
+  font-weight: 300 !important; /* font-light */
+  color: rgba(250, 249, 246, 0.5) !important;
+  letter-spacing: 0.14em !important;
+  line-height: 1.25 !important;
+}
+@media (min-width: 768px) {
+  .haste-hero-slogan {
+    font-size: 25px !important;
+  }
+}
+@media (min-width: 1024px) {
+  .haste-hero-slogan {
+    font-size: 34px !important;
+  }
+}
+
+.haste-hero-subtext {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important; /* 모바일 축소 */
+  color: #C5A059 !important;
+  letter-spacing: 0.42em !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  opacity: 0.9 !important;
+}
+@media (min-width: 768px) {
+  .haste-hero-subtext {
+    font-size: 0.75rem !important; /* text-xs */
+  }
+}
+
+/* CSS-only Play Icon (Triangle) */
+.haste-play-icon {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid currentColor;
+  margin-left: 1px;
+}
+
+/* Global Responsive Slide Navigation Arrows */
+.haste-slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.haste-slider-arrow svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+  .haste-slider-arrow {
+    width: 2.5rem; /* w-10 */
+    height: 2.5rem; /* h-10 */
+    border-radius: 9999px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  .haste-slider-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+    transform: translateY(-50%) scale(1.1);
+  }
+  .haste-slider-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+  .haste-slider-arrow-left {
+    left: 1rem; /* left-4 */
+  }
+  .haste-slider-arrow-right {
+    right: 1rem; /* right-4 */
+  }
+  .haste-slider-arrow-left:hover svg {
+    transform: translateX(-2px);
+  }
+  .haste-slider-arrow-right:hover svg {
+    transform: translateX(2px);
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .haste-slider-arrow {
+    width: 2.25rem; /* w-9 */
+    height: 2.25rem; /* h-9 */
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    color: #C5A059; /* Signature Bronze Gold */
+  }
+  .haste-slider-arrow:active {
+    transform: translateY(-50%) scale(0.9);
+  }
+  .haste-slider-arrow-left {
+    left: 0.375rem; /* left-1.5 */
+  }
+  .haste-slider-arrow-right {
+    right: 0.375rem; /* right-1.5 */
+  }
+  .haste-slider-arrow svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ==========================================================================
+   HASTE Admin Dashboard Design System (CSS 규격화)
+   ========================================================================== */
+.admin-table-container {
+  overflow-x: auto;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.admin-table-header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #4b5563;
+  padding: 0.75rem 1rem;
+}
+
+.admin-table-row {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.admin-table-row:hover {
+  background-color: #f9fafb;
+}
+
+.admin-table-cell {
+  padding: 0.75rem 1rem;
+  color: #374151;
+  vertical-align: middle;
+}
+
+/* 어드민용 액션 버튼 */
+.admin-btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.admin-btn-action-primary {
+  background-color: #4a3525;
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+.admin-btn-action-primary:hover {
+  background-color: #38281c;
+}
+
+.admin-btn-action-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+.admin-btn-action-danger:hover {
+  background-color: #dc2626;
+}
+
+.admin-btn-action-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+.admin-btn-action-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+/* 어드민 모달 오버레이 및 컨텐츠 */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(4px);
+}
+
+.admin-modal-content {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 32rem;
+  padding: 1.5rem;
+  position: relative;
+  border: 1px solid #e5e7eb;
+}
+
+/* HASTE Membership Badge Styles */
+.haste-badge-membership {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.375rem; /* px-1.5 py-0.5 */
+  border-radius: 4px; /* rounded-[4px] */
+  font-size: 8px; /* text-[8px] */
+  font-weight: 800; /* font-extrabold */
+  background-color: rgba(197, 160, 89, 0.15); /* bg-[#C5A059]/15 */
+  color: #9c7a3c; /* darker gold for high readability */
+  border: 1px solid rgba(197, 160, 89, 0.4); /* border-[#C5A059]/40 */
+  user-select: none; /* select-none */
+  letter-spacing: -0.025em; /* sharper tiny text */
+}
+
+.haste-badge-haste-membership {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.375rem; /* px-1.5 py-0.5 */
+  border-radius: 4px; /* rounded-[4px] */
+  font-size: 8px; /* text-[8px] */
+  font-weight: 800; /* font-extrabold (increased from 700) */
+  background-color: rgba(197, 160, 89, 0.15); /* bg-[#C5A059]/15 (increased from 0.1) */
+  color: #9c7a3c; /* darker gold for high readability */
+  border: 1px solid rgba(197, 160, 89, 0.4); /* border-[#C5A059]/40 (increased from 0.25) */
+  user-select: none; /* select-none */
+  letter-spacing: -0.025em; /* sharper tiny text */
+}
+
+/* Ensure input fields, textareas, and contenteditables are always selectable, bypassing global select-none */
+input, textarea, [contenteditable="true"], [contenteditable="true"] * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* haste-body-html content width constraints on mobile */
+.haste-body-html {
+  width: 100% !important;
+  line-height: 1.75 !important;
+}
+
+.haste-body-html img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.haste-body-html pre {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+}
+
+.haste-body-html table {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.haste-body-html td,
+.haste-body-html th {
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+}
+
+.haste-body-html h1,
+.haste-body-html h2,
+.haste-body-html h3,
+.haste-body-html h4,
+.haste-body-html h5,
+.haste-body-html h6 {
+  .haste-slider-arrow:active {
+    transform: translateY(-50%) scale(0.9);
+  }
+  .haste-slider-arrow-left {
+    left: 0.375rem; /* left-1.5 */
+  }
+  .haste-slider-arrow-right {
+    right: 0.375rem; /* right-1.5 */
+  }
+  .haste-slider-arrow svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ==========================================================================
+   HASTE Admin Dashboard Design System (CSS 규격화)
+   ========================================================================== */
+.admin-table-container {
+  overflow-x: auto;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.admin-table-header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #4b5563;
+  padding: 0.75rem 1rem;
+}
+
+.admin-table-row {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.admin-table-row:hover {
+  background-color: #f9fafb;
+}
+
+.admin-table-cell {
+  padding: 0.75rem 1rem;
+  color: #374151;
+  vertical-align: middle;
+}
+
+/* 어드민용 액션 버튼 */
+.admin-btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.admin-btn-action-primary {
+  background-color: #4a3525;
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+.admin-btn-action-primary:hover {
+  background-color: #38281c;
+}
+
+.admin-btn-action-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+.admin-btn-action-danger:hover {
+  background-color: #dc2626;
+}
+
+.admin-btn-action-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+.admin-btn-action-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+/* 어드민 모달 오버레이 및 컨텐츠 */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(4px);
+}
+
+.admin-modal-content {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 32rem;
+  padding: 1.5rem;
+  position: relative;
+  border: 1px solid #e5e7eb;
+}
+
+/* HASTE Membership Badge Styles */
+.haste-badge-membership {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.375rem; /* px-1.5 py-0.5 */
+  border-radius: 4px; /* rounded-[4px] */
+  font-size: 8px; /* text-[8px] */
+  font-weight: 700; /* font-bold (increased from 500) */
+  background-color: #f5f5f4; /* bg-stone-100 */
+  color: #292524; /* text-stone-800 (darker for high visibility) */
+  border: 1px solid #d6d3d1; /* border-stone-300 (darker border) */
+  user-select: none; /* select-none */
+  letter-spacing: -0.025em; /* sharper tiny text */
+}
+
+.haste-badge-haste-membership {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.375rem; /* px-1.5 py-0.5 */
+  border-radius: 4px; /* rounded-[4px] */
+  font-size: 8px; /* text-[8px] */
+  font-weight: 800; /* font-extrabold (increased from 700) */
+  background-color: rgba(197, 160, 89, 0.15); /* bg-[#C5A059]/15 (increased from 0.1) */
+  color: #9c7a3c; /* darker gold for high readability */
+  border: 1px solid rgba(197, 160, 89, 0.4); /* border-[#C5A059]/40 (increased from 0.25) */
+  user-select: none; /* select-none */
+  letter-spacing: -0.025em; /* sharper tiny text */
+}
+
+/* Ensure input fields, textareas, and contenteditables are always selectable, bypassing global select-none */
+input, textarea, [contenteditable="true"], [contenteditable="true"] * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+
+
+
+
+
+/* ==========================================
+   HASTE DASHBOARD SYSTEM STYLES
+   ========================================== */
+.dashboard-wrapper {
+  background-color: #0c0b0e;
+  font-family: Pretendard, sans-serif;
+  color: #d6d3d1;
+}
+.dashboard-title-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: #C5A059;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.dashboard-title-main {
+  font-size: 29px;
+  font-weight: 400;
+  color: #e7e5e4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dashboard-card {
+  background-color: rgba(12, 10, 15, 0.75);
+  border: 1px solid #1c1917;
+  border-radius: 16px;
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+.dashboard-card-header {
+  border-bottom: 1px solid #1c1917;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dashboard-card-title {
+  color: #e7e5e4;
+  font-weight: 700;
+  font-size: 14px;
+}
+.dashboard-card-subtitle {
+  font-size: 10px;
+  color: #C5A059;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  display: block;
+}
+.dashboard-grid-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid rgba(28, 25, 23, 0.4);
+  padding-bottom: 6px;
+}
+.dashboard-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #9e9b98;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.dashboard-value {
+  font-size: 14px;
+  font-weight: 400;
+  color: #d6d3d1;
+}
+.dashboard-value-bold {
+  font-size: 14px;
+  font-weight: 700;
+  color: #d6d3d1;
+}
+.dashboard-value-gold {
+  font-size: 14px;
+  font-weight: 700;
+  color: #C5A059;
+}
+.dashboard-value-green {
+  font-size: 14px;
+  font-weight: 700;
+  color: #10b981;
+}
+.dashboard-sidebar-container {
+  width: 192px;
+  background-color: rgba(12, 10, 15, 0.75);
+  border: 1px solid #1c1917;
+  border-radius: 16px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dashboard-sidebar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.dashboard-sidebar-btn-active {
+  background-color: #C5A059;
+  color: #0c0b0e;
+  font-weight: 900;
+}
+.dashboard-sidebar-btn-inactive {
+  color: #a8a29e;
+}
+.dashboard-sidebar-btn-inactive:hover {
+  color: #e7e5e4;
+  background-color: rgba(28, 25, 23, 0.5);
+}
+
+/* ==========================================================================
+   HASTE Operations Guide Responsive Styling (No Inline sizes)
+   ========================================================================== */
+.guide-container {
+  font-family: var(--font-sans) !important;
+}
+
+/* Icon class definitions (Replacing size prop in TSX) */
+.guide-icon-header svg {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+@media (min-width: 768px) {
+  .guide-icon-header svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.guide-icon-tab svg {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+}
+@media (min-width: 768px) {
+  .guide-icon-tab svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.guide-icon-search svg {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.guide-icon-card svg {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  vertical-align: middle;
+}
+@media (min-width: 768px) {
+  .guide-icon-card svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.guide-icon-book svg {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+}
+@media (min-width: 768px) {
+  .guide-icon-book svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.guide-icon-layers svg {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.guide-icon-cpu svg {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   HASTE Dashboard Typography Standards (Simplified & Merged)
+   ========================================================================== */
+
+/* 1. Card & Panel Titles (Merged 16.5px & 15.5px -> 16px) */
+.dashboard-card-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  font-family: var(--font-sans) !important;
+  line-height: 1.375 !important;
+}
+
+.dashboard-panel-title {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: #C5A059 !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* 2. Descriptions (Merged 12.5px & 11.5px -> 12px) */
+.dashboard-desc {
+  font-size: 12px !important;
+  color: #78716c !important; /* text-stone-500 / 550 */
+  font-family: var(--font-sans) !important;
+  line-height: 1.5 !important;
+}
+
+/* 3. Form Labels & Controls (Merged to standard 11px & 13px) */
+.dashboard-form-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #78716c !important; /* text-stone-500 */
+  display: block;
+}
+
+.dashboard-form-control {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* 4. Table Elements (Cascading styles for cleaner markup) */
+.dashboard-table th {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: #a8a29e !important; /* text-stone-400 */
+  padding: 0.75rem !important;
+}
+
+.dashboard-table td {
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: #d6d3d1 !important; /* text-stone-300 */
+  padding: 0.75rem !important;
+}
+
+/* 5. Pricing & Numbers (Standardized to 18px for large price tags) */
+.dashboard-price-large {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  color: #C5A059 !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* 6. Buttons & Action Sizing (Merged 12.5px & 13px -> 13px) */
+.dashboard-btn-text {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+/* 7. Badges & Metadata Sizing (Standardized to 10.5px) */
+.dashboard-badge-text {
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+}
+
