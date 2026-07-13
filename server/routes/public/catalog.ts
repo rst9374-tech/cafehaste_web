@@ -27,7 +27,15 @@ function getCategoryFolderForImage(filename: string): string | null {
 
 // Helper to convert local upload path to live Supabase Storage URL under production/missing environments
 function transformProductionImageUrl(url: string | null | undefined): string {
-  return url || '';
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  if (url.startsWith('/uploads/')) {
+    const relativePath = url.substring(9);
+    return `https://fuzhdcsdfblwcgwfylsx.supabase.co/storage/v1/object/public/cafehaste-bucket/${relativePath}`;
+  }
+  return url;
 }
 
 // Clear public cache stub for backward compatibility
