@@ -57,6 +57,13 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
     }
   }, [selectedMenuItemId, menuItems]);
 
+  useEffect(() => {
+    const isCoffee = selectedCategory === 'ALL' || selectedCategory === 'AMERICANO' || selectedCategory === 'COFFEE_LATTE' || selectedCategory === 'SIGNATURE';
+    if (!isCoffee) {
+      setSelectedBean('ALL');
+    }
+  }, [selectedCategory]);
+
   const searchFilteredItems = React.useMemo(() => {
     let list = [...menuItems];
     if (selectedBean === 'S') {
@@ -124,48 +131,52 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
             전체 메뉴 ({searchFilteredItems.length})
           </button>
 
-          {/* Bean filter buttons permanently visible */}
-          <button
-            onClick={() => setSelectedBean('ALL')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'ALL'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            전체 원두
-          </button>
-          <button
-            onClick={() => setSelectedBean('S')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'S'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            일반 원두
-          </button>
-          <button
-            onClick={() => setSelectedBean('D')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'D'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            디카페인
-          </button>
-          <button
-            onClick={() => setSelectedBean('P')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'P'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            프리미엄
-          </button>
-          <div className="h-5 w-[1px] bg-stone-300 mx-2 shrink-0" />
+          {/* Conditionally render Bean filter buttons (Only for coffee categories or ALL) */}
+          {(selectedCategory === 'ALL' || selectedCategory === 'AMERICANO' || selectedCategory === 'COFFEE_LATTE' || selectedCategory === 'SIGNATURE') && (
+            <>
+              <button
+                onClick={() => setSelectedBean('ALL')}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+                  selectedBean === 'ALL'
+                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                    : 'text-stone-400 border-transparent hover:text-white'
+                }`}
+              >
+                전체 원두
+              </button>
+              <button
+                onClick={() => setSelectedBean('S')}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+                  selectedBean === 'S'
+                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                    : 'text-stone-400 border-transparent hover:text-white'
+                }`}
+              >
+                일반 원두 ({menuItems.filter(item => item.id.startsWith('MS')).length})
+              </button>
+              <button
+                onClick={() => setSelectedBean('D')}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+                  selectedBean === 'D'
+                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                    : 'text-stone-400 border-transparent hover:text-white'
+                }`}
+              >
+                디카페인 ({menuItems.filter(item => item.id.startsWith('MD')).length})
+              </button>
+              <button
+                onClick={() => setSelectedBean('P')}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+                  selectedBean === 'P'
+                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                    : 'text-stone-400 border-transparent hover:text-white'
+                }`}
+              >
+                프리미엄 ({menuItems.filter(item => item.id.startsWith('MP')).length})
+              </button>
+              <div className="h-5 w-[1px] bg-stone-300 mx-2 shrink-0" />
+            </>
+          )}
           <button
             id="menu-cat-btn-SIGNATURE"
             onClick={() => setSelectedCategory('SIGNATURE')}
