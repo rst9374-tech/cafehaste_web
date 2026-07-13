@@ -98,7 +98,16 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
     return list.sort((a, b) => {
       const orderA = (a as any).order_index !== undefined ? (a as any).order_index : ((a as any).orderIndex !== undefined ? (a as any).orderIndex : 99999);
       const orderB = (b as any).order_index !== undefined ? (b as any).order_index : ((b as any).orderIndex !== undefined ? (b as any).orderIndex : 99999);
-      return orderA - orderB;
+      if (orderA !== orderB) return orderA - orderB;
+
+      const getBeanPriority = (item: any) => {
+        const idStr = item.id || '';
+        if (idStr.startsWith('MS')) return 1;
+        if (idStr.startsWith('MP')) return 2;
+        if (idStr.startsWith('MD')) return 3;
+        return 9;
+      };
+      return getBeanPriority(a) - getBeanPriority(b);
     });
   }, [catFilteredItems, selectedBean, selectedCategory]);
 
@@ -204,16 +213,6 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
               일반 원두 ({beanSCount})
             </button>
             <button
-              onClick={() => setSelectedBean('D')}
-              className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
-                selectedBean === 'D'
-                  ? 'bg-stone-900 text-[#C5A059] shadow-xs'
-                  : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/45'
-              }`}
-            >
-              디카페인 ({beanDCount})
-            </button>
-            <button
               onClick={() => setSelectedBean('P')}
               className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
                 selectedBean === 'P'
@@ -222,6 +221,16 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
               }`}
             >
               프리미엄 ({beanPCount})
+            </button>
+            <button
+              onClick={() => setSelectedBean('D')}
+              className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
+                selectedBean === 'D'
+                  ? 'bg-stone-900 text-[#C5A059] shadow-xs'
+                  : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/45'
+              }`}
+            >
+              디카페인 ({beanDCount})
             </button>
           </div>
         </section>
