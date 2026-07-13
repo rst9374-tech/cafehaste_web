@@ -74,8 +74,20 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
     }
   }, [selectedCategory]);
 
-  const searchFilteredItems = React.useMemo(() => {
+  const catFilteredItems = React.useMemo(() => {
     let list = [...menuItems];
+    if (selectedCategory !== 'ALL') {
+      if (selectedCategory === 'SIGNATURE') {
+        list = list.filter(item => item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true);
+      } else {
+        list = list.filter(item => item.category === selectedCategory);
+      }
+    }
+    return list;
+  }, [menuItems, selectedCategory]);
+
+  const searchFilteredItems = React.useMemo(() => {
+    let list = [...catFilteredItems];
     if (selectedBean === 'S') {
       list = list.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE'));
     } else if (selectedBean === 'D') {
@@ -88,19 +100,7 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
       const orderB = (b as any).order_index !== undefined ? (b as any).order_index : ((b as any).orderIndex !== undefined ? (b as any).orderIndex : 99999);
       return orderA - orderB;
     });
-  }, [menuItems, selectedBean]);
-
-  const catFilteredItems = React.useMemo(() => {
-    let list = [...menuItems];
-    if (selectedCategory !== 'ALL') {
-      if (selectedCategory === 'SIGNATURE') {
-        list = list.filter(item => item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true);
-      } else {
-        list = list.filter(item => item.category === selectedCategory);
-      }
-    }
-    return list;
-  }, [menuItems, selectedCategory]);
+  }, [catFilteredItems, selectedBean, selectedCategory]);
 
   const beanAllCount = catFilteredItems.length;
   const beanSCount = catFilteredItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE')).length;
