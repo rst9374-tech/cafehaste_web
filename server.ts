@@ -68,6 +68,7 @@ try {
 }
 
 // Serve uploaded static image resources directly from disk to keep DB fast and light
+app.use('/uploads/menu', express.static(path.join(process.cwd(), 'cafehaste_menu_images_korean')));
 app.use('/uploads', express.static(EXTERNAL_DIR));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
