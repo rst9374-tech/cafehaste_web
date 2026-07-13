@@ -142,6 +142,7 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
 
   const removeItem = (cartItemId: string) => {
     setCart(prev => prev.filter(item => item.id !== cartItemId));
+  };
   return (
     <div id="haste-menu-all-view-root" className="pt-2 md:pt-4 pb-4 md:pb-10 bg-[var(--haste-body-bg)] relative">
 
