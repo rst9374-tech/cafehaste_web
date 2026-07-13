@@ -183,7 +183,6 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
       {(selectedCategory === 'ALL' || selectedCategory === 'AMERICANO' || selectedCategory === 'COFFEE_LATTE' || selectedCategory === 'SIGNATURE') && (
         <section className="max-w-[1440px] mx-auto px-3 md:px-6 mb-4 flex justify-start items-center overflow-x-auto gap-2 scrollbar-none select-none" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="flex gap-1.5 flex-nowrap items-center shrink-0 py-0.5 bg-stone-100/50 p-1 rounded-lg border border-stone-200/40">
-            <span className="text-[10px] font-sans font-bold text-stone-400 px-2 uppercase tracking-wider">원두:</span>
             <button
               onClick={() => setSelectedBean('ALL')}
               className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
