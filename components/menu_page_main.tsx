@@ -138,8 +138,8 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
     <div id="haste-menu-view-root" className="pt-1 md:pt-2 pb-4 md:pb-10 bg-[var(--haste-body-bg)] relative">
       
       {/* Category selector capsules */}
-      <section className="max-w-[1440px] mx-auto px-3 md:px-6 mb-2 md:mb-4 pb-1 flex justify-start md:justify-between items-center overflow-x-auto md:overflow-x-visible md:flex-wrap gap-2 scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
-        <div className="flex gap-1.5 flex-nowrap md:flex-wrap items-center">
+      <section className="max-w-[1440px] mx-auto px-3 md:px-6 mb-2 flex justify-start items-center overflow-x-auto gap-2 scrollbar-none select-none" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="flex gap-1.5 flex-nowrap items-center shrink-0 py-1">
           <button
             id="menu-cat-btn-ALL"
             onClick={() => setSelectedCategory('ALL')}
@@ -147,39 +147,6 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
           >
             전체 메뉴 ({menuItems.length})
           </button>
-
-          {/* Bean filter buttons - permanently fixed and visible */}
-          <button
-            onClick={() => setSelectedBean('S')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'S'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            일반 원두 ({beanSCount})
-          </button>
-          <button
-            onClick={() => setSelectedBean('D')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'D'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            디카페인 ({beanDCount})
-          </button>
-          <button
-            onClick={() => setSelectedBean('P')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'P'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            프리미엄 ({beanPCount})
-          </button>
-          <div className="h-5 w-[1px] bg-stone-300 mx-2 shrink-0" />
           <button
             id="menu-cat-btn-SIGNATURE"
             onClick={() => setSelectedCategory('SIGNATURE')}
@@ -202,6 +169,55 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
           })}
         </div>
       </section>
+
+      {/* Sub Bean Filter Navigation - Visible only for Coffee, All, and Signature */}
+      {(selectedCategory === 'ALL' || selectedCategory === 'AMERICANO' || selectedCategory === 'COFFEE_LATTE' || selectedCategory === 'SIGNATURE') && (
+        <section className="max-w-[1440px] mx-auto px-3 md:px-6 mb-4 flex justify-start items-center overflow-x-auto gap-2 scrollbar-none select-none" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="flex gap-1.5 flex-nowrap items-center shrink-0 py-0.5 bg-stone-100/50 p-1 rounded-lg border border-stone-200/40">
+            <span className="text-[10px] font-sans font-bold text-stone-400 px-2 uppercase tracking-wider">원두:</span>
+            <button
+              onClick={() => setSelectedBean('ALL')}
+              className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
+                selectedBean === 'ALL'
+                  ? 'bg-stone-900 text-[#C5A059] shadow-xs'
+                  : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/45'
+              }`}
+            >
+              전체
+            </button>
+            <button
+              onClick={() => setSelectedBean('S')}
+              className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
+                selectedBean === 'S'
+                  ? 'bg-stone-900 text-[#C5A059] shadow-xs'
+                  : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/45'
+              }`}
+            >
+              일반 원두 ({beanSCount})
+            </button>
+            <button
+              onClick={() => setSelectedBean('D')}
+              className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
+                selectedBean === 'D'
+                  ? 'bg-stone-900 text-[#C5A059] shadow-xs'
+                  : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/45'
+              }`}
+            >
+              디카페인 ({beanDCount})
+            </button>
+            <button
+              onClick={() => setSelectedBean('P')}
+              className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap ${
+                selectedBean === 'P'
+                  ? 'bg-stone-900 text-[#C5A059] shadow-xs'
+                  : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/45'
+              }`}
+            >
+              프리미엄 ({beanPCount})
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Main menu item cards bento-grid */}
       <section className="max-w-[1440px] mx-auto px-3 sm:px-6 mb-4 md:mb-10">
