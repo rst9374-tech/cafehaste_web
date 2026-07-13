@@ -161,16 +161,6 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
 
           {/* Bean filter buttons - permanently fixed and visible */}
           <button
-            onClick={() => setSelectedBean('ALL')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-              selectedBean === 'ALL'
-                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                : 'text-stone-400 border-transparent hover:text-white'
-            }`}
-          >
-            전체 원두
-          </button>
-          <button
             onClick={() => setSelectedBean('S')}
             className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
               selectedBean === 'S'
