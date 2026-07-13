@@ -311,8 +311,8 @@ router.get('/api/menu-items-all', async (req, res) => {
     if (dbPool.isFallback) {
       items = STATIC_MENU_ITEMS;
     } else {
-      // 전체 결합 마스터 조회
-      const [rows]: any = await dbPool.query("SELECT * FROM web_menu_items_all ORDER BY order_index ASC, id ASC");
+      // 대표 메뉴 304종 조회 (M% 접두사 필터링)
+      const [rows]: any = await dbPool.query("SELECT * FROM web_menu_items_all WHERE visible = true AND id LIKE 'M%' ORDER BY order_index ASC, id ASC");
       items = (rows || []).map((row: any) => ({
         ...row,
         nameKr: row.name_kr || row.nameKr || '',
@@ -482,7 +482,7 @@ router.get('/api/menu-bulk', async (req, res) => {
     if (dbPool.isFallback) {
       items = STATIC_MENU_ITEMS;
     } else {
-      const [rows]: any = await dbPool.query('SELECT * FROM web_menu_items_all WHERE visible = true');
+      const [rows]: any = await dbPool.query('SELECT * FROM web_menu_items WHERE visible = true');
       items = rows || [];
     }
     
