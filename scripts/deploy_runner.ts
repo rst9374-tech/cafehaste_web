@@ -49,9 +49,8 @@ try {
   execSync('npm run build', { stdio: 'inherit' });
   console.log('빌드 성공! 구글 클라우드 런 배포 시작...');
   execSync(deployCmd, { stdio: 'inherit' });
-  console.log('배포가 성공적으로 완료되었습니다. 이어서 Git 히스토리 자동 최적화 및 강제 푸시를 시작합니다...');
-  execSync('npm run git:flatten', { stdio: 'inherit' });
+  console.log('배포가 성공적으로 완료되었습니다.');
 } catch (error) {
-  console.error('배포 및 최적화 중 에러가 발생했습니다:', error);
+  console.error('배포 중 에러가 발생했습니다:', error);
   process.exit(1);
 }
