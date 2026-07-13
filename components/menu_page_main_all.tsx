@@ -90,6 +90,23 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
     });
   }, [menuItems, selectedBean]);
 
+  const catFilteredItems = React.useMemo(() => {
+    let list = [...menuItems];
+    if (selectedCategory !== 'ALL') {
+      if (selectedCategory === 'SIGNATURE') {
+        list = list.filter(item => item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true);
+      } else {
+        list = list.filter(item => item.category === selectedCategory);
+      }
+    }
+    return list;
+  }, [menuItems, selectedCategory]);
+
+  const beanAllCount = catFilteredItems.length;
+  const beanSCount = catFilteredItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE')).length;
+  const beanDCount = catFilteredItems.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D').length;
+  const beanPCount = catFilteredItems.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P').length;
+
   const filteredItems = searchFilteredItems.filter(item => {
     if (selectedCategory === 'ALL') return true;
     if (selectedCategory === 'SIGNATURE') {
@@ -142,52 +159,48 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
             전체 메뉴 ({searchFilteredItems.length})
           </button>
 
-          {/* Conditionally render Bean filter buttons (Only for coffee categories or ALL) */}
-          {(selectedCategory === 'ALL' || selectedCategory === 'AMERICANO' || selectedCategory === 'COFFEE_LATTE' || selectedCategory === 'SIGNATURE') && (
-            <>
-              <button
-                onClick={() => setSelectedBean('ALL')}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-                  selectedBean === 'ALL'
-                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                    : 'text-stone-400 border-transparent hover:text-white'
-                }`}
-              >
-                전체 원두
-              </button>
-              <button
-                onClick={() => setSelectedBean('S')}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-                  selectedBean === 'S'
-                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                    : 'text-stone-400 border-transparent hover:text-white'
-                }`}
-              >
-                일반 원두 ({menuItems.filter(item => item.id.startsWith('MS')).length})
-              </button>
-              <button
-                onClick={() => setSelectedBean('D')}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-                  selectedBean === 'D'
-                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                    : 'text-stone-400 border-transparent hover:text-white'
-                }`}
-              >
-                디카페인 ({menuItems.filter(item => item.id.startsWith('MD')).length})
-              </button>
-              <button
-                onClick={() => setSelectedBean('P')}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
-                  selectedBean === 'P'
-                    ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
-                    : 'text-stone-400 border-transparent hover:text-white'
-                }`}
-              >
-                프리미엄 ({menuItems.filter(item => item.id.startsWith('MP')).length})
-              </button>
-              <div className="h-5 w-[1px] bg-stone-300 mx-2 shrink-0" />
-            </>
-          )}
+          {/* Bean filter buttons - permanently fixed and visible */}
+          <button
+            onClick={() => setSelectedBean('ALL')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+              selectedBean === 'ALL'
+                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                : 'text-stone-400 border-transparent hover:text-white'
+            }`}
+          >
+            전체 원두 ({beanAllCount})
+          </button>
+          <button
+            onClick={() => setSelectedBean('S')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+              selectedBean === 'S'
+                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                : 'text-stone-400 border-transparent hover:text-white'
+            }`}
+          >
+            일반 원두 ({beanSCount})
+          </button>
+          <button
+            onClick={() => setSelectedBean('D')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+              selectedBean === 'D'
+                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                : 'text-stone-400 border-transparent hover:text-white'
+            }`}
+          >
+            디카페인 ({beanDCount})
+          </button>
+          <button
+            onClick={() => setSelectedBean('P')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all tracking-wider cursor-pointer whitespace-nowrap bg-stone-900 border ${
+              selectedBean === 'P'
+                ? 'text-[#C5A059] border-[#C5A059] shadow-md font-extrabold'
+                : 'text-stone-400 border-transparent hover:text-white'
+            }`}
+          >
+            프리미엄 ({beanPCount})
+          </button>
+          <div className="h-5 w-[1px] bg-stone-300 mx-2 shrink-0" />
 
           <button
             id="menu-all-cat-btn-SIGNATURE"
