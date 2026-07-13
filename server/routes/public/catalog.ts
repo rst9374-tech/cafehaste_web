@@ -27,25 +27,7 @@ function getCategoryFolderForImage(filename: string): string | null {
 
 // Helper to convert local upload path to live Supabase Storage URL under production/missing environments
 function transformProductionImageUrl(url: string | null | undefined): string {
-  if (!url) return '';
-
-  if (url.includes('menu_all_uploads')) {
-    return url;
-  }
-
-  if (url.includes('supabase.co')) {
-    const bucketIndex = url.indexOf('cafehaste-bucket/');
-    if (bucketIndex !== -1) {
-      const relativePath = url.substring(bucketIndex + 17);
-      return `/uploads/${relativePath}`;
-    }
-  }
-
-  if (url.startsWith('/uploads/')) {
-    return url;
-  }
-
-  return url;
+  return url || '';
 }
 
 // Clear public cache stub for backward compatibility
