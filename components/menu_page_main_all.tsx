@@ -89,11 +89,11 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
   const searchFilteredItems = React.useMemo(() => {
     let list = [...catFilteredItems];
     if (selectedBean === 'S') {
-      list = list.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null);
+      list = list.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null);
     } else if (selectedBean === 'D') {
-      list = list.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D');
+      list = list.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MD') || (item as any).bean_type === 'D');
     } else if (selectedBean === 'P') {
-      list = list.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P');
+      list = list.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MP') || (item as any).bean_type === 'P');
     }
     return list.sort((a, b) => {
       const orderA = (a as any).order_index !== undefined ? (a as any).order_index : ((a as any).orderIndex !== undefined ? (a as any).orderIndex : 99999);
@@ -101,7 +101,7 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
       if (orderA !== orderB) return orderA - orderB;
 
       const getBeanPriority = (item: any) => {
-        const idStr = item.id || '';
+        const idStr = String(item.original_id || item.originalId || item.id || '');
         if (idStr.startsWith('MS')) return 1;
         if (idStr.startsWith('MP')) return 2;
         if (idStr.startsWith('MD')) return 3;
@@ -112,9 +112,9 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
   }, [catFilteredItems, selectedBean, selectedCategory]);
 
   const beanAllCount = menuItems.length;
-  const beanSCount = menuItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null).length;
-  const beanDCount = menuItems.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D').length;
-  const beanPCount = menuItems.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P').length;
+  const beanSCount = menuItems.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null).length;
+  const beanDCount = menuItems.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MD') || (item as any).bean_type === 'D').length;
+  const beanPCount = menuItems.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MP') || (item as any).bean_type === 'P').length;
 
   const filteredItems = searchFilteredItems.filter(item => {
     if (selectedCategory === 'ALL') return true;

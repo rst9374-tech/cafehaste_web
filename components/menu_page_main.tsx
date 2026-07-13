@@ -91,7 +91,7 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
       if (orderA !== orderB) return orderA - orderB;
 
       const getBeanPriority = (item: any) => {
-        const idStr = item.id || '';
+        const idStr = String(item.original_id || item.originalId || item.id || '');
         if (idStr.startsWith('MS')) return 1;
         if (idStr.startsWith('MP')) return 2;
         if (idStr.startsWith('MD')) return 3;
@@ -102,14 +102,15 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
   }, [catFilteredItems, selectedBean, selectedCategory]);
 
   const beanAllCount = menuItems.length;
-  const beanSCount = menuItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S').length;
-  const beanDCount = menuItems.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D').length;
-  const beanPCount = menuItems.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P').length;
+  const beanSCount = menuItems.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MS') || (item as any).bean_type === 'S').length;
+  const beanDCount = menuItems.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MD') || (item as any).bean_type === 'D').length;
+  const beanPCount = menuItems.filter(item => String(item.original_id || item.originalId || item.id).startsWith('MP') || (item as any).bean_type === 'P').length;
 
   const filteredItems = searchFilteredItems.filter(item => {
     if (selectedCategory === 'ALL') return true;
     if (selectedCategory === 'SIGNATURE') {
-      return (item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true) && !item.id.endsWith('_D') && !item.id.endsWith('_P');
+      const idStr = String(item.original_id || item.originalId || item.id);
+      return (item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true) && !idStr.endsWith('_D') && !idStr.endsWith('_P');
     }
     return item.category === selectedCategory;
   });

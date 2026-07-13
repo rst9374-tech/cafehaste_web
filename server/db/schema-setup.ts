@@ -2,13 +2,7 @@ import { runTableRenames, seedInitialData } from './seeder';
 import * as serverDefaults from '../../serverDefaults';
 
 export async function setupDatabaseSchema(connection: any, database: string) {
-  // Purge redundant web_menu_items table per USER request
-  try {
-    await connection.query('DROP TABLE IF EXISTS web_menu_items CASCADE');
-    console.log('[DB Schema] Redundant web_menu_items table dropped successfully.');
-  } catch (err) {
-    console.error('[DB Schema Warning] Failed to drop web_menu_items:', err);
-  }
+  // web_menu_items is now preserved and used for clean homepage representation.
 
   // 1. Run Legacy Table Reroutes (haste_ to web_)
   await runTableRenames(connection, database);
