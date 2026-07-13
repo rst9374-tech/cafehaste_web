@@ -102,10 +102,10 @@ export const HasteMenuAll: React.FC<HasteMenuAllProps> = ({
     });
   }, [catFilteredItems, selectedBean, selectedCategory]);
 
-  const beanAllCount = catFilteredItems.length;
-  const beanSCount = catFilteredItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null).length;
-  const beanDCount = catFilteredItems.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D').length;
-  const beanPCount = catFilteredItems.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P').length;
+  const beanAllCount = menuItems.length;
+  const beanSCount = menuItems.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || !(item as any).bean_type || (item as any).bean_type === null).length;
+  const beanDCount = menuItems.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D').length;
+  const beanPCount = menuItems.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P').length;
 
   const filteredItems = searchFilteredItems.filter(item => {
     if (selectedCategory === 'ALL') return true;
