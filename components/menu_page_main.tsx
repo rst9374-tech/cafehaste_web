@@ -60,11 +60,11 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
   const searchFilteredItems = React.useMemo(() => {
     let list = [...menuItems];
     if (selectedBean === 'S') {
-      list = list.filter(item => item.id.endsWith('_S') || (item as any).bean_type === 'S');
+      list = list.filter(item => item.id.startsWith('MS') || (item as any).bean_type === 'S' || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE'));
     } else if (selectedBean === 'D') {
-      list = list.filter(item => item.id.endsWith('_D') || (item as any).bean_type === 'D' || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE'));
+      list = list.filter(item => item.id.startsWith('MD') || (item as any).bean_type === 'D');
     } else if (selectedBean === 'P') {
-      list = list.filter(item => item.id.endsWith('_P') || (item as any).bean_type === 'P' || (item.category !== 'AMERICANO' && item.category !== 'COFFEE_LATTE'));
+      list = list.filter(item => item.id.startsWith('MP') || (item as any).bean_type === 'P');
     }
     return list.sort((a, b) => {
       const orderA = (a as any).order_index !== undefined ? (a as any).order_index : ((a as any).orderIndex !== undefined ? (a as any).orderIndex : 99999);

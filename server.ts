@@ -1,7 +1,21 @@
-import express from 'express';
-import path from 'path';
-import cors from 'cors';
 import fs from 'fs';
+import path from 'path';
+try {
+  const envContent = fs.readFileSync(path.resolve(process.cwd(), '.env'), 'utf-8');
+  envContent.split(/\r?\n/).forEach((line: string) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const match = trimmed.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      process.env[match[1].trim()] = match[2].trim().replace(/^["']|["']$/g, '');
+    }
+  });
+} catch (e) {
+  console.warn('[Env Warning] .env file load failed, skipping local assignment.');
+}
+
+import express from 'express';
+import cors from 'cors';
 import adminRouter from './server/routes/admin.ts';
 import publicRouter from './server/routes/public';
 import { rateLimiterMiddleware } from './server/middleware/rate_limiter';
