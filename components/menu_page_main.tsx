@@ -195,10 +195,10 @@ export const HasteMenu: React.FC<HasteMenuProps> = ({
             onClick={() => setSelectedCategory('SIGNATURE')}
             className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all tracking-wider cursor-pointer whitespace-nowrap ${ selectedCategory === 'SIGNATURE' ? 'bg-[#C5A059] text-stone-950 font-extrabold shadow-md' : 'bg-white hover:bg-stone-50 border border-stone-200 haste-body-text-2 !font-bold' }`}
           >
-            ⭐ 시그니처 ({searchFilteredItems.filter(item => item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true).length})
+            ⭐ 시그니처 ({menuItems.filter(item => item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true).length})
           </button>
           {categories.map(cat => {
-            const catItemCount = searchFilteredItems.filter(it => it.category === cat.id).length;
+            const catItemCount = menuItems.filter(it => it.category === cat.id).length;
             return (
               <button
                 id={`menu-cat-btn-${cat.id}`}
