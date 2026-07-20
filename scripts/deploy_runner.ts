@@ -64,7 +64,7 @@ for (const [k, v] of Object.entries(varsToExport)) {
 fs.writeFileSync(yamlPath, yamlContent, 'utf-8');
 
 // 배포 명령어 구성 (--env-vars-file 옵션 적용)
-const deployCmd = `gcloud run deploy cafehaste-web-sdb --source . --region asia-northeast1 --allow-unauthenticated --project cafehaste-zero --env-vars-file env.yaml --port 3000 --quiet`;
+const deployCmd = `gcloud run deploy cafehaste-web --source . --region asia-northeast3 --allow-unauthenticated --project cafehaste-zero --env-vars-file env.yaml --port 3000 --quiet`;
 
 console.log('로컬 빌드(npm run build) 가동 중...');
 try {
