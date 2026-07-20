@@ -414,14 +414,14 @@ export const AdminMusicSongTab: React.FC<AdminMusicSongTabProps> = ({
                     </button>
                     <button
                       onClick={() => handleOpenEditModal(song)}
-                      className="p-2 border border-stone-200 text-stone-500 hover:text-[#C5A059] hover:border-[#C5A059]/40 hover:bg-stone-50 rounded-xl transition-colors cursor-pointer"
+                      className="admin-btn-action-edit"
                       title="수정하기"
                     >
                       <Edit size={13} />
                     </button>
                     <button
                       onClick={() => handleDeleteSong(song.id)}
-                      className="p-2 border border-stone-200 hover:border-rose-200 hover:bg-rose-50 text-stone-400 hover:text-rose-600 rounded-xl transition-all cursor-pointer"
+                      className="admin-btn-action-delete"
                       title="삭제"
                     >
                       <Trash2 size={13} />

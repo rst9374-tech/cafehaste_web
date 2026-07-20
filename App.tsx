@@ -36,10 +36,7 @@ export default function App() {
         return true;
       }
 
-      // 2. 중요 검수 및 테스트 페이지인 '/test' 경로는 가림막 대상에서 제외하여 항시 오픈
-      if (pathname === '/test' || pathname === '/test/') {
-        return true;
-      }
+
 
       // 3. 실제 본사 관리자 로그인 세션 정보 체크 (24시간 동안 유효)
       const adminAuth = localStorage.getItem('haste_admin_auth') === 'true';
@@ -239,7 +236,7 @@ export default function App() {
     );
   }
 
-  const isNavbarLight = (ctrl.currentRoute !== 'HOME' && ctrl.currentRoute !== 'FILM' && ctrl.currentRoute !== 'MUSIC' && ctrl.currentRoute !== 'CONTROL' && ctrl.currentRoute !== 'MYINFO') || ctrl.mobileMenuOpen;
+  const isNavbarLight = (ctrl.currentRoute !== 'HOME' && ctrl.currentRoute !== 'FILM' && ctrl.currentRoute !== 'MUSIC' && ctrl.currentRoute !== 'ADMIN' && ctrl.currentRoute !== 'LILLY_DASHBOARD' && ctrl.currentRoute !== 'CONTROL' && ctrl.currentRoute !== 'MYINFO') || ctrl.mobileMenuOpen;
 
   return (
     <HomeSimulator
@@ -247,7 +244,7 @@ export default function App() {
       setMockMobileFrame={ctrl.setMockMobileFrame}
       handleTouchStart={handleTouchStart}
       handleTouchEnd={handleTouchEnd}
-      isFilm={ctrl.currentRoute === 'FILM' || ctrl.currentRoute === 'MUSIC' || ctrl.currentRoute === 'CONTROL'}
+      isFilm={ctrl.currentRoute === 'FILM' || ctrl.currentRoute === 'MUSIC' || ctrl.currentRoute === 'ADMIN' || ctrl.currentRoute === 'LILLY_DASHBOARD' || ctrl.currentRoute === 'CONTROL' || ctrl.currentRoute === 'MYINFO'}
     >
       <HomeCompRoutes
         ctrl={ctrl}

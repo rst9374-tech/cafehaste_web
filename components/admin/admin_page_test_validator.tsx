@@ -606,7 +606,7 @@ export const AdminPageTestValidator: React.FC<AdminPageTestValidatorProps> = ({ 
             }`}
           >
             <Clock size={14} />
-            커피머신 연동 검증 (기존) (v1.2.0)
+            커피머신 연동 검증 (기존) (v2.6.2)
           </button>
           <button
             type="button"
@@ -618,7 +618,7 @@ export const AdminPageTestValidator: React.FC<AdminPageTestValidatorProps> = ({ 
             }`}
           >
             <Layers size={14} />
-            토스 키오스크 연동 검증 (v2.4.0)
+            토스 키오스크 연동 검증 (v2.6.2)
           </button>
         </div>
       )}
@@ -766,7 +766,7 @@ export const AdminPageTestValidator: React.FC<AdminPageTestValidatorProps> = ({ 
             <div className="flex justify-between items-center border-b border-stone-100 pb-2.5">
               <h4 className="text-sm font-bold text-stone-900 flex items-center gap-1.5">
                 <FileJson size={16} className="text-[#C5A059]" />
-                <span>자바로컬서버연동 API 규격서 (v1.2.0)</span>
+                <span>자바로컬서버연동 API 규격서 (v2.6.2)</span>
               </h4>
               <div className="flex gap-1.5 items-center flex-wrap">
                 <a
@@ -1411,7 +1411,7 @@ export const AdminPageTestValidator: React.FC<AdminPageTestValidatorProps> = ({ 
               <div className="flex justify-between items-center border-b border-stone-100 pb-2.5 flex-wrap gap-2">
                 <h4 className="text-sm font-bold text-stone-900 flex items-center gap-1.5">
                   <FileJson size={16} className="text-[#C5A059]" />
-                  <span>토스 키오스크 로컬 연동 API 규격서 (v2.4.0)</span>
+                  <span>토스 키오스크 로컬 연동 API 규격서 (v2.6.2)</span>
                 </h4>
                 <div className="flex gap-1.5 items-center flex-wrap">
                   <a

@@ -12,6 +12,7 @@ import licenseLogsRouter from './admin/license_logs';
 import cleanRouter from './admin/clean';
 import hqstampRouter from './admin/hqstamp';
 import kakaoInjectorRouter from './admin/kakao_injector';
+import settingsRouter from './admin/settings';
 
 const router = Router();
 
@@ -29,5 +30,6 @@ router.use(licenseLogsRouter);
 router.use(cleanRouter);
 router.use(hqstampRouter);
 router.use(kakaoInjectorRouter);
+router.use(settingsRouter);
 
 export default router;

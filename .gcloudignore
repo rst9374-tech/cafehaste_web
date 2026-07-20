@@ -5,6 +5,8 @@
 node_modules/
 /uploads/
 /external_uploads/
+dist/uploads/
+dist/uploads/**
 !public/uploads/
 !public/uploads/**
 *.log

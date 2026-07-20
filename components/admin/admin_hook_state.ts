@@ -34,6 +34,12 @@ export const useAdminState = ({ interiorsList, onUpdateInteriors }: UseAdminStat
   });
 
   useEffect(() => {
+    // Clear out legacy local storage cache to prevent React rendering crashes
+    localStorage.removeItem('haste_mock_menu_items');
+    localStorage.removeItem('haste_mock_categories');
+  }, []);
+
+  useEffect(() => {
     if (isAdminAuth) {
       const checkExpiry = () => {
         const loginTimeStr = localStorage.getItem('haste_admin_login_time');
@@ -106,7 +112,7 @@ export const useAdminState = ({ interiorsList, onUpdateInteriors }: UseAdminStat
     }
   });
 
-  const [adminMenuItemsAll, setAdminMenuItemsAll] = useState<any[]>([]);
+
 
   const [cloudMembers, setCloudMembers] = useState<any[]>(() => {
     try {
@@ -426,8 +432,6 @@ export const useAdminState = ({ interiorsList, onUpdateInteriors }: UseAdminStat
     setAdminCategories,
     adminMenuItems,
     setAdminMenuItems,
-    adminMenuItemsAll,
-    setAdminMenuItemsAll,
     cloudMembers,
     setCloudMembers,
     isFetchingCloud,

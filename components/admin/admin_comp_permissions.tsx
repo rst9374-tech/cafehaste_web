@@ -21,6 +21,7 @@ export const AdminPermissionsTab: React.FC<AdminPermissionsTabProps> = ({
   showTemporaryError
 }) => {
   const [permissions, setPermissions] = useState<PermissionItem[]>([]);
+  const [activeGrade, setActiveGrade] = useState<string>('일반');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -116,12 +117,12 @@ export const AdminPermissionsTab: React.FC<AdminPermissionsTabProps> = ({
 
   return (
     <div className="w-full font-sans animate-in fade-in duration-300">
-      <div className="flex items-center justify-between border-b border-stone-200 pb-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-900 pb-4 mb-5 gap-3">
         <div>
           <span className="text-[10px] font-mono font-bold text-[#C5A059] tracking-[0.3em] uppercase block mb-1">
             HASTE PERMISSION ENGINE
           </span>
-          <h2 className="font-sans font-normal leading-tight text-stone-900 tracking-tight text-2xl md:text-3xl">
+          <h2 className="font-sans font-normal leading-tight text-stone-100 tracking-tight text-xl md:text-2xl">
             등급별 게시판 권한 설정
           </h2>
         </div>
@@ -131,104 +132,114 @@ export const AdminPermissionsTab: React.FC<AdminPermissionsTabProps> = ({
             type="button"
             onClick={fetchPermissions}
             disabled={isLoading}
-            className="p-2.5 bg-white border border-stone-200 rounded-2xl hover:bg-stone-50 transition-all text-stone-650 active:scale-95 cursor-pointer shadow-xs disabled:opacity-50"
+            className="p-2 bg-stone-900 hover:bg-stone-850 border border-stone-900 rounded-xl transition-all text-stone-400 active:scale-95 cursor-pointer shadow-xs disabled:opacity-50"
           >
-            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={isLoading ? 'animate-spin' : ''} />
           </button>
           <button
             type="button"
             onClick={() => setShowConfirm(true)}
             disabled={isSaving || isLoading}
-            className="bg-stone-900 hover:bg-stone-850 text-[#C5A059] font-bold py-3.5 px-5 rounded-2xl border border-stone-800 transition-all text-xs flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+            className="bg-stone-900 hover:bg-stone-850 text-[#C5A059] font-bold py-2 px-4 rounded-xl border border-stone-900 transition-all text-xs flex items-center gap-1.5 cursor-pointer shadow-md disabled:opacity-50"
           >
-            <Save size={14} />
+            <Save size={13} />
             <span>설정 저장하기</span>
           </button>
         </div>
       </div>
 
+      {/* 4개의 등급 설정 탭 (1줄 배치, 흰색 테두리 배제) */}
+      <div className="flex flex-nowrap items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-3 border-b border-stone-900 mb-4 select-none">
+        {grades.map(grade => {
+          const isActive = activeGrade === grade;
+          return (
+            <button
+              key={grade}
+              onClick={() => setActiveGrade(grade)}
+              className={`h-8 px-4 border transition-all cursor-pointer rounded-full text-xs font-bold flex items-center focus:outline-none whitespace-nowrap active:scale-95 ${
+                isActive
+                  ? 'bg-stone-900 border-[#C5A059]/40 text-[#C5A059] shadow-sm'
+                  : 'bg-stone-950 hover:bg-stone-900 border-stone-900 text-stone-400'
+              }`}
+            >
+              <span>{grade === '일반' ? '일반 회원' : grade === '멤버십' ? '멤버십 회원' : grade === '프리미엄' ? '프리미엄 멤버십' : grade === '임원' ? '임원 등급 매장' : grade}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {isLoading ? (
-        <div className="py-24 text-center text-stone-450 text-xs font-semibold flex flex-col items-center gap-2 justify-center">
-          <RefreshCw size={24} className="animate-spin text-[#C5A059]" />
+        <div className="py-24 text-center text-stone-500 text-xs font-semibold flex flex-col items-center gap-2 justify-center">
+          <RefreshCw size={20} className="animate-spin text-[#C5A059]" />
           <span>권한 설정표 로딩중...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {grades.map(grade => {
-            return (
-              <div key={grade} className="bg-white border border-stone-200 rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4">
-                <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[#C5A059]/10 text-[#C5A059] flex items-center justify-center">
-                      <Shield size={16} />
-                    </div>
-                    <span className="font-sans font-bold text-stone-900 text-base md:text-lg">
-                      {grade === '일반' ? '일반 (가입하지 않은 회원)' : grade === '멤버십' ? '멤버십 회원' : grade === '프리미엄' ? '헤이스트멤버십 회원' : grade === '임원' ? '임원 등급 매장' : grade}
-                    </span>
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold font-sans tracking-wide bg-stone-900 text-[#C5A059] border border-stone-850">
-                    ROLE_GRADE
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-stone-50 border-b border-stone-150 text-stone-500 font-bold uppercase tracking-wider text-[9px]">
-                        <th className="py-2.5 px-3">카테고리</th>
-                        <th className="py-2.5 px-3 text-center w-24">목록 (List)</th>
-                        <th className="py-2.5 px-3 text-center w-24">읽기 (Read)</th>
-                        <th className="py-2.5 px-3 text-center w-24">쓰기 (Write)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-100 font-medium">
-                      {categories.map(cat => {
-                        const perm = getPermission(grade, cat);
-                        return (
-                          <tr key={cat} className="hover:bg-stone-50/50">
-                            <td className="py-3.5 px-3 font-semibold text-stone-750 text-xs">{cat === '헤이스트소식' ? '소식' : cat === '노하우팁' ? '노하우팁' : cat}</td>
-                            <td className="py-3.5 px-3 text-center">
-                              <label className="inline-flex items-center justify-center cursor-pointer select-none">
-                                <input
-                                  type="checkbox"
-                                  checked={perm.canList === 1}
-                                  onChange={() => handleToggle(grade, cat, 'canList')}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white peer-checked:after:bg-white after:border-stone-300 after:border after:rounded-full after:height-4 after:width-4 after:h-4 after:w-4 after:transition-all peer-checked:bg-[#C5A059] relative transition-colors duration-200"></div>
-                              </label>
-                            </td>
-                            <td className="py-3.5 px-3 text-center">
-                              <label className="inline-flex items-center justify-center cursor-pointer select-none">
-                                <input
-                                  type="checkbox"
-                                  checked={perm.canRead === 1}
-                                  onChange={() => handleToggle(grade, cat, 'canRead')}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white peer-checked:after:bg-white after:border-stone-300 after:border after:rounded-full after:height-4 after:width-4 after:h-4 after:w-4 after:transition-all peer-checked:bg-[#C5A059] relative transition-colors duration-200"></div>
-                              </label>
-                            </td>
-                            <td className="py-3.5 px-3 text-center">
-                              <label className="inline-flex items-center justify-center cursor-pointer select-none">
-                                <input
-                                  type="checkbox"
-                                  checked={perm.canWrite === 1}
-                                  onChange={() => handleToggle(grade, cat, 'canWrite')}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white peer-checked:after:bg-white after:border-stone-300 after:border after:rounded-full after:height-4 after:width-4 after:h-4 after:w-4 after:transition-all peer-checked:bg-[#C5A059] relative transition-colors duration-200"></div>
-                              </label>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          })}
+        <div className="bg-stone-950 border border-stone-900 rounded-2xl p-4 shadow-sm overflow-hidden select-none">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-stone-900 bg-stone-900/30 text-stone-350 font-extrabold uppercase tracking-wider text-[10px] text-center">
+                  <th className="py-3 px-4 text-left w-64 border-r border-stone-900">
+                    게시판 카테고리
+                  </th>
+                  <th className="py-3 px-3 border-r border-stone-900 text-center font-extrabold w-28">목록 (List)</th>
+                  <th className="py-3 px-3 border-r border-stone-900 text-center font-extrabold w-28">읽기 (Read)</th>
+                  <th className="py-3 px-3 text-center font-extrabold w-28">쓰기 (Write)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-900 font-semibold text-xs text-stone-300">
+                {categories.map(cat => {
+                  const perm = getPermission(activeGrade, cat);
+                  return (
+                    <tr key={cat} className="hover:bg-stone-900/10 transition-colors">
+                      <td className="py-4 px-4 font-bold text-stone-200 border-r border-stone-900 text-[12px]">
+                        {cat === '헤이스트소식' ? '소식' : cat === '노하우팁' ? '노하우팁' : cat}
+                      </td>
+                      
+                      {/* 목록 권한 (List) */}
+                      <td className="py-3 px-3 text-center border-r border-stone-900">
+                        <label className="inline-flex items-center justify-center cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={perm.canList === 1}
+                            onChange={() => handleToggle(activeGrade, cat, 'canList')}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-stone-900 border border-stone-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-stone-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-stone-600 peer-checked:after:bg-[#C5A059] after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-[#C5A059]/10 peer-checked:border-[#C5A059]/30 relative transition-colors duration-250"></div>
+                        </label>
+                      </td>
+                      
+                      {/* 읽기 권한 (Read) */}
+                      <td className="py-3 px-3 text-center border-r border-stone-900">
+                        <label className="inline-flex items-center justify-center cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={perm.canRead === 1}
+                            onChange={() => handleToggle(activeGrade, cat, 'canRead')}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-stone-900 border border-stone-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-stone-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-stone-600 peer-checked:after:bg-[#C5A059] after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-[#C5A059]/10 peer-checked:border-[#C5A059]/30 relative transition-colors duration-250"></div>
+                        </label>
+                      </td>
+                      
+                      {/* 쓰기 권한 (Write) */}
+                      <td className="py-3 px-3 text-center">
+                        <label className="inline-flex items-center justify-center cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={perm.canWrite === 1}
+                            onChange={() => handleToggle(activeGrade, cat, 'canWrite')}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-stone-900 border border-stone-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-stone-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-stone-600 peer-checked:after:bg-[#C5A059] after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-[#C5A059]/10 peer-checked:border-[#C5A059]/30 relative transition-colors duration-250"></div>
+                        </label>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

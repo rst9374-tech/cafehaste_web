@@ -1,12 +1,12 @@
 import path from 'path';
 import fs from 'fs';
-import * as serverDefaults from '../../serverDefaults';
+import * as serverDefaults from '../serverDefaults';
 
 const DEFAULT_LICENSES = serverDefaults.DEFAULT_LICENSES;
 const DEFAULT_CATEGORIES = serverDefaults.DEFAULT_CATEGORIES;
 const DEFAULT_MENU_ITEMS = serverDefaults.DEFAULT_MENU_ITEMS;
 const DEFAULT_FILMS = serverDefaults.DEFAULT_FILMS;
-const DEFAULT_DRAFTS = serverDefaults.DEFAULT_DRAFTS;
+const DEFAULT_DRAFTS: any[] = [];
 const DEFAULT_INTERIORS = serverDefaults.DEFAULT_INTERIORS;
 const DEFAULT_SOUNDS = (serverDefaults as any).DEFAULT_SOUNDS || [];
 
@@ -215,7 +215,7 @@ export async function seedInitialData(connection: any) {
       for (const item of DEFAULT_MENU_ITEMS) {
         const isSig = !!(item.isSignature || item.is_signature || ['AME_HOT_LIGHT', 'AME_ICED_LIGHT', 'AME_HOT', 'AME_ICED'].includes(item.id));
         await connection.query(
-          'INSERT INTO web_menu_items (id, name, name_kr, category, image, description, acidity, sweetness, body, bitterness, visible, is_signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, true, ?)',
+          'INSERT INTO web_menu_items (id, name, name_kr, category, image_url, description, acidity, sweetness, body, bitterness, visible, is_signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, true, ?)',
           [
             item.id,
             item.name || item.nameEng || '',
@@ -232,36 +232,6 @@ export async function seedInitialData(connection: any) {
         );
       }
       console.log('[DB Seeding Success] Initial Menu categories and items seeded smoothly.');
-    } else {
-      // DB has data! Respect the DB completely. We must NEVER wipe, delete or bulk-overwrite DB content.
-      // To apply the user's updated natural description, name and name_kr, we perform soft-patching on text columns.
-      try {
-        const localMenuItemsFile = path.join(process.cwd(), 'local_menu_items.json');
-        let localMenuItems: any[] = [];
-        if (fs.existsSync(localMenuItemsFile)) {
-          try {
-            localMenuItems = JSON.parse(fs.readFileSync(localMenuItemsFile, 'utf-8'));
-          } catch (err) {
-            console.warn('[DB Seeding Warn] Failed to parse local_menu_items.json:', err);
-          }
-        }
-
-        const itemsToUpdate = localMenuItems.length > 0 ? localMenuItems : DEFAULT_MENU_ITEMS;
-        console.log(`[DB Seeding] Soft-patching menu items text content (keeping images intact)...`);
-        for (const item of itemsToUpdate) {
-          const itemDesc = item.description || '';
-          const itemNameKr = item.name_kr || item.nameKr || '';
-          const itemName = item.name || item.nameEng || '';
-          
-          await connection.query(
-            "UPDATE web_menu_items SET name = ?, name_kr = ?, description = ? WHERE id = ?",
-            [itemName, itemNameKr, itemDesc, item.id]
-          );
-        }
-        console.log(`[DB Seeding Success] Soft-patched ${itemsToUpdate.length} menu items.`);
-      } catch (healErr: any) {
-        console.warn('[DB Healing Alert] Safe soft-patching of menu items failed:', healErr.message);
-      }
     }
   } catch (e: any) {
     console.error('[DB Seeding Error] Menu system:', e.message);

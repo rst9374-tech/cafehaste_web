@@ -73,6 +73,7 @@ export const useImageUpload = () => {
         boardName: string;
         categoryId: string;
         storeCode?: string;
+        customFilename?: string;
       }
     ): Promise<string> => {
       setIsFileCompressing(true);
@@ -113,7 +114,9 @@ export const useImageUpload = () => {
       const category = (options.categoryId || 'CAT').toUpperCase();
       
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const generatedFilename = `${prefix}_${category}_${uniqueId}_${timestamp}.${fileExt}`;
+      const generatedFilename = options.customFilename 
+        ? options.customFilename.normalize('NFC')
+        : `${prefix}_${category}_${uniqueId}_${timestamp}.${fileExt}`;
 
       try {
         const res = await fetch('/api/upload', {

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { supabase } from '../database';
-import * as serverDefaults from '../../serverDefaults';
+import * as serverDefaults from '../serverDefaults';
 import {
   BACKUP_DRAFTS_FILE,
   BACKUP_INTERIORS_FILE,

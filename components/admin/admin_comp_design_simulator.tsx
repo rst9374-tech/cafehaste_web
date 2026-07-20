@@ -21,12 +21,12 @@ export const AdminDesignSimulator: React.FC<AdminDesignSimulatorProps> = ({
   if (!activePreview) {
     return (
       <div className="lg:col-span-4 sticky top-28 flex flex-col gap-6">
-        <div className="bg-stone-955 rounded-2xl border border-stone-850 overflow-hidden shadow-2xl relative shadow-stone-950/20 font-sans">
+        <div className="bg-stone-955 rounded-2xl border border-stone-900 overflow-hidden shadow-2xl relative shadow-stone-950/20 font-sans">
           <div className="aspect-[16/9] w-full flex flex-col items-center justify-center text-stone-500 text-xs p-8 bg-stone-900">
             <AlertTriangle size={24} className="text-stone-600 mb-2" />
             <span>인테리어 구성이 비어있습니다.</span>
           </div>
-          <div className="bg-stone-900 px-4 py-2.5 border-t border-stone-850 text-[10px] font-sans text-stone-400 flex items-center justify-between">
+          <div className="bg-stone-900 px-4 py-2.5 border-t border-stone-900 text-[10px] font-sans text-stone-400 flex items-center justify-between">
             <span>장착: <strong className="text-white">없음</strong></span>
           </div>
         </div>
@@ -49,12 +49,12 @@ export const AdminDesignSimulator: React.FC<AdminDesignSimulatorProps> = ({
   if (imgs.length === 0) {
     return (
       <div className="lg:col-span-4 sticky top-28 flex flex-col gap-6">
-        <div className="bg-stone-955 rounded-2xl border border-stone-850 overflow-hidden shadow-2xl relative shadow-stone-950/20 font-sans">
+        <div className="bg-stone-955 rounded-2xl border border-stone-900 overflow-hidden shadow-2xl relative shadow-stone-950/20 font-sans">
           <div className="aspect-[16/9] w-full flex flex-col items-center justify-center text-stone-500 text-xs p-8 bg-stone-900">
             <AlertTriangle size={24} className="text-stone-600 mb-2" />
             <span>등록된 이미지가 없습니다.</span>
           </div>
-          <div className="bg-stone-900 px-4 py-2.5 border-t border-stone-850 text-[10px] font-sans text-stone-400 flex items-center justify-between">
+          <div className="bg-stone-900 px-4 py-2.5 border-t border-stone-900 text-[10px] font-sans text-stone-400 flex items-center justify-between">
             <span>장착: <strong className="text-white">{activePreview.id}</strong></span>
             <button 
               type="button"
@@ -76,7 +76,7 @@ export const AdminDesignSimulator: React.FC<AdminDesignSimulatorProps> = ({
 
   return (
     <div className="lg:col-span-4 sticky top-28 flex flex-col gap-6">
-      <div className="bg-stone-950 rounded-2xl border border-stone-850 overflow-hidden shadow-2xl relative shadow-stone-950/20 font-sans">
+      <div className="bg-stone-955 rounded-2xl border border-stone-900 overflow-hidden shadow-2xl relative shadow-stone-950/20 font-sans">
         <div className="relative aspect-[16/9] w-full bg-stone-955 overflow-hidden flex flex-col justify-end p-6 select-none group">
           <div className="absolute inset-0">
             <img
@@ -133,7 +133,7 @@ export const AdminDesignSimulator: React.FC<AdminDesignSimulatorProps> = ({
             <p className="font-mono text-[8px] text-[#C5A059] tracking-[0.2em] font-bold uppercase drop-shadow-sm leading-none">
               {activePreview.subtitle || 'Subtitle info'}
             </p>
-            <p className="text-[10px] text-stone-300 font-light max-w-sm leading-relaxed line-clamp-2 mt-1">
+            <p className="text-[11px] text-stone-300 font-light max-w-sm leading-relaxed line-clamp-2 mt-1">
               {activePreview.desc || 'No description provided.'}
             </p>
           </div>
@@ -149,7 +149,7 @@ export const AdminDesignSimulator: React.FC<AdminDesignSimulatorProps> = ({
           </div>
         </div>
 
-        <div className="bg-stone-900 px-4 py-2.5 border-t border-stone-850 text-[10px] font-sans text-stone-400 flex flex-col xs:flex-row gap-2 xs:items-center justify-between">
+        <div className="bg-stone-900 px-4 py-2.5 border-t border-stone-900 text-[10px] font-sans text-stone-400 flex flex-col xs:flex-row gap-2 xs:items-center justify-between">
           <span>장착: <strong className="text-white">{activePreview.id}</strong></span>
           
           <div className="flex flex-wrap items-center gap-2">

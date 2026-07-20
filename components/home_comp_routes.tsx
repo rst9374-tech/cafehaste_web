@@ -15,6 +15,7 @@ const HasteTermsModal = React.lazy(() => import('./membership_modal_terms').then
 const HasteInterior = React.lazy(() => import('./interior_page_main').then(m => ({ default: m.HasteInterior })));
 const HasteBoard = React.lazy(() => import('./board_page_main').then(m => ({ default: m.HasteBoard })));
 const HasteControl = React.lazy(() => import('./membership_page_control').then(m => ({ default: m.HasteControlPage })));
+const HasteLillyDashboard = React.lazy(() => import('./lilly_dashboard/lilly_dashboard_main').then(m => ({ default: m.HasteLillyDashboard })));
 const AdminPageTestValidator = React.lazy(() => import('./admin/admin_page_test_validator').then(m => ({ default: m.AdminPageTestValidator })));
 
 
@@ -171,7 +172,7 @@ export function HomeCompRoutes({
         />
       )}
 
-      <main className={`min-h-[calc(100vh-250px)] ${(ctrl.currentRoute === 'FILM' || ctrl.currentRoute === 'MUSIC') ? 'bg-[#0A0A0C]' : ''} ${ctrl.currentRoute === 'TEST_VALIDATOR' ? 'pt-0 pb-6' : ctrl.currentRoute === 'HOME' ? '' : (ctrl.currentRoute === 'FRANCHISE' || ctrl.currentRoute === 'INTERIOR') ? 'pt-[40px] md:pt-28 pb-6 md:pb-12' : 'pt-[80px] md:pt-28 pb-6 md:pb-12'}`}>
+      <main className={`min-h-[calc(100vh-250px)] ${(ctrl.currentRoute === 'FILM' || ctrl.currentRoute === 'MUSIC' || ctrl.currentRoute === 'LILLY_DASHBOARD' || ctrl.currentRoute === 'CONTROL' || ctrl.currentRoute === 'MYINFO') ? 'bg-[#0c0b0e]' : ''} ${ctrl.currentRoute === 'TEST_VALIDATOR' ? 'pt-0 pb-6' : ctrl.currentRoute === 'HOME' ? '' : (ctrl.currentRoute === 'FRANCHISE' || ctrl.currentRoute === 'INTERIOR') ? 'pt-[40px] md:pt-28 pb-6 md:pb-12' : 'pt-[80px] md:pt-28 pb-6 md:pb-12'}`}>
         <div className="w-full">
           {ctrl.currentRoute === 'HOME' && (
             ctrl.isCurrentlyMobile ? (
@@ -360,27 +361,10 @@ export function HomeCompRoutes({
             </div>
           )}
 
-          {ctrl.currentRoute === 'MYINFO' && (
-            <div id="myinfo-view-wrapper">
+          {(ctrl.currentRoute === 'CONTROL' || ctrl.currentRoute === 'MYINFO' || ctrl.currentRoute === 'LILLY_DASHBOARD') && (
+            <div id="lilly-dashboard-view-wrapper">
               <Suspense fallback={<FallbackLoader />}>
-                <HasteControl
-                  user={ctrl.loggedUser || (localStorage.getItem('haste_admin_auth') === 'true' ? ADMIN_MOCK_USER : null)}
-                  navigateTo={ctrl.navigateTo}
-                  onLogout={() => {
-                    localStorage.removeItem('haste_admin_auth');
-                    localStorage.removeItem('haste_logged_user');
-                    ctrl.setLoggedUser(null);
-                    ctrl.navigateTo('HOME');
-                  }}
-                />
-              </Suspense>
-            </div>
-          )}
-
-          {ctrl.currentRoute === 'CONTROL' && (
-            <div id="control-view-wrapper">
-              <Suspense fallback={<FallbackLoader />}>
-                <HasteControl
+                <HasteLillyDashboard
                   user={ctrl.loggedUser || (localStorage.getItem('haste_admin_auth') === 'true' ? ADMIN_MOCK_USER : null)}
                   navigateTo={ctrl.navigateTo}
                   onLogout={() => {

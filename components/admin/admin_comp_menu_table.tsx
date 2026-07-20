@@ -1,4 +1,5 @@
 import React from 'react';
+import { Edit, Trash2 } from 'lucide-react';
 import { getDrinkSvg } from '../menu_comp_drinksvg';
 
 interface AdminMenuTableProps {
@@ -71,7 +72,7 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
     return (
       <div className="space-y-4">
         {/* Bulk select checkbox bar for visual grid convenience */}
-        <div className="flex items-center gap-2 p-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs select-none">
+        <div className="flex items-center gap-2 p-2.5 bg-stone-950 border border-stone-900 rounded-xl text-xs select-none">
           <input 
             type="checkbox"
             checked={currentItemsToShow.length > 0 && currentItemsToShow.every(item => selectedMenuIds.includes(item.id))}
@@ -84,9 +85,9 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
                 setSelectedMenuIds(prev => prev.filter(id => !pageIds.includes(id)));
               }
             }}
-            className="w-4 h-4 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+            className="w-4 h-4 rounded border-stone-800 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer bg-stone-950"
           />
-          <span className="font-extrabold text-stone-700">전체 선택</span>
+          <span className="font-extrabold text-stone-300">전체 선택</span>
         </div>
 
         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
@@ -96,10 +97,10 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
             return (
               <div 
                 key={item.id} 
-                className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-xs flex flex-col group relative"
+                className="bg-[#0c0a09]/95 rounded-xl border border-stone-900 overflow-hidden shadow-xs flex flex-col group relative"
               >
                 {/* Select Checkbox & Index Badge Overlay */}
-                <div className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur-xs px-1.5 py-1 rounded-lg border border-stone-200 flex items-center gap-1.5 shadow-sm">
+                <div className="absolute top-2 left-2 z-10 bg-stone-950/90 backdrop-blur-xs px-1.5 py-1 rounded-lg border border-stone-900 flex items-center gap-1.5 shadow-sm">
                   <input 
                     type="checkbox"
                     checked={selectedMenuIds.includes(item.id)}
@@ -108,46 +109,46 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
                         prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]
                       );
                     }}
-                    className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                    className="w-3.5 h-3.5 rounded border-stone-800 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer bg-stone-950"
                   />
-                  <span className="font-mono text-[9px] font-bold text-stone-500">{itemIndex}</span>
+                  <span className="font-mono text-[9px] font-bold text-stone-400">{itemIndex}</span>
                 </div>
 
                 {/* Big Image Section matching menu page aspect ratio */}
-                <div className="w-full aspect-[3/4] overflow-hidden relative bg-stone-50 flex items-center justify-center border-b border-stone-100 p-1">
+                <div className="w-full aspect-[3/4] overflow-hidden relative bg-stone-950/40 flex items-center justify-center border-b border-stone-900 p-1">
                   <img 
                     src={getDrinkSvg(item)} 
                     alt={item.nameKr} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'><path d='M17 8h1a4 4 0 1 1 0 8h-1'/><path d='M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z'/><line x1='6' y1='2' x2='6' y2='4'/><line x1='10' y1='2' x2='10' y2='4'/><line x1='14' y1='2' x2='14' y2='4'/></svg>";
+                    }}
                   />
                 </div>
 
                 {/* Card Details */}
                 <div className="p-2 flex-grow flex flex-col justify-between gap-2.5">
                   <div>
-                    <div className="font-extrabold text-stone-900 text-xs truncate" title={item.nameKr}>{item.nameKr}</div>
-                    <div className="text-[9px] font-mono text-stone-400 uppercase truncate mt-0.5" title={item.name}>{item.name || 'ENG NAME UNSET'}</div>
+                    <div className="font-extrabold text-stone-200 text-xs truncate" title={item.nameKr}>{item.nameKr}</div>
+                    <div className="text-[9px] font-mono text-stone-500 uppercase truncate mt-0.5" title={item.name}>{item.name || 'ENG NAME UNSET'}</div>
                     <div className="mt-1.5 flex flex-wrap gap-1">
                       <span className="font-bold text-[#C5A059] bg-[#C5A059]/10 px-1.5 py-0.5 rounded text-[8px] font-mono uppercase">
                         {adminCategories.find(c => c.id === item.category)?.name || item.category}
                       </span>
-                      <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
-                        item.visible ? 'bg-emerald-50 text-emerald-800' : 'bg-stone-100 text-stone-400'
+                      <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border ${
+                        item.visible ? 'bg-emerald-950/30 text-emerald-450 border-emerald-900/40' : 'bg-stone-900 text-stone-500 border-stone-850'
                       }`}>
                         {item.visible ? '노출 설정 ✓' : '숨김 상태 ✕'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="space-y-1.5 pt-1.5 border-t border-stone-100">
+                  <div className="space-y-1.5 pt-1.5 border-t border-stone-900">
                     <button
                       onClick={() => handleToggleSignature(item)}
-                      className={`w-full py-1 rounded text-[9px] font-bold border transition-all cursor-pointer text-center ${
-                        isSig 
-                          ? 'bg-amber-50 text-amber-800 border-amber-200' 
-                          : 'bg-stone-50 text-stone-400 border-stone-200'
-                      }`}
+                      className={isSig ? 'dashboard-btn-amber py-1 text-[9px] rounded-lg w-full' : 'dashboard-btn-dark py-1 text-[9px] rounded-lg w-full'}
                     >
                       {isSig ? '시그니처 ★' : '일반 설정'}
                     </button>
@@ -170,15 +171,19 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
                           setMenuFormVideoUrl(item.videoUrl || '');
                           setIsMenuModalOpen(true);
                         }}
-                        className="flex-1 py-1 text-[9px] font-bold bg-stone-100 hover:bg-stone-200 border border-stone-250 text-stone-850 rounded transition-colors cursor-pointer text-center"
+                        className="admin-btn-action-edit flex-1 py-1 text-[9px]"
+                        title="수정"
                       >
-                        수정
+                        <Edit size={11} className="mr-1" />
+                        <span>수정</span>
                       </button>
                       <button
                         onClick={() => handleDeleteMenuItem(item.id)}
-                        className="flex-1 py-1 text-[9px] font-bold bg-rose-50 hover:bg-rose-100 border border-rose-250 text-rose-600 rounded transition-colors cursor-pointer text-center"
+                        className="admin-btn-action-delete flex-1 py-1 text-[9px]"
+                        title="삭제"
                       >
-                        삭제
+                        <Trash2 size={11} className="mr-1" />
+                        <span>삭제</span>
                       </button>
                     </div>
                   </div>
@@ -193,10 +198,10 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
   }
 
   return (
-    <div className="overflow-x-auto border border-stone-200 rounded-xl">
+    <div className="overflow-x-auto border border-stone-900 rounded-xl">
       <table className="w-full text-left border-collapse min-w-[800px] text-xs font-sans">
         <thead>
-          <tr className="bg-stone-50 border-b border-stone-200 text-stone-500 font-bold uppercase font-sans text-[10px] tracking-wider">
+          <tr className="bg-stone-900 border-b border-stone-800 text-stone-400 font-bold uppercase font-sans text-[12px] tracking-wider">
             <th className="py-2.5 px-4 text-center w-28 text-stone-500">
               <div className="flex items-center justify-center gap-1.5 font-bold">
                 <input 
@@ -211,14 +216,14 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
                       setSelectedMenuIds(prev => prev.filter(id => !pageIds.includes(id)));
                     }
                   }}
-                  className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                  className="w-3.5 h-3.5 rounded border-stone-800 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer bg-stone-950"
                 />
                 <span>선택 | 순서</span>
               </div>
             </th>
-            <th className="py-2.5 px-4 text-center w-28 font-bold">사진 (IMAGE)</th>
+            <th className="py-2.5 px-4 text-center w-28 font-bold">사진</th>
             <th 
-              className="py-2.5 px-4 font-bold cursor-pointer select-none hover:text-stone-900 group"
+              className="py-2.5 px-4 font-bold cursor-pointer select-none hover:text-stone-200 group"
               onClick={() => {
                 if (setSortByName) {
                   setSortByName(prev => prev === 'NONE' ? 'ASC' : prev === 'ASC' ? 'DESC' : 'NONE');
@@ -227,22 +232,21 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
               title="클릭하여 가나다순 정렬"
             >
               <div className="flex items-center gap-1">
-                <span>음료명 (NAME)</span>
+                <span>음료명</span>
                 {sortByName === 'ASC' && <span className="text-[#C5A059] font-sans font-bold">▲</span>}
                 {sortByName === 'DESC' && <span className="text-[#C5A059] font-sans font-bold">▼</span>}
-                {sortByName === 'NONE' && <span className="text-stone-300 group-hover:text-stone-500 opacity-0 group-hover:opacity-100 transition-opacity font-sans font-bold">▲</span>}
+                {sortByName === 'NONE' && <span className="text-stone-600 group-hover:text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity font-sans font-bold">▲</span>}
               </div>
             </th>
-            <th className="py-2.5 px-4 font-bold">소속 카테고리 (CATEGORY)</th>
-            <th className="py-2.5 px-4 text-center w-28 font-bold">대표 설정 (SIGNATURE)</th>
-            <th className="py-2.5 px-4 text-center w-36 font-bold">노출상태 (VISIBILITY)</th>
+            <th className="py-2.5 px-4 text-center w-28 font-bold">대표 설정</th>
+            <th className="py-2.5 px-4 text-center w-36 font-bold">노출상태</th>
             <th className="py-2.5 px-4 text-center w-36 font-bold">관리 제어</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-stone-150">
+        <tbody className="divide-y divide-stone-900">
           {currentItemsToShow.length === 0 ? (
             <tr>
-              <td colSpan={7} className="py-12 text-center text-stone-500 font-light">
+              <td colSpan={6} className="py-12 text-center text-stone-500 font-light">
                 해당 카테고리에 할당된 음료 품목이 없습니다. 우측 상단의 [음료 추가하기]로 새 품목을 추가해 보세요.
               </td>
             </tr>
@@ -250,7 +254,7 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
             currentItemsToShow.map((item, relativeIdx) => {
               const itemIndex = (menuItemsPage - 1) * MENU_ITEMS_PER_PAGE + relativeIdx + 1;
               return (
-                <tr key={item.id} className="hover:bg-stone-50/50 transition-colors">
+                <tr key={item.id} className="hover:bg-stone-900/40 transition-colors border-b border-stone-900">
                   <td className="py-2.5 px-4 text-center font-mono font-bold text-stone-500 whitespace-nowrap">
                     <div className="flex items-center justify-center gap-2">
                       <input 
@@ -261,44 +265,43 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
                             prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]
                           );
                         }}
-                        className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                        className="w-3.5 h-3.5 rounded border-stone-800 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer bg-stone-950"
                       />
                       <span>{itemIndex}</span>
                     </div>
                   </td>
                   <td className="py-2.5 px-4 text-center">
                     <img
-                      src={getDrinkSvg(item)}
+                      src={item.image || getDrinkSvg(item)}
                       alt={item.nameKr}
                       referrerPolicy="no-referrer"
-                      className={`${isLargeImages ? 'w-44 h-44' : 'w-20 h-20'} object-contain p-1 rounded-lg border border-stone-250 bg-stone-150 shadow-sm mx-auto transition-all duration-300`}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'><path d='M17 8h1a4 4 0 1 1 0 8h-1'/><path d='M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z'/><line x1='6' y1='2' x2='6' y2='4'/><line x1='10' y1='2' x2='10' y2='4'/><line x1='14' y1='2' x2='14' y2='4'/></svg>";
+                      }}
+                      className={`${isLargeImages ? 'w-44 h-44' : 'w-20 h-20'} object-contain p-1 rounded-lg border border-stone-900 bg-stone-950 shadow-sm mx-auto transition-all duration-300`}
                     />
                   </td>
                   <td className="py-2.5 px-4">
-                    <div className="font-extrabold text-stone-955 text-xs whitespace-nowrap">{item.nameKr}</div>
-                    <div className="text-[9px] font-mono text-stone-400 uppercase mt-0.5">{item.name || 'ENG NAME UNSET'}</div>
-                  </td>
-                  <td className="py-2.5 px-4">
-                    <span className="font-bold text-[#C5A059] bg-[#C5A059]/10 px-2 py-0.5 rounded inline-block text-[10px] font-mono uppercase">
-                      {adminCategories.find(c => c.id === item.category)?.name || item.category}
-                    </span>
+                    <div className="font-bold text-stone-200 text-[13px] whitespace-nowrap">{item.nameKr}</div>
+                    <div className="text-[11px] font-sans font-normal text-stone-450 uppercase mt-0.5">{item.name || 'ENG NAME UNSET'}</div>
                   </td>
                   <td className="py-2.5 px-4 text-center font-sans">
                     <button
                       onClick={() => handleToggleSignature(item)}
-                      className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+                      className={
                         (item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true)
-                          ? 'bg-amber-100 text-amber-850 border-amber-300 hover:bg-amber-200'
-                          : 'bg-stone-100 text-stone-400 border-stone-200 hover:bg-stone-200 hover:text-stone-600'
-                      }`}
+                          ? 'dashboard-btn-amber py-0.5 px-2.5 text-[10px] rounded-full'
+                          : 'dashboard-btn-dark py-0.5 px-2.5 text-[10px] rounded-full'
+                      }
                       title="클릭하여 시그니처 / 일반 메뉴 전환"
                     >
-                      {(item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true) ? '시그니처 ★' : '일반 메뉴'}
+                      {(item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true) ? '시그니처 ★' : '일반'}
                     </button>
                   </td>
                   <td className="py-2.5 px-4 text-center font-sans">
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      item.visible ? 'bg-emerald-100 text-emerald-850' : 'bg-stone-140 text-stone-400'
+                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                      item.visible ? 'bg-emerald-950/40 text-emerald-450 border-emerald-900/40' : 'bg-stone-950/40 text-stone-500 border border-stone-900'
                     }`}>
                       {item.visible ? '노출 설정 ✓' : '숨김 상태 ✕'}
                     </span>
@@ -323,15 +326,17 @@ export const AdminMenuTable: React.FC<AdminMenuTableProps> = ({
                           setMenuFormVideoUrl(item.videoUrl || '');
                           setIsMenuModalOpen(true);
                         }}
-                        className="p-1 px-2.5 text-[10px] font-bold bg-stone-100 hover:bg-stone-200 border border-stone-250 text-stone-850 rounded-md transition-colors cursor-pointer"
+                        className="admin-btn-action-edit"
+                        title="수정"
                       >
-                        수정
+                        <Edit size={12} />
                       </button>
                       <button
                         onClick={() => handleDeleteMenuItem(item.id)}
-                        className="p-1 px-2.5 text-[10px] font-bold bg-rose-50 hover:bg-rose-100 border border-rose-250 text-rose-600 rounded-md transition-colors cursor-pointer"
+                        className="admin-btn-action-delete"
+                        title="삭제"
                       >
-                        삭제
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   </td>

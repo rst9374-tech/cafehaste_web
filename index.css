@@ -66,6 +66,34 @@ body, button, input, select, textarea {
   background: #C5A059;
 }
 
+/* Dark mode custom scrollbars scoped to Admin & Lilly Dashboard panels */
+.admin-console-wrapper ::-webkit-scrollbar,
+.haste-dashboard-wrapper ::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+.admin-console-wrapper ::-webkit-scrollbar-track,
+.haste-dashboard-wrapper ::-webkit-scrollbar-track {
+  background: #0c0a09 !important;
+}
+.admin-console-wrapper ::-webkit-scrollbar-thumb,
+.haste-dashboard-wrapper ::-webkit-scrollbar-thumb {
+  background: #1c1917 !important;
+  border: 2px solid #0c0a09 !important;
+  border-radius: 9999px !important;
+}
+.admin-console-wrapper ::-webkit-scrollbar-thumb:hover,
+.haste-dashboard-wrapper ::-webkit-scrollbar-thumb:hover {
+  background: #27272a !important;
+}
+
+/* Firefox scrollbar support for dark layouts */
+.admin-console-wrapper,
+.haste-dashboard-wrapper {
+  scrollbar-width: thin !important;
+  scrollbar-color: #1c1917 #0c0a09 !important;
+}
+
 /* Pulse Glow Effects */
 .lightning-glow {
   filter: drop-shadow(0 0 10px rgba(197, 160, 89, 0.45));
@@ -1297,3 +1325,761 @@ input, textarea, [contenteditable="true"], [contenteditable="true"] * {
   font-weight: 700 !important;
 }
 
+/* Chrome/Safari Autofill input background override to prevent bright white flash on dark theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #222026 inset !important;
+  -webkit-text-fill-color: #e7e5e4 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ==========================================================================
+   릴리 대시보드 전용 스타일 통합 영역 (Lilly Dashboard Beige Theme Sandbox)
+   ========================================================================== */
+.lilly-theme-panel {
+  background-color: #F4ECE1 !important;
+  color: #4A3525 !important;
+  border: 1px solid rgba(197, 160, 89, 0.35) !important;
+  font-family: var(--font-sans) !important;
+}
+.lilly-theme-card {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E5E5E0 !important;
+  color: #4A3525 !important;
+}
+.lilly-theme-title {
+  color: #4A3525 !important;
+  font-weight: 700 !important;
+}
+.lilly-theme-text-muted {
+  color: #7A6B5D !important;
+}
+.lilly-theme-select {
+  background-color: #FFFFFF !important;
+  border: 1px solid #C5A059 !important;
+  color: #4A3525 !important;
+}
+.lilly-theme-select option {
+  background-color: #FFFFFF !important;
+  color: #4A3525 !important;
+}
+.lilly-theme-btn-primary {
+  background-color: #C5A059 !important;
+  border: 1px solid #C5A059 !important;
+  color: #FFFFFF !important;
+}
+.lilly-theme-btn-primary:hover {
+  background-color: #B28E4C !important;
+}
+.lilly-theme-btn-secondary {
+  background-color: #4A3525 !important;
+  border: 1px solid #4A3525 !important;
+  color: #FFFFFF !important;
+}
+.lilly-theme-btn-secondary:hover {
+  background-color: #38281C !important;
+}
+.lilly-theme-table-header {
+  background-color: #EFE6D9 !important;
+  color: #4A3525 !important;
+  border-bottom: 1px solid #D9CFC4 !important;
+}
+.lilly-theme-table-row {
+  border-bottom: 1px solid #E5E5E0 !important;
+  color: #4A3525 !important;
+}
+.lilly-theme-table-row:hover {
+  background-color: #FAF6F0 !important;
+}
+.lilly-theme-console {
+  background-color: #2D231B !important;
+  border: 1px solid #4A3525 !important;
+  color: #F4ECE1 !important;
+}
+.lilly-theme-console-header {
+  border-bottom: 1px solid #3D3126 !important;
+  color: #C5A059 !important;
+}
+
+/* ==========================================================================
+   HASTE 3-Domain Scoping CSS Rules (index.css)
+   ========================================================================== */
+
+/* 1. Dashboard & Admin Common Dark Theme (.dashboard-theme) */
+.dashboard-theme {
+  --db-bg: #1c1917; /* bg-stone-900 */
+  --db-sub-bg: #0c0a09; /* bg-stone-955 */
+  --db-gold: #C5A059;
+  --db-gold-hover: #b08e4d;
+  --db-border: #292524; /* border-stone-850 */
+  --db-border-light: #44403c; /* border-stone-700 */
+  --db-text-primary: #f5f5f4; /* text-stone-100 */
+  --db-text-secondary: #a8a29e; /* text-stone-400 */
+  --db-text-muted: #78716c; /* text-stone-500 */
+}
+
+.dashboard-theme .dashboard-modal {
+  background-color: var(--db-bg);
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  overflow: hidden;
+}
+
+.dashboard-theme .dashboard-header {
+  background-color: var(--db-sub-bg);
+  border-bottom: 1px solid var(--db-border);
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-theme .dashboard-input {
+  width: 100%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  background-color: var(--db-sub-bg);
+  border: 0;
+  border-radius: 0.75rem;
+  color: var(--db-text-primary);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.dashboard-theme .dashboard-input:focus {
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.4);
+}
+.dashboard-theme .dashboard-input::placeholder {
+  color: #57534e;
+}
+
+.dashboard-theme .dashboard-textarea {
+  width: 100%;
+  font-size: 0.75rem;
+  font-weight: 300;
+  padding: 0.75rem;
+  background-color: var(--db-sub-bg);
+  border: 0;
+  border-radius: 0.75rem;
+  color: var(--db-text-primary);
+  line-height: 1.625;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  resize: none;
+}
+.dashboard-theme .dashboard-textarea:focus {
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.4);
+}
+.dashboard-theme .dashboard-textarea::placeholder {
+  color: #57534e;
+}
+
+.dashboard-theme .dashboard-select {
+  width: 100%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  background-color: var(--db-sub-bg);
+  border: 0;
+  border-radius: 0.75rem;
+  color: var(--db-text-primary);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  cursor: pointer;
+}
+.dashboard-theme .dashboard-select:focus {
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.4);
+}
+
+/* HASTE 멤버십정보 수정 팝업창 전용 흰색 입력 폼 스타일 */
+.member-edit-modal-wrapper input,
+.member-edit-modal-wrapper select,
+.member-edit-modal-wrapper textarea {
+  background-color: #ffffff;
+  color: #1c1917;
+  -webkit-text-fill-color: #1c1917;
+}
+.member-edit-modal-wrapper input::placeholder,
+.member-edit-modal-wrapper textarea::placeholder {
+  color: #78716c;
+  -webkit-text-fill-color: #78716c;
+}
+
+/* ===== Admin Console Wrapper - dashboard-btn 공유 스코프 확장 ===== */
+/* .admin-console-wrapper도 .dashboard-theme과 동일한 버튼 스타일을 공유한다 */
+
+.dashboard-theme .dashboard-btn-gold,
+.admin-console-wrapper .dashboard-btn-gold {
+  background-color: var(--db-gold);
+  color: #0c0a09;
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+}
+.dashboard-theme .dashboard-btn-gold:hover,
+.admin-console-wrapper .dashboard-btn-gold:hover {
+  background-color: var(--db-gold-hover);
+}
+
+.dashboard-theme .dashboard-btn-dark,
+.admin-console-wrapper .dashboard-btn-dark {
+  background-color: #292524; /* bg-stone-800 */
+  color: var(--db-text-secondary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  transition-property: color, background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+}
+.dashboard-theme .dashboard-btn-dark:hover,
+.admin-console-wrapper .dashboard-btn-dark:hover {
+  background-color: #44403c; /* bg-stone-700 */
+  color: var(--db-text-primary);
+}
+
+/* HASTE 어드민 전용 공통 수정/삭제 아이콘 버튼 클래스 */
+.admin-console-wrapper .admin-btn-action-edit {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  color: #38bdf8 !important;
+  padding: 0.375rem !important;
+  border-radius: 0.375rem !important;
+  transition: all 200ms ease !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.admin-console-wrapper .admin-btn-action-edit:hover {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #7dd3fc !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+.admin-console-wrapper .admin-btn-action-delete {
+  background-color: rgba(136, 19, 55, 0.2) !important;
+  border: 1px solid rgba(244, 63, 94, 0.25) !important;
+  color: #fb7185 !important;
+  padding: 0.375rem !important;
+  border-radius: 0.375rem !important;
+  transition: all 200ms ease !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.admin-console-wrapper .admin-btn-action-delete:hover {
+  background-color: rgba(244, 63, 94, 0.15) !important;
+  color: #fecdd3 !important;
+  border-color: rgba(244, 63, 94, 0.4) !important;
+}
+
+.dashboard-theme .dashboard-btn-gold-compact,
+.admin-console-wrapper .dashboard-btn-gold-compact {
+  background-color: var(--db-gold);
+  color: #0c0a09 !important;
+  font-weight: 900;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(197, 160, 89, 0.4);
+  transition: all 150ms ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.dashboard-theme .dashboard-btn-gold-compact:hover:not(:disabled),
+.admin-console-wrapper .dashboard-btn-gold-compact:hover:not(:disabled) {
+  background-color: var(--db-gold-hover);
+}
+.dashboard-theme .dashboard-btn-gold-compact:disabled,
+.admin-console-wrapper .dashboard-btn-gold-compact:disabled {
+  background-color: rgba(12, 10, 9, 0.2) !important;
+  border-color: #292524 !important;
+  color: #ffffff !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dashboard-theme .dashboard-btn-red,
+.admin-console-wrapper .dashboard-btn-red {
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 2px solid #ef4444 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.dashboard-theme .dashboard-btn-red:hover:not(:disabled),
+.admin-console-wrapper .dashboard-btn-red:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.35);
+}
+.dashboard-theme .dashboard-btn-red:disabled,
+.admin-console-wrapper .dashboard-btn-red:disabled {
+  background-color: rgba(12, 10, 9, 0.2) !important;
+  border-color: #292524 !important;
+  color: #ffffff !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dashboard-theme .dashboard-btn-amber,
+.admin-console-wrapper .dashboard-btn-amber {
+  background-color: rgba(245, 158, 11, 0.12);
+  border: 2px solid #f59e0b !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.dashboard-theme .dashboard-btn-amber:hover:not(:disabled),
+.admin-console-wrapper .dashboard-btn-amber:hover:not(:disabled) {
+  background-color: rgba(245, 158, 11, 0.35);
+}
+.dashboard-theme .dashboard-btn-amber:disabled,
+.admin-console-wrapper .dashboard-btn-amber:disabled {
+  background-color: rgba(12, 10, 9, 0.2) !important;
+  border-color: #292524 !important;
+  color: #ffffff !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dashboard-theme .dashboard-btn-orange,
+.admin-console-wrapper .dashboard-btn-orange {
+  background-color: rgba(249, 115, 22, 0.12);
+  border: 2px solid #f97316 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.dashboard-theme .dashboard-btn-orange:hover:not(:disabled),
+.admin-console-wrapper .dashboard-btn-orange:hover:not(:disabled) {
+  background-color: rgba(249, 115, 22, 0.35);
+}
+.dashboard-theme .dashboard-btn-orange:disabled,
+.admin-console-wrapper .dashboard-btn-orange:disabled {
+  background-color: rgba(12, 10, 9, 0.2) !important;
+  border-color: #292524 !important;
+  color: #ffffff !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dashboard-theme .dashboard-btn-blue,
+.admin-console-wrapper .dashboard-btn-blue {
+  background-color: rgba(59, 130, 246, 0.12);
+  border: 2px solid #3b82f6 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.dashboard-theme .dashboard-btn-blue:hover:not(:disabled),
+.admin-console-wrapper .dashboard-btn-blue:hover:not(:disabled) {
+  background-color: rgba(59, 130, 246, 0.35);
+}
+.dashboard-theme .dashboard-btn-blue:disabled,
+.admin-console-wrapper .dashboard-btn-blue:disabled {
+  background-color: rgba(12, 10, 9, 0.2) !important;
+  border-color: #292524 !important;
+  color: #ffffff !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dashboard-theme .dashboard-btn-rose,
+.admin-console-wrapper .dashboard-btn-rose {
+  background-color: rgba(244, 63, 94, 0.12);
+  border: 2px solid #f43f5e !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.dashboard-theme .dashboard-btn-rose:hover:not(:disabled),
+.admin-console-wrapper .dashboard-btn-rose:hover:not(:disabled) {
+  background-color: rgba(244, 63, 94, 0.35);
+}
+.dashboard-theme .dashboard-btn-rose:disabled,
+.admin-console-wrapper .dashboard-btn-rose:disabled {
+  background-color: rgba(12, 10, 9, 0.2) !important;
+  border-color: #292524 !important;
+  color: #ffffff !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dashboard-theme .dashboard-btn-rose-filter,
+.admin-console-wrapper .dashboard-btn-rose-filter {
+  background-color: rgba(244, 63, 94, 0.12);
+  border: 2px solid #f43f5e !important;
+  color: #f43f5e !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.dashboard-theme .dashboard-btn-rose-filter:hover,
+.admin-console-wrapper .dashboard-btn-rose-filter:hover {
+  background-color: rgba(244, 63, 94, 0.3);
+}
+
+.dashboard-theme .dashboard-btn-gold-filter,
+.admin-console-wrapper .dashboard-btn-gold-filter {
+  background-color: rgba(197, 160, 89, 0.12);
+  border: 2px solid #C5A059 !important;
+  color: #C5A059 !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.dashboard-theme .dashboard-btn-gold-filter:hover,
+.admin-console-wrapper .dashboard-btn-gold-filter:hover {
+  background-color: rgba(197, 160, 89, 0.25);
+}
+
+.dashboard-theme .dashboard-btn-dark-filter,
+.admin-console-wrapper .dashboard-btn-dark-filter {
+  background-color: rgba(12, 10, 9, 0.4);
+  border: 2px solid #292524 !important;
+  color: #a8a29e !important;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.dashboard-theme .dashboard-btn-dark-filter:hover,
+.admin-console-wrapper .dashboard-btn-dark-filter:hover {
+  background-color: rgba(29, 25, 24, 0.6);
+  color: #ffffff !important;
+}
+
+.dashboard-theme .dashboard-border-t {
+  border-top: 1px solid var(--db-border);
+}
+.dashboard-theme .dashboard-border-b {
+  border-bottom: 1px solid var(--db-border);
+}
+
+/* 2. Board Common Theme (.board-theme) */
+.board-theme {
+  --board-border: #e5e5e0;
+  --board-text: #4a3525;
+  --board-text-light: #78716c;
+}
+
+.board-theme .board-table-header {
+  background-color: #faf6f0;
+  border-bottom: 1px solid var(--board-border);
+  color: var(--board-text);
+  font-weight: 700;
+}
+
+.board-theme .board-table-row {
+  border-bottom: 1px solid var(--board-border);
+  color: var(--board-text);
+}
+.board-theme .board-table-row:hover {
+  background-color: #faf6f0;
+}
+
+/* ============================================================
+   3. Admin Dark Theme — 공통 유틸 클래스 (.admin-dark-*)
+   키오스크 연동 설정 / 실시간 검증기 / API 관리대장 공용
+   ============================================================ */
+
+/* 카드 */
+.admin-dark-card {
+  background-color: #1c1917;
+  border: 1px solid #292524;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+.admin-dark-card-lg {
+  background-color: #1c1917;
+  border: 1px solid #292524;
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+}
+
+/* 카드 헤더 구분선 */
+.admin-dark-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #292524;
+  padding-bottom: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+.admin-dark-card-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #e7e5e4;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* 서브 섹션 박스 */
+.admin-dark-section {
+  background-color: rgba(41, 37, 36, 0.4);
+  border: 1px solid rgba(68, 64, 60, 0.5);
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+}
+
+/* 인풋 — 편집 가능 */
+.admin-dark-input {
+  background-color: #1c1917;
+  border: 1px solid #44403c;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  color: #e7e5e4;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.admin-dark-input:focus {
+  border-color: #C5A059;
+}
+.admin-dark-input::placeholder {
+  color: #57534e;
+}
+
+/* 인풋 — readOnly (표시 전용) */
+.admin-dark-input-readonly {
+  background-color: #0c0a09;
+  border: 1px solid #44403c;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  color: #78716c;
+  outline: none;
+  cursor: not-allowed;
+  width: 100%;
+  user-select: all;
+}
+
+/* 셀렉트 */
+.admin-dark-select {
+  background-color: #1c1917;
+  border: 1px solid #44403c;
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #e7e5e4;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.admin-dark-select:focus {
+  border-color: #C5A059;
+}
+
+/* 테이블 컨테이너 */
+.admin-dark-table-wrap {
+  border: 1px solid #292524;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: rgba(12, 10, 9, 0.3);
+}
+.admin-dark-table-wrap table {
+  width: 100%;
+  text-align: left;
+  color: #a8a29e;
+  font-size: 0.6875rem;
+}
+.admin-dark-table-wrap thead {
+  position: sticky;
+  top: 0;
+  background-color: rgba(41, 37, 36, 0.8);
+  z-index: 10;
+}
+.admin-dark-table-wrap thead tr {
+  border-bottom: 1px solid #292524;
+  color: #a8a29e;
+  font-weight: 800;
+  font-size: 0.5625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.admin-dark-table-wrap tbody tr {
+  border-bottom: 1px solid rgba(41, 37, 36, 0.5);
+  transition: background-color 0.15s;
+}
+.admin-dark-table-wrap tbody tr:last-child {
+  border-bottom: none;
+}
+.admin-dark-table-wrap tbody tr:hover {
+  background-color: rgba(41, 37, 36, 0.2);
+}
+
+/* 코드 pre 블록 */
+.admin-dark-pre {
+  background-color: #0c0a09;
+  border: 1px solid #292524;
+  border-radius: 0.5rem;
+  padding: 0.625rem;
+  font-size: 0.5938rem;
+  font-family: ui-monospace, monospace;
+  color: #d6d3d1;
+  white-space: pre;
+  overflow-x: auto;
+  user-select: all;
+  line-height: 1.4;
+}
+
+/* 뱃지 — 매핑소스 표시용 */
+.admin-badge-indigo {
+  background-color: rgba(67, 56, 202, 0.2);
+  border: 1px solid #4338ca;
+  color: #a5b4fc;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+.admin-badge-blue {
+  background-color: rgba(37, 99, 235, 0.2);
+  border: 1px solid #2563eb;
+  color: #93c5fd;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+.admin-badge-emerald {
+  background-color: rgba(16, 185, 129, 0.15);
+  border: 1px solid #059669;
+  color: #6ee7b7;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+/* 소형 액션 버튼 */
+.admin-dark-btn-sm {
+  background-color: #292524;
+  border: 1px solid #44403c;
+  color: #d6d3d1;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.admin-dark-btn-sm:hover {
+  background-color: #3c3735;
+}
+
+/* 경고/알림 박스 */
+.admin-dark-alert-info {
+  background-color: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 1rem;
+  padding: 0.875rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.75rem;
+  color: #a8a29e;
+  line-height: 1.6;
+}
+.admin-dark-alert-error {
+  background-color: rgba(190, 18, 60, 0.1);
+  border: 1px solid rgba(190, 18, 60, 0.3);
+  border-radius: 0.75rem;
+  padding: 0.625rem;
+  font-size: 0.6875rem;
+  color: #f87171;
+  font-weight: 500;
+}
+.admin-dark-alert-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 0.75rem;
+  padding: 0.625rem;
+  font-size: 0.6875rem;
+  color: #6ee7b7;
+  font-weight: 700;
+}
+
+/* 장바구니 */
+.admin-dark-cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  background-color: rgba(41, 37, 36, 0.6);
+  border-bottom: 1px solid #44403c;
+  font-weight: 700;
+  color: #e7e5e4;
+}
+.admin-dark-cart-body {
+  max-height: 10rem;
+  overflow-y: auto;
+  background-color: rgba(28, 25, 23, 0.4);
+  divide-color: #292524;
+}

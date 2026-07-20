@@ -444,10 +444,19 @@ export const HasteControlPage: React.FC<HasteControlPageProps> = ({
       const isLogout = menu.id === 'LOGOUT';
       const isPassword = menu.id === 'PASSWORD';
       const Icon = menu.icon;
+
+      const isHqAdmin = user?.role === 'ADMIN' || uStoreCode === 'HASTE-HQS-ADMIN';
+      const isMonthlyPaid = localPaymentState === 'paid';
+      const hasControlPermission = isHqAdmin || (isMonthlyPaid && !dbIsExpired);
+
       return (
         <button
           key={menu.id}
           onClick={() => {
+            if ((menu.id === 'DEVICE' || menu.id === 'RECIPE') && !hasControlPermission) {
+              alert('❌ 제어 권한 없음:\n라이선스가 만료되었거나 비활성 상태입니다. [결제 관리] 탭에서 구독 플랜을 활성화해 주세요.');
+              return;
+            }
             if (menu.action) {
               menu.action();
             } else {
@@ -469,11 +478,15 @@ export const HasteControlPage: React.FC<HasteControlPageProps> = ({
           
           {(menu.id === 'DEVICE' || menu.id === 'RECIPE') && (
             <span className={`ml-auto text-[10.5px] px-1.5 py-0.5 rounded-md font-bold font-sans tracking-tight shrink-0 select-none ${
-              isSelected
-                ? 'bg-stone-955 text-[#C5A059] border border-[#C5A059] shadow-[0_0_8px_rgba(197,160,89,0.3)]'
-                : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+              hasControlPermission
+                ? isSelected
+                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-400/30'
+                  : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                : isSelected
+                  ? 'bg-stone-955 text-[#C5A059] border border-[#C5A059] shadow-[0_0_8px_rgba(197,160,89,0.3)]'
+                  : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
             }`}>
-              준비중
+              {hasControlPermission ? '연동됨' : '준비중'}
             </span>
           )}
         </button>

@@ -20,26 +20,6 @@ export async function withDbConnection<T>(callback: (connection: any) => Promise
     }
   } catch (err: any) {
     console.warn('[DB Context Error] Failed to execute DB context:', err.message);
-    const errMsg = err.message || '';
-    if (
-      errMsg.includes('ETIMEDOUT') || 
-      errMsg.includes('ENOTFOUND') || 
-      errMsg.includes('ECONNREFUSED') || 
-      errMsg.includes('lost') || 
-      errMsg.includes('closed') || 
-      errMsg.includes('Handshake')
-    ) {
-      console.warn('[DB Context Info] Triggering forced fallback to local database simulator due to connection issues.');
-      try {
-        const { forceFallbackToLocalSimulator } = await import('../database');
-        forceFallbackToLocalSimulator();
-      } catch (importErr) {
-        console.error('[DB Context Error] Could not trigger forced fallback:', importErr);
-      }
-      // Retry with local simulator
-      const fallbackPool = await getDbPool();
-      return await callback(fallbackPool);
-    }
     throw err;
   }
 }

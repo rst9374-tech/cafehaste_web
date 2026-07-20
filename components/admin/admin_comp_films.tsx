@@ -260,10 +260,10 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
   return (
     <div id="admin-films-board-wrapper" className="space-y-4">
       {/* Top action header - cleaned and simplified */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-transparent py-1 border-b border-stone-200 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-transparent py-1 border-b border-stone-900 pb-3">
         {/* Left: bulk select and delete selected */}
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs font-bold text-stone-700 select-none cursor-pointer bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-xl">
+          <label className="flex items-center gap-2 text-xs font-bold text-stone-300 select-none cursor-pointer bg-stone-900 border border-stone-900 px-3 py-1.5 rounded-xl">
             <input 
               type="checkbox"
               checked={currentFilms.length > 0 && currentFilms.every(f => selectedIds.includes(f.id))}
@@ -283,20 +283,22 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
           
           {selectedIds.length > 0 && (
             <button
-              onClick={() => {
+              onClick={async () => {
+                const targetIds = selectedIds;
                 setConfirmModal({
-                  message: `선택한 ${selectedIds.length}개의 필름을 일괄 삭제하시겠습니까?`,
+                  message: `선택하신 ${targetIds.length}개의 필름 게시글을 완전히 영구 삭제하시겠습니까?`,
                   onConfirm: async () => {
                     setIsLoading(true);
                     try {
                       await Promise.all(
-                        selectedIds.map(id =>
+                        targetIds.map(id =>
                           fetch(`/api/films/${id}`, { method: 'DELETE' })
                         )
                       );
-                      showTemporaryToast('선택한 필름들이 일괄 삭제되었습니다.');
+                      showTemporaryToast('선택한 필름 게시글이 성공적으로 영구 삭제 완료되었습니다.');
+                      const remain = films.filter(f => !targetIds.includes(f.id));
+                      setFilms(remain);
                       setSelectedIds([]);
-                      fetchFilms();
                       window.dispatchEvent(new Event('haste_films_updated'));
                     } catch (err: any) {
                       showTemporaryError('일괄 삭제 중 오류가 발생했습니다: ' + err.message);
@@ -306,7 +308,7 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
                   }
                 });
               }}
-              className="bg-rose-50 hover:bg-rose-100 border border-rose-250 text-rose-600 font-extrabold py-1.5 px-3 rounded-xl text-[10px] flex items-center gap-1 cursor-pointer transition-all active:scale-95 shadow-sm"
+              className="bg-rose-955/40 hover:bg-rose-900 border border-rose-900/60 text-rose-350 font-extrabold py-1.5 px-3 rounded-xl text-[11px] flex items-center gap-1 cursor-pointer transition-all active:scale-95 shadow-sm"
             >
               <Trash2 size={11} />
               <span>선택 일괄 삭제 ({selectedIds.length})</span>
@@ -316,7 +318,7 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
 
         <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto justify-end">
           {/* 필름 랜덤 노출 토글 스위치 */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl shadow-sm text-[10px] sm:text-xs font-semibold text-stone-650 select-none mr-1">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-stone-900 rounded-xl shadow-sm text-[10px] sm:text-xs font-semibold text-stone-300 select-none mr-1">
             <span>필름 랜덤 노출</span>
             <button
               type="button"
@@ -339,19 +341,22 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
                   showTemporaryError('설정 저장 중 오류: ' + err.message);
                 }
               }}
-              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${filmRandomShow ? 'bg-[#C5A059]' : 'bg-stone-300'}`}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${filmRandomShow ? 'bg-white' : 'bg-[#3F3F46]'}`}
             >
               <span
-                className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${filmRandomShow ? 'translate-x-4' : 'translate-x-0'}`}
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out ${filmRandomShow ? 'translate-x-5' : 'translate-x-0'}`}
+                style={{ backgroundColor: filmRandomShow ? '#18181b' : '#ffffff' }}
               />
             </button>
           </div>
 
+          {/* [HASTE 임시 제어 우회 수정 지점] 필름 게시판 내 시스템 허브 렌더링 제거
           <AdminSystemHub 
             showTemporaryToast={showTemporaryToast}
             showTemporaryError={showTemporaryError}
             activeAdminTab="FILMS"
           />
+          */}
           <button
             onClick={handleOpenCreateModal}
             className="flex-1 sm:flex-none bg-[#C5A059] hover:bg-[#B38F46] text-stone-950 font-black py-1.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-[0.98] cursor-pointer"
@@ -363,8 +368,8 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
       </div>
 
       {films.length === 0 ? (
-        <div className="text-center py-16 bg-stone-50 border border-dashed border-stone-200 rounded-2xl flex flex-col items-center justify-center text-stone-500 gap-3">
-          <AlertCircle size={32} className="text-stone-400" />
+        <div className="text-center py-16 bg-stone-950 border border-dashed border-stone-900 rounded-2xl flex flex-col items-center justify-center text-stone-400 gap-3">
+          <AlertCircle size={32} className="text-stone-500" />
           <p className="text-xs tracking-wider">등록된 시네마틱 동영상 카드가 아직 없습니다. ‘필름 추가’ 버튼을 눌러 등록해주세요.</p>
         </div>
       ) : (
@@ -397,12 +402,12 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
                   setDraggedIdx(null);
                   handleReorderSave(filmsRef.current);
                 }}
-                className={`group border rounded-2xl overflow-hidden transition-all duration-300 bg-white flex flex-col sm:flex-row items-stretch sm:items-center p-3.5 gap-4 cursor-grab active:cursor-grabbing ${
-                  draggedIdx === filmIndex ? 'opacity-35 bg-stone-100 border-2 border-dashed border-[#C5A059]/30 scale-[0.995]' : ''
+                className={`group border rounded-2xl overflow-hidden transition-all duration-300 bg-stone-950 flex flex-col sm:flex-row items-stretch sm:items-center p-3.5 gap-4 cursor-grab active:cursor-grabbing ${
+                  draggedIdx === filmIndex ? 'opacity-35 bg-stone-900 border-2 border-dashed border-[#C5A059]/30 scale-[0.995]' : ''
                 } ${
                   film.visible 
-                    ? 'border-stone-200 hover:border-stone-300 hover:shadow-md' 
-                    : 'border-dashed border-stone-250 opacity-60 bg-stone-50/30'
+                    ? 'border-stone-900 hover:border-stone-850 hover:shadow-md' 
+                    : 'border-dashed border-stone-900 opacity-60 bg-stone-950/20'
                 }`}
               >
                 {/* Left drag handle and selection checkbox */}
@@ -442,17 +447,17 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
                 </div>
 
                 {/* Title & Description & URL */}
-                <div className="flex-1 min-w-0 space-y-1.5">
+                 <div className="flex-1 min-w-0 space-y-1.5">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-stone-400 text-[10px] font-mono font-bold bg-stone-100 px-1.5 py-0.5 rounded">
+                    <span className="text-stone-400 text-[11px] font-sans font-normal bg-stone-900 px-1.5 py-0.5 rounded">
                       No.{filmIndex + 1}
                     </span>
-                    <h3 className="text-stone-900 font-bold text-sm tracking-tight truncate max-w-xs sm:max-w-md">
+                    <h3 className="text-stone-200 font-bold text-[13px] tracking-tight truncate max-w-xs sm:max-w-md">
                       {film.title}
                     </h3>
                   </div>
-                  <p className="text-stone-655 font-sans font-light text-[11px] leading-relaxed line-clamp-1">
-                    {film.desc}
+                  <p className="text-stone-450 font-sans font-normal text-[11px] leading-relaxed line-clamp-1">
+                    {film.desc || '설명이 등록되어 있지 않습니다.'}
                   </p>
                   <div className="font-mono text-[9px] text-stone-400 truncate max-w-xs sm:max-w-md select-all">
                     {film.videoUrl}
@@ -467,13 +472,13 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
                   {/* Badges */}
                   <div className="flex items-center gap-1.5">
                     <span className={`text-[9px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider shadow-sm ${
-                      film.visible ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'
+                      film.visible ? 'bg-emerald-950/20 text-emerald-400 border border-emerald-900/30' : 'bg-rose-955/20 text-rose-400 border border-rose-900/30'
                     }`}>
                       {film.visible ? '노출중' : '숨김'}
                     </span>
                     {(film.category || 'THEATER').split(',').map((cat) => {
                       let label = '홍보관';
-                      let badgeClass = 'bg-stone-100 text-stone-700 border border-stone-200';
+                      let badgeClass = 'bg-stone-900 text-stone-450 border border-stone-850';
                       if (cat === 'BRAND1') {
                         label = '브랜드1';
                         badgeClass = 'bg-[#C5A059]/10 text-[#C5A059] border-[#C5A059]/20';
@@ -501,10 +506,10 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
                     <button
                       onClick={() => handleMoveUp(filmIndex)}
                       disabled={filmIndex === 0}
-                      className={`p-2 border border-stone-200 rounded-xl transition-colors ${
+                      className={`p-2 border border-stone-900 rounded-xl transition-colors ${
                         filmIndex === 0 
-                          ? 'text-stone-300 bg-stone-50 cursor-not-allowed' 
-                          : 'text-stone-505 hover:text-[#C5A059] hover:border-[#C5A059]/40 hover:bg-stone-50 cursor-pointer'
+                          ? 'text-stone-600 bg-stone-900/20 cursor-not-allowed' 
+                          : 'text-stone-400 hover:text-[#C5A059] hover:border-[#C5A059]/40 hover:bg-stone-900 cursor-pointer'
                       }`}
                       title="위로 이동"
                     >
@@ -513,36 +518,36 @@ export const AdminFilmsTab: React.FC<AdminFilmsTabProps> = ({
                     <button
                       onClick={() => handleMoveDown(filmIndex)}
                       disabled={filmIndex === films.length - 1}
-                      className={`p-2 border border-stone-200 rounded-xl transition-colors ${
+                      className={`p-2 border border-stone-900 rounded-xl transition-colors ${
                         filmIndex === films.length - 1 
-                          ? 'text-stone-300 bg-stone-50 cursor-not-allowed' 
-                          : 'text-stone-505 hover:text-[#C5A059] hover:border-[#C5A059]/40 hover:bg-stone-50 cursor-pointer'
+                          ? 'text-stone-600 bg-stone-900/20 cursor-not-allowed' 
+                          : 'text-stone-400 hover:text-[#C5A059] hover:border-[#C5A059]/40 hover:bg-stone-900 cursor-pointer'
                       }`}
                       title="아래로 이동"
                     >
                       <ChevronDown size={13} />
                     </button>
-                    <button
-                      onClick={() => handleToggleVisibility(film)}
-                      className={`p-2 rounded-xl border transition-colors cursor-pointer ${
-                        film.visible 
-                          ? 'border-emerald-100 text-emerald-600 bg-emerald-50/60 hover:bg-emerald-100/50' 
-                          : 'border-stone-200 text-stone-400 hover:text-stone-600 hover:bg-stone-50'
-                      }`}
+                     <button
+                       onClick={() => handleToggleVisibility(film)}
+                       className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+                         film.visible 
+                           ? 'border-emerald-950/40 text-emerald-400 bg-emerald-950/20 hover:bg-emerald-950/40' 
+                           : 'border-stone-900 text-stone-500 hover:text-stone-450 hover:bg-stone-900/40'
+                       }`}
                       title={film.visible ? "숨기기 (노출 토글)" : "노출시키기 (노출 토글)"}
                     >
                       {film.visible ? <Eye size={13} /> : <EyeOff size={13} />}
                     </button>
                     <button
                       onClick={() => handleOpenEditModal(film)}
-                      className="p-2 border border-stone-200 text-stone-500 hover:text-[#C5A059] hover:border-[#C5A059]/40 hover:bg-stone-50 rounded-xl transition-colors cursor-pointer"
+                      className="p-2 border border-stone-900 text-stone-500 hover:text-[#C5A059] hover:border-[#C5A059]/40 hover:bg-stone-50 rounded-xl transition-colors cursor-pointer"
                       title="수정하기"
                     >
                       <Edit size={13} />
                     </button>
                     <button
                       onClick={() => handleDeleteFilm(film.id)}
-                      className="p-2 border border-stone-200 hover:border-rose-200 hover:bg-rose-50 text-stone-400 hover:text-rose-600 rounded-xl transition-all cursor-pointer"
+                      className="p-2 border border-stone-900 hover:border-rose-900 hover:bg-rose-950/20 text-stone-400 hover:text-rose-500 rounded-xl transition-all cursor-pointer"
                       title="기록 소거"
                     >
                       <Trash2 size={13} />

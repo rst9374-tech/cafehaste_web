@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Search, Sparkles } from 'lucide-react';
-import { AdminSystemHub } from './admin/admin_comp_systemhub';
+
 import { BoardCompList, KakaoIcon } from './board_comp_list';
 import { BoardCompWrite } from './board_comp_write';
 import { AdminConfirmModal } from './admin/admin_comp_shared';
@@ -55,12 +55,7 @@ export const HasteBoard: React.FC<HasteBoardProps> = ({ loggedUser, onOpenLogin,
             </div>
 
             <div className="flex items-center gap-2 shrink-0 justify-end">
-              {board.isAdmin && (
-                <AdminSystemHub 
-                  showTemporaryToast={(msg) => alert(msg)}
-                  showTemporaryError={(msg) => alert(`Error: ${msg}`)}
-                />
-              )}
+
               <button
                 type="button"
                 onClick={() => {

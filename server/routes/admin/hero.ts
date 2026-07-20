@@ -8,7 +8,7 @@ import {
   getDbPool
 } from '../../database';
 import { withDbConnection, getLocalCheckpoints, saveLocalCheckpoint, deleteLocalCheckpoint } from '../../db/common-handler';
-import * as serverDefaults from '../../../serverDefaults';
+import * as serverDefaults from '../../serverDefaults';
 
 const { DEFAULT_DRAFTS } = serverDefaults;
 

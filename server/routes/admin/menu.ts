@@ -9,112 +9,158 @@ import {
 } from '../../database';
 import { withDbConnection, getLocalCheckpoints, saveLocalCheckpoint, deleteLocalCheckpoint } from '../../db/common-handler';
 import { supabase } from '../../database';
-import * as serverDefaults from '../../../serverDefaults';
+import * as serverDefaults from '../../serverDefaults';
 
-function saveBase64ToSpecificFile(base64Data: string, nameKr: string): string {
-  if (!base64Data || typeof base64Data !== 'string') return base64Data;
-  if (base64Data.startsWith('http://') || base64Data.startsWith('https://') || base64Data.startsWith('/uploads/')) {
-    return base64Data;
-  }
-
-  const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-  let mimeType = 'image/png';
-  let buffer: Buffer;
-
-  if (matches && matches.length === 3) {
-    mimeType = matches[1];
-    buffer = Buffer.from(matches[2], 'base64');
-  } else {
-    try {
-      buffer = Buffer.from(base64Data, 'base64');
-    } catch (e) {
-      return base64Data;
-    }
-  }
-
-  try {
-    const safeName = nameKr.trim().replace(/\s+/g, '_');
-    const filename = `${safeName}.png`;
-    const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
-    const EXTERNAL_DIR = path.join(process.cwd(), 'external_uploads');
-    
-    const filePath = path.join(UPLOADS_DIR, filename);
-    const extFilePath = path.join(EXTERNAL_DIR, filename);
-
-    if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-    if (!fs.existsSync(EXTERNAL_DIR)) fs.mkdirSync(EXTERNAL_DIR, { recursive: true });
-
-    // Write binary buffer directly to prevent container startup failure from sharp native bindings
-    fs.writeFileSync(filePath, buffer);
-    fs.writeFileSync(extFilePath, buffer);
-
-    supabase.storage.from('cafehaste-bucket').upload(`menu/${filename}`, buffer, {
-      contentType: 'image/png',
-      upsert: true
-    }).then(({ error }: any) => {
-      if (error) console.error(`[Supabase Storage] Upload error for ${filename}:`, error.message);
-    }).catch((err: any) => {});
-
-    const supabaseUrl = 'https://fuzhdcsdfblwcgwfylsx.supabase.co';
-    return `${supabaseUrl}/storage/v1/object/public/cafehaste-bucket/menu/${filename}`;
-  } catch (err) {
-    console.error('saveBase64ToSpecificFile error:', err);
-    return base64Data;
-  }
-}
-
+import { 
+  saveBase64ToSpecificFile, 
+  getSupabaseRedirectUrlLocal, 
+  cleanDisplayName 
+} from '../../utils/image-uploader';
 
 const { DEFAULT_CATEGORIES, DEFAULT_MENU_ITEMS } = serverDefaults;
 
-function getCategoryFolderForImageLocal(filename: string): string | null {
-  if (filename.startsWith('menu_americano_')) return 'menu/americano';
-  if (filename.startsWith('menu_coffee_latte_')) return 'menu/coffee_latte';
-  if (filename.startsWith('menu_milk_latte_')) return 'menu/milk_latte';
-  if (filename.startsWith('menu_tea_base_')) return 'menu/tea_base';
-  if (filename.startsWith('menu_ade_etc_')) return 'menu/ade_etc';
-  return null;
-}
-
-function getSupabaseRedirectUrlLocal(relativePath: string): string | null {
-  const filename = relativePath;
-  const supabaseUrl = (process.env.SUPABASE_URL || 'https://fuzuzhdcsdfblwcgwfylsx.supabase.co').trim().replace('fuzuzhdcsdfblwcgwfylsx', 'fuzhdcsdfblwcgwfylsx');
-
-  if (filename.startsWith('HERO_DRAFT_')) {
-    return `${supabaseUrl}/storage/v1/object/public/cafehaste-bucket/draft/${filename}`;
-  }
-  
-  const upperFile = filename.toUpperCase();
-  const isMenu = filename.startsWith('menu_') || 
-                 upperFile.startsWith('DRINK_') || 
-                 upperFile.startsWith('AME_') || 
-                 upperFile.startsWith('COFFEE_LATTE_') || 
-                 upperFile.startsWith('MILK_') || 
-                 upperFile.startsWith('TEA_') || 
-                 upperFile.startsWith('ADE_') ||
-                 upperFile.startsWith('LAT_') ||
-                 upperFile.startsWith('TEA_BASE_') ||
-                 upperFile.startsWith('GS') ||
-                 upperFile.startsWith('MS') ||
-                 upperFile.startsWith('VS') ||
-                 upperFile.startsWith('XS');
-                 
-  if (isMenu) {
-    const subFolder = getCategoryFolderForImageLocal(filename) || 'menu';
-    return `${supabaseUrl}/storage/v1/object/public/cafehaste-bucket/${subFolder}/${filename}`;
-  }
-  return null;
-}
-
-function cleanDisplayName(name: string): string {
-  let clean = name || '';
-  // Remove trailing _G, _MV, _V, _M (case-insensitive)
-  clean = clean.replace(/_(G|MV|V|M)$/i, '');
-  // Replace underscores with spaces
-  clean = clean.replace(/_/g, ' ');
-  return clean.trim();
-}
-
 const router = Router();
+
+// [HASTE 임시 제어 우회 수정 지점] 메뉴 데이터 변경 시 HASTE 로컬 제어 코어로의 실시간 양방향 동기화 격발
+async function triggerMenuSyncToDevice(storeCode: string): Promise<void> {
+  const targetStore = storeCode || 'store075575';
+  try {
+    let menus: any[] = [];
+    let primaryToken = 'MTUyNjI0MDE2NTg2ODIxMjQ0NQ.GAfCVA.p5QmUbvqKZGMhZT4GSdsAX89OQBNIhAe9TIDEs';
+    let secondaryToken = 'MTUyNjI4MjUwMzIzNzEzMjk2Mg.GBgDVB.q6RnVcvqKZGMhZT4GSdsAX89OQBNIhAe9TIDEs';
+
+    await withDbConnection(async (conn) => {
+      // 1. 전체 메뉴 목록 로드
+      const [items]: any = await conn.query('SELECT * FROM web_menu_items ORDER BY order_index ASC, id ASC');
+      // 2. 릴리 단말 데이터 대칭 포맷팅 (Field Name Symmetry 준수)
+      menus = items.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        nameKr: item.name_kr,
+        category: item.category,
+        imageUrl: item.image_url,
+        description: item.description,
+        acidity: item.acidity,
+        sweetness: item.sweetness,
+        body: item.body,
+        bitterness: item.bitterness,
+        visible: item.visible === true || Number(item.visible) === 1,
+        isSignature: item.is_signature === true || Number(item.is_signature) === 1,
+        videoUrl: item.video_url,
+        price: item.price || 0,
+        steps: item.steps ? (typeof item.steps === 'string' ? JSON.parse(item.steps) : item.steps) : {}
+      }));
+
+      // 3. 디스코드 토큰 로드 (DB에서 공용으로 읽어옴)
+      try {
+        const [settingsRows]: any = await conn.query("SELECT setting_value FROM web_system_settings WHERE setting_key = 'discord_bot_token_primary' LIMIT 1");
+        if (settingsRows && settingsRows.length > 0 && settingsRows[0].setting_value) {
+          primaryToken = settingsRows[0].setting_value;
+        }
+      } catch (e) {}
+
+      try {
+        const [settingsRows]: any = await conn.query("SELECT setting_value FROM web_system_settings WHERE setting_key = 'discord_bot_token_secondary' LIMIT 1");
+        if (settingsRows && settingsRows.length > 0 && settingsRows[0].setting_value) {
+          secondaryToken = settingsRows[0].setting_value;
+        }
+      } catch (e) {}
+    });
+
+    if (menus.length === 0) return;
+
+    const isLocalTestEnv = process.env.NODE_ENV !== 'production';
+    const activeApiKey = targetStore === 'HASTE-HQS-ADMIN' ? 'store075575' : targetStore;
+
+    if (isLocalTestEnv) {
+      // [Case A] 로컬 개발 환경: 로컬 제어 코어(127.0.0.1:8080)로 즉시 100% 직송 (로컬 직접 직송 룰 준수)
+      fetch('http://127.0.0.1:8080/v3/menu/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${activeApiKey}`
+        },
+        body: JSON.stringify({ storeCode: targetStore, menus })
+      }).catch((err: any) => {
+        console.warn('[HASTE Sync Trigger Request Warn]', err.message);
+      });
+    } else {
+      // [Case B] 실서버 운영 환경: 루프백 fetch 대신 직접 디스코드 1 ➔ 2차 자동 Failover 릴레이 채널 전송 대행 (본사 직접 노킹 금지 룰 준수!)
+      (async () => {
+        try {
+          const originUrl = process.env.PUBLIC_ORIGIN_URL || 'https://cafehaste-web-3940176840.a.run.app';
+          
+          const sendToDiscord = async (token: string): Promise<boolean> => {
+            try {
+              const guildsResponse = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+                headers: { 'Authorization': `Bot ${token}` }
+              });
+              if (!guildsResponse.ok) return false;
+              const guilds: any = await guildsResponse.json();
+              if (guilds.length === 0) return false;
+              const targetGuildId = guilds[0].id;
+
+              const channelsResponse = await fetch(`https://discord.com/api/v10/guilds/${targetGuildId}/channels`, {
+                headers: { 'Authorization': `Bot ${token}` }
+              });
+              const channels: any = await channelsResponse.json();
+              const textChannel = channels.find((c: any) => c.type === 0);
+              if (!textChannel) return false;
+
+              // 독자 보안 시그니처 및 타임스탬프 계산
+              const timestamp = String(Date.now());
+              const salt = process.env.HASTE_SECRET_SALT || "HASTE_SECURE_TUNNEL_SALT_2026";
+              const rawMsg = `${targetStore}:true:${timestamp}:${salt}`;
+              const signature = crypto.createHash("sha256").update(rawMsg).digest("hex");
+
+              const packetContent = JSON.stringify({
+                route: '/v3/menu/sync',
+                targetStore,
+                originUrl,
+                body: { storeCode: targetStore, menus },
+                headers: {
+                  "X-Haste-Tunnel-Signature": signature,
+                  "X-Haste-Timestamp": timestamp
+                }
+              });
+
+              const postResponse = await fetch(`https://discord.com/api/v10/channels/${textChannel.id}/messages`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bot ${token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: packetContent })
+              });
+
+              return postResponse.ok;
+            } catch (err) {
+              return false;
+            }
+          };
+
+          let success = await sendToDiscord(primaryToken);
+          if (!success) {
+            console.warn(`⚠️ [Discord Menu Sync Primary Failed] Attempting failover to Secondary Channel...`);
+            success = await sendToDiscord(secondaryToken);
+          }
+
+          if (success) {
+            console.log(`[HASTE Sync Trigger] Successfully dispatched menu sync through Discord tunnel to store: ${targetStore}`);
+          } else {
+            console.warn(`❌ [HASTE Sync Trigger Failed] Failed to send menu sync through all Discord channels for store: ${targetStore}`);
+          }
+        } catch (err: any) {
+          console.error('[Discord Sync Trigger Exec Error]', err.message);
+        }
+      })();
+    }
+
+    console.log(`[HASTE Sync Trigger] Dispatched menu sync sequence to store: ${targetStore}`);
+  } catch (err: any) {
+    console.error('❌ [HASTE Sync Trigger Error] Menu Sync failed:', err.message);
+  }
+}
 
 // 6. Menu Categories Operations
 router.post('/api/menu-categories', async (req, res) => {
@@ -256,16 +302,16 @@ router.post('/api/menu-items/sync-option-mappings', async (req, res) => {
   }
 });
 
-
-
 // 7. Menu Items Operations
 router.post('/api/menu-items', async (req, res) => {
   const { id, name, nameKr, category, image, description, acidity, sweetness, body, bitterness, visible, isSignature, videoUrl } = req.body;
-  if (!id || !nameKr) {
-    return res.status(400).json({ success: false, message: '메뉴 ID와 한글 메뉴명은 필수 입력 사항입니다.' });
+  if (!nameKr) {
+    return res.status(400).json({ success: false, message: '한글 메뉴명은 필수 입력 사항입니다.' });
   }
   try {
-    const cleanImage = saveBase64ToSpecificFile(image || '', nameKr);
+    const { productCode, product_code } = req.body;
+    const codeVal = productCode || product_code;
+    const cleanImage = saveBase64ToSpecificFile(image || '', nameKr, codeVal, category);
     const visibleVal = (visible === undefined || visible === true || visible === 1);
     const isSignatureVal = (isSignature === true || isSignature === 1);
     const acidityVal = parseInt(acidity || 0);
@@ -274,24 +320,53 @@ router.post('/api/menu-items', async (req, res) => {
     const bitternessVal = parseInt(bitterness || 0);
     const videoUrlVal = videoUrl || '';
 
+    let finalId = id || '';
+    let exists = false;
+
     await withDbConnection(async (conn) => {
-      if (conn.isFallback) {
+      if (finalId) {
+        const [checkRows]: any = await conn.query('SELECT COUNT(*) as count FROM web_menu_items WHERE id = ?', [finalId]);
+        exists = Number(checkRows[0]?.count ?? checkRows[0]?.COUNT ?? 0) > 0;
+      }
+
+      if (exists) {
+        // 존재하면 UPDATE 실행
         await conn.query(
-          'INSERT INTO web_menu_items (id, name, name_kr, category, image, description, acidity, sweetness, body, bitterness, visible, is_signature, video_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-          [id, name || '', nameKr, category || 'AMERICANO', cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrlVal]
+          'UPDATE web_menu_items SET name = ?, name_kr = ?, category = ?, image_url = ?, description = ?, acidity = ?, sweetness = ?, body = ?, bitterness = ?, visible = ?, is_signature = ?, video_url = ? WHERE id = ?',
+          [name || '', nameKr, category || 'AMERICANO', cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrlVal, finalId]
         );
       } else {
+        // 존재하지 않으면 새 정수 ID 연산 및 INSERT 실행
+        if (!finalId) {
+          let categoryMin = 1000;
+          if (category === 'AMERICANO') categoryMin = 1000;
+          else if (category === 'COFFEE_LATTE') categoryMin = 2000;
+          else if (category === 'MILK_LATTE') categoryMin = 3000;
+          else if (category === 'ADE_ETC' || category === 'ADE') categoryMin = 4000;
+          else if (category === 'TEA_BASE') categoryMin = 5000;
+
+          const [maxRows]: any = await conn.query(
+            "SELECT MAX(CAST(id AS INTEGER)) as maxId FROM web_menu_items WHERE id ~ '^[0-9]+$' AND CAST(id AS INTEGER) >= ? AND CAST(id AS INTEGER) < ?",
+            [categoryMin + 1, categoryMin + 1000]
+          );
+          const maxVal = (maxRows && maxRows[0] && maxRows[0].maxId) ? maxRows[0].maxId : categoryMin;
+          finalId = String(maxVal + 1);
+        }
+
         await conn.query(
-          'INSERT INTO web_menu_items (id, name, name_kr, category, image, description, acidity, sweetness, body, bitterness, visible, is_signature, video_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), name_kr = VALUES(name_kr), category = VALUES(category), image = VALUES(image), description = VALUES(description), acidity = VALUES(acidity), sweetness = VALUES(sweetness), body = VALUES(body), bitterness = VALUES(bitterness), visible = VALUES(visible), is_signature = VALUES(is_signature), video_url = VALUES(video_url)',
-          [id, name || '', nameKr, category || 'AMERICANO', cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrlVal]
+          'INSERT INTO web_menu_items (id, name, name_kr, category, image_url, description, acidity, sweetness, body, bitterness, visible, is_signature, video_url, order_index) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [finalId, name || '', nameKr, category || 'AMERICANO', cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrlVal, 0]
         );
       }
     });
 
+    // [HASTE 임시 제어 우회 수정 지점] HASTE 로컬 제어 코어로 양방향 실시간 동기화 격발
+    triggerMenuSyncToDevice(req.body.storeCode);
+
     res.json({
       success: true,
-      message: '메뉴 항목이 데이터베이스에 등록되었습니다.',
-      item: { id, name, nameKr, category, image: cleanImage, description, acidity: acidityVal, sweetness: sweetnessVal, body: bodyVal, bitterness: bitternessVal, visible: visibleVal, isSignature: isSignatureVal, videoUrl: videoUrlVal }
+      message: '메뉴 항목이 등록/수정되었습니다.',
+      item: { id: finalId, name, nameKr, category, image: cleanImage, description, acidity: acidityVal, sweetness: sweetnessVal, body: bodyVal, bitterness: bitternessVal, visible: visibleVal, isSignature: isSignatureVal, videoUrl: videoUrlVal }
     });
   } catch (err: any) {
     console.error('[API error] Upsert menu-item failed:', err);
@@ -299,71 +374,12 @@ router.post('/api/menu-items', async (req, res) => {
   }
 });
 
-// MENU_ALL raw data operations
-router.get('/api/menu-items-all/raw', async (req, res) => {
-  try {
-    const result = await withDbConnection(async (conn) => {
-      if (conn.isFallback) {
-        return [];
-      }
-      const [rows]: any = await conn.query('SELECT * FROM web_menu_items_all ORDER BY order_index ASC, id ASC');
-      return rows;
-    });
-    const items = result.map((row: any) => ({
-      ...row,
-      nameKr: row.name_kr !== undefined ? row.name_kr : row.nameKr,
-      name_kr: row.name_kr !== undefined ? row.name_kr : row.nameKr,
-      isSignature: row.is_signature !== undefined ? row.is_signature : row.isSignature,
-      is_signature: row.is_signature !== undefined ? row.is_signature : row.isSignature,
-      videoUrl: row.video_url || row.videoUrl || ''
-    }));
-    res.json({ success: true, items });
-  } catch (err: any) {
-    console.error('[API error] Fetch raw menu-items-all failed:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-router.post('/api/menu-items-all', async (req, res) => {
-  const { id, name, nameKr, category, image, description, acidity, sweetness, body, bitterness, visible, isSignature, videoUrl } = req.body;
-  if (!id || !nameKr) {
-    return res.status(400).json({ success: false, message: '메뉴 ID와 한글 메뉴명은 필수 입력 사항입니다.' });
-  }
-  try {
-    const cleanImage = saveBase64ToSpecificFile(image || '', nameKr);
-    const visibleVal = (visible === undefined || visible === true || visible === 1);
-    const isSignatureVal = (isSignature === true || isSignature === 1);
-    const acidityVal = parseInt(acidity || 0);
-    const sweetnessVal = parseInt(sweetness || 0);
-    const bodyVal = parseInt(body || 0);
-    const bitternessVal = parseInt(bitterness || 0);
-    const videoUrlVal = videoUrl || '';
-
-    await withDbConnection(async (conn) => {
-      if (!conn.isFallback) {
-        await conn.query(
-          'INSERT INTO web_menu_items_all (id, name, name_kr, category, image, description, acidity, sweetness, body, bitterness, visible, is_signature, video_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), name_kr = VALUES(name_kr), category = VALUES(category), image = VALUES(image), description = VALUES(description), acidity = VALUES(acidity), sweetness = VALUES(sweetness), body = VALUES(body), bitterness = VALUES(bitterness), visible = VALUES(visible), is_signature = VALUES(is_signature), video_url = VALUES(video_url)',
-          [id, name || '', nameKr, category || 'AMERICANO', cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrlVal]
-        );
-      }
-    });
-
-    res.json({
-      success: true,
-      message: '메뉴 ALL 항목이 데이터베이스에 등록되었습니다.',
-      item: { id, name, nameKr, category, image: cleanImage, description, acidity: acidityVal, sweetness: sweetnessVal, body: bodyVal, bitterness: bitternessVal, visible: visibleVal, isSignature: isSignatureVal, videoUrl: videoUrlVal }
-    });
-  } catch (err: any) {
-    console.error('[API error] Upsert menu-item-all failed:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
 router.put('/api/menu-items/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, nameKr, category, image, description, acidity, sweetness, body, bitterness, visible, isSignature, videoUrl } = req.body;
+  const { name, nameKr, category, image, description, acidity, sweetness, body, bitterness, visible, isSignature, videoUrl, productCode, product_code } = req.body;
   try {
-    const cleanImage = saveBase64ToSpecificFile(image || '', nameKr);
+    const codeVal = productCode || product_code;
+    const cleanImage = saveBase64ToSpecificFile(image || '', nameKr, codeVal, category);
     const visibleVal = (visible === undefined || visible === true || visible === 1);
     const isSignatureVal = (isSignature === true || isSignature === 1);
     const acidityVal = parseInt(acidity || 0);
@@ -371,21 +387,15 @@ router.put('/api/menu-items/:id', async (req, res) => {
     const bodyVal = parseInt(body || 0);
     const bitternessVal = parseInt(bitterness || 0);
 
-    const isAllMenuTable = id.endsWith('_S') || id.endsWith('_D') || id.endsWith('_P');
-
     await withDbConnection(async (conn) => {
-      if (isAllMenuTable) {
-        await conn.query(
-          'UPDATE web_menu_items_all SET name = ?, name_kr = ?, category = ?, image = ?, description = ?, acidity = ?, sweetness = ?, body = ?, bitterness = ?, visible = ?, is_signature = ?, video_url = ? WHERE id = ?',
-          [name || '', nameKr, category, cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrl || '', id]
-        );
-      } else {
-        await conn.query(
-          'UPDATE web_menu_items SET name = ?, name_kr = ?, category = ?, image = ?, description = ?, acidity = ?, sweetness = ?, body = ?, bitterness = ?, visible = ?, is_signature = ?, video_url = ? WHERE id = ?',
-          [name || '', nameKr, category, cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrl || '', id]
-        );
-      }
+      await conn.query(
+        'UPDATE web_menu_items SET name = ?, name_kr = ?, category = ?, image_url = ?, description = ?, acidity = ?, sweetness = ?, body = ?, bitterness = ?, visible = ?, is_signature = ?, video_url = ? WHERE id = ?',
+        [name || '', nameKr, category, cleanImage, description || '', acidityVal, sweetnessVal, bodyVal, bitternessVal, visibleVal, isSignatureVal, videoUrl || '', id]
+      );
     });
+
+    // [HASTE 임시 제어 우회 수정 지점] HASTE 로컬 제어 코어로 양방향 실시간 동기화 격발
+    triggerMenuSyncToDevice(req.body.storeCode);
 
     res.json({
       success: true,
@@ -401,14 +411,13 @@ router.put('/api/menu-items/:id', async (req, res) => {
 router.delete('/api/menu-items/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const isAllMenuTable = id.endsWith('_S') || id.endsWith('_D') || id.endsWith('_P');
     await withDbConnection(async (conn) => {
-      if (isAllMenuTable) {
-        await conn.query('DELETE FROM web_menu_items_all WHERE id = ?', [id]);
-      } else {
-        await conn.query('DELETE FROM web_menu_items WHERE id = ?', [id]);
-      }
+      await conn.query('DELETE FROM web_menu_items WHERE id = ?', [id]);
     });
+    
+    // [HASTE 임시 제어 우회 수정 지점] HASTE 로컬 제어 코어로 양방향 실시간 동기화 격발
+    triggerMenuSyncToDevice(req.body.storeCode || req.query.storeCode);
+
     res.json({ success: true, message: '메뉴가 삭제되었습니다.', deletedId: id });
   } catch (err: any) {
     console.error('[API error] Delete menu-item failed:', err);
@@ -452,6 +461,9 @@ router.post('/api/menu-items/reorder', async (req, res) => {
     if (typeof (global as any).flushPublicReadCache === 'function') {
       (global as any).flushPublicReadCache();
     }
+    
+    // [HASTE 임시 제어 우회 수정 지점] HASTE 로컬 제어 코어로 양방향 실시간 동기화 격발
+    triggerMenuSyncToDevice(req.body.storeCode);
 
     res.json({ success: true, message: '메뉴 순서가 성공적으로 정렬되었습니다.' });
   } catch (err: any) {
@@ -474,10 +486,6 @@ router.post('/api/menu-items/bulk-image', async (req, res) => {
         `UPDATE web_menu_items SET image = ? WHERE id IN (${placeholders})`,
         [cleanImage, ...ids]
       );
-      await conn.query(
-        `UPDATE web_menu_items_all SET image = ? WHERE id IN (${placeholders})`,
-        [cleanImage, ...ids]
-      );
     });
     res.json({
       success: true,
@@ -486,6 +494,54 @@ router.post('/api/menu-items/bulk-image', async (req, res) => {
     });
   } catch (err: any) {
     console.error('[API error] Bulk update menu-item images failed:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Bulk Edit Signatures
+router.post('/api/menu-items/bulk-signature', async (req, res) => {
+  const { ids, isSignature } = req.body;
+  if (!ids || !Array.isArray(ids) || ids.length === 0 || isSignature === undefined) {
+    return res.status(400).json({ success: false, message: '올바른 메뉴 ID 배열과 시그니처 값이 전달되지 않았습니다.' });
+  }
+  try {
+    const isSignatureVal = (isSignature === true || isSignature === 1);
+    await withDbConnection(async (conn) => {
+      const placeholders = ids.map(() => '?').join(',');
+      await conn.query(
+        `UPDATE web_menu_items SET is_signature = ? WHERE id IN (${placeholders})`,
+        [isSignatureVal, ...ids]
+      );
+      
+      // Update local backups
+      const [items]: any = await conn.query('SELECT * FROM web_menu_items ORDER BY order_index ASC, id ASC');
+      const mappedItems = items.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        nameKr: r.name_kr !== undefined ? r.name_kr : r.nameKr,
+        category: r.category,
+        image: r.image || '',
+        description: r.description || '',
+        acidity: r.acidity || 0,
+        sweetness: r.sweetness || 0,
+        body: r.body || 0,
+        bitterness: r.bitterness || 0,
+        visible: r.visible !== 0,
+        isSignature: r.is_signature !== undefined ? (r.is_signature !== 0 && r.is_signature !== false) : (r.isSignature !== undefined && r.isSignature !== false)
+      }));
+      writeBackupMenuItems(mappedItems);
+    });
+
+    if (typeof (global as any).flushPublicReadCache === 'function') {
+      (global as any).flushPublicReadCache();
+    }
+
+    res.json({
+      success: true,
+      message: `선택한 ${ids.length}개 메뉴 품목의 시그니처 설정을 성공적으로 일괄 변경했습니다.`
+    });
+  } catch (err: any) {
+    console.error('[API error] Bulk update menu-item signatures failed:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -514,6 +570,10 @@ router.post('/api/menu-items/reset', async (req, res) => {
         );
       }
     });
+    
+    // [HASTE 임시 제어 우회 수정 지점] HASTE 로컬 제어 코어로 양방향 실시간 동기화 격발
+    triggerMenuSyncToDevice(req.body.storeCode);
+
     res.json({ success: true, message: '메뉴 목록이 기본값으로 초기화되었습니다.' });
   } catch (err: any) {
     console.error('[API error] Reset menu-items failed:', err);
@@ -621,6 +681,9 @@ router.post('/api/menu/restore-checkpoint', async (req, res) => {
 
     writeBackupCategories(mappedCats);
     writeBackupMenuItems(mappedItems);
+    
+    // [HASTE 임시 제어 우회 수정 지점] HASTE 로컬 제어 코어로 양방향 실시간 동기화 격발
+    triggerMenuSyncToDevice(req.body.storeCode);
 
     res.json({ 
       success: true, 

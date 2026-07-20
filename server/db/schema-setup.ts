@@ -1,5 +1,5 @@
-import { runTableRenames, seedInitialData } from './seeder';
-import * as serverDefaults from '../../serverDefaults';
+import { runTableRenames, seedInitialData } from "./seeder";
+import * as serverDefaults from "../serverDefaults";
 
 export async function setupDatabaseSchema(connection: any, database: string) {
   // web_menu_items is now preserved and used for clean homepage representation.
@@ -64,8 +64,21 @@ export async function setupDatabaseSchema(connection: any, database: string) {
     );
   `);
 
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS web_board_store_version (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      content TEXT NULL,
+      file_url TEXT NOT NULL,
+      author VARCHAR(100) DEFAULT 'admin',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   try {
-    await connection.query('ALTER TABLE web_board_posts ADD COLUMN writer_name VARCHAR(255) NULL');
+    await connection.query(
+      "ALTER TABLE web_board_posts ADD COLUMN writer_name VARCHAR(255) NULL",
+    );
   } catch (err) {
     // Ignore error if column already exists
   }
@@ -184,7 +197,6 @@ export async function setupDatabaseSchema(connection: any, database: string) {
     );
   `);
 
-
   await connection.query(`
     CREATE TABLE IF NOT EXISTS web_store_licenses (
       id SERIAL PRIMARY KEY,
@@ -291,34 +303,64 @@ export async function setupDatabaseSchema(connection: any, database: string) {
 
   // Ensure fallback columns or updates exist
   try {
-    await connection.query("ALTER TABLE web_membership_users ADD COLUMN agreement_document_url VARCHAR(500) NULL");
+    await connection.query(
+      "ALTER TABLE web_membership_users ADD COLUMN alert_email VARCHAR(255) NULL",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_menu_items ADD COLUMN is_signature BOOLEAN NOT NULL DEFAULT FALSE");
+    await connection.query(
+      "ALTER TABLE web_membership_users ADD COLUMN agreement_document_url VARCHAR(500) NULL",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_menu_items MODIFY COLUMN image TEXT NULL");
+    await connection.query(
+      "ALTER TABLE web_menu_items ADD COLUMN is_signature BOOLEAN NOT NULL DEFAULT FALSE",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_menu_items ADD COLUMN video_url TEXT NULL");
+    await connection.query(
+      "ALTER TABLE web_menu_items MODIFY COLUMN image TEXT NULL",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_board_posts ADD COLUMN category VARCHAR(100) DEFAULT 'Q&A'");
+    await connection.query(
+      "ALTER TABLE web_menu_items DROP COLUMN IF EXISTS original_id",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_board_posts ADD COLUMN skin_type INT DEFAULT 1");
+    await connection.query(
+      "ALTER TABLE web_menu_items ADD COLUMN video_url TEXT NULL",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_store_licenses ADD COLUMN password VARCHAR(255) NULL");
+    await connection.query(
+      "ALTER TABLE web_board_posts ADD COLUMN category VARCHAR(100) DEFAULT 'Q&A'",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_brand_films ADD COLUMN category VARCHAR(50) DEFAULT 'THEATER'");
+    await connection.query(
+      "ALTER TABLE web_board_posts ADD COLUMN skin_type INT DEFAULT 1",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_interior_layouts ADD COLUMN video_links TEXT NULL");
+    await connection.query(
+      "ALTER TABLE web_store_licenses ADD COLUMN password VARCHAR(255) NULL",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_interior_layouts ADD COLUMN default_video_links TEXT NULL");
+    await connection.query(
+      "ALTER TABLE web_brand_films ADD COLUMN category VARCHAR(50) DEFAULT 'THEATER'",
+    );
+  } catch (_) {}
+  try {
+    await connection.query(
+      "ALTER TABLE web_interior_layouts ADD COLUMN video_links TEXT NULL",
+    );
+  } catch (_) {}
+  try {
+    await connection.query(
+      "ALTER TABLE web_interior_layouts ADD COLUMN default_video_links TEXT NULL",
+    );
   } catch (_) {}
 
   // 공식 홈페이지 오픈 공지글 본문에 MENU 안내 누락사항 복원 보정
@@ -351,7 +393,7 @@ export async function setupDatabaseSchema(connection: any, database: string) {
 <p>감사합니다.</p>`;
     await connection.query(
       "UPDATE web_board_posts SET content = ? WHERE id = 106 OR title LIKE '%공식 홈페이지 오픈%'",
-      [announcementContent]
+      [announcementContent],
     );
   } catch (_) {}
 
@@ -457,30 +499,48 @@ export async function setupDatabaseSchema(connection: any, database: string) {
 감사합니다.</p>`;
     await connection.query(
       "UPDATE web_board_posts SET content = ? WHERE id = 107 OR title LIKE '%멤버십 가입 절차%'",
-      [benefitDetailContent]
+      [benefitDetailContent],
     );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE music_songs ADD COLUMN lyrics TEXT NULL");
+    await connection.query(
+      "ALTER TABLE music_songs ADD COLUMN lyrics TEXT NULL",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE music_songs ADD COLUMN visible BOOLEAN DEFAULT TRUE");
+    await connection.query(
+      "ALTER TABLE music_songs ADD COLUMN visible BOOLEAN DEFAULT TRUE",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE music_songs ADD COLUMN order_index INT NOT NULL DEFAULT 0");
+    await connection.query(
+      "ALTER TABLE music_songs ADD COLUMN order_index INT NOT NULL DEFAULT 0",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_board_posts ADD COLUMN is_notice BOOLEAN DEFAULT FALSE");
+    await connection.query(
+      "ALTER TABLE web_board_posts ADD COLUMN is_notice BOOLEAN DEFAULT FALSE",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_board_posts ADD COLUMN like_count INT DEFAULT 0");
+    await connection.query(
+      "ALTER TABLE web_board_posts ADD COLUMN like_count INT DEFAULT 0",
+    );
   } catch (_) {}
   try {
-    await connection.query("ALTER TABLE web_grade_permissions ADD COLUMN can_list INT DEFAULT 1");
+    await connection.query(
+      "ALTER TABLE web_grade_permissions ADD COLUMN can_list INT DEFAULT 1",
+    );
     // Migrate existing '일반' store types to '멤버십'
-    await connection.query("UPDATE web_membership_users SET store_type = '멤버십' WHERE store_type = '일반'");
-    await connection.query("UPDATE web_kakao_members SET store_type = '멤버십' WHERE store_type = '일반'");
-    console.log('[Schema Setup] web_grade_permissions table checked and migrated.');
+    await connection.query(
+      "UPDATE web_membership_users SET store_type = '멤버십' WHERE store_type = '일반'",
+    );
+    await connection.query(
+      "UPDATE web_kakao_members SET store_type = '멤버십' WHERE store_type = '일반'",
+    );
+    console.log(
+      "[Schema Setup] web_grade_permissions table checked and migrated.",
+    );
   } catch (_) {}
 
   await connection.query(`
@@ -502,13 +562,25 @@ export async function setupDatabaseSchema(connection: any, database: string) {
   `);
 
   try {
-    await connection.query(`ALTER TABLE web_system_settings ALTER COLUMN setting_value TYPE TEXT`);
+    await connection.query(
+      `ALTER TABLE web_system_settings ALTER COLUMN setting_value TYPE TEXT`,
+    );
   } catch (_) {}
 
   try {
     await connection.query(`
       INSERT INTO web_system_settings (setting_key, setting_value) 
       VALUES ('draft_random_show', 'false') 
+      ON CONFLICT (setting_key) DO NOTHING
+    `);
+    await connection.query(`
+      INSERT INTO web_system_settings (setting_key, setting_value) 
+      VALUES ('discord_bot_token_primary', 'MTUyNjI0MDE2NTg2ODIxMjQ0NQ.GAfCVA.p5QmUbvqKZGMhZT4GSdsAX89OQBNIhAe9TIDEs') 
+      ON CONFLICT (setting_key) DO NOTHING
+    `);
+    await connection.query(`
+      INSERT INTO web_system_settings (setting_key, setting_value) 
+      VALUES ('discord_bot_token_secondary', '') 
       ON CONFLICT (setting_key) DO NOTHING
     `);
   } catch (_) {}
@@ -519,28 +591,36 @@ export async function setupDatabaseSchema(connection: any, database: string) {
       subtitle: serverDefaults.AGREEMENT_SUBTITLE,
       lines: serverDefaults.AGREEMENT_LINES,
       provider: {
-        name: '주식회사 헤이스트 에이아이',
-        bizNo: '(발급 후 기재)',
-        ceo: '김성규',
-        address: '(법인 등기부상 본점 주소)',
-        phone: '1644-8999'
-      }
+        name: "주식회사 헤이스트 에이아이",
+        bizNo: "(발급 후 기재)",
+        ceo: "김성규",
+        address: "(법인 등기부상 본점 주소)",
+        phone: "1644-8999",
+      },
     });
-    await connection.query(`
+    await connection.query(
+      `
       INSERT INTO web_system_settings (setting_key, setting_value) 
       VALUES ('agreement_config', ?) 
       ON CONFLICT (setting_key) DO NOTHING
-    `, [defaultVal]);
+    `,
+      [defaultVal],
+    );
 
     // Surgical migration of the 18th line if it contains the old 6/12 month text
-    const [rows]: any = await connection.query("SELECT setting_value FROM web_system_settings WHERE setting_key = 'agreement_config' LIMIT 1");
+    const [rows]: any = await connection.query(
+      "SELECT setting_value FROM web_system_settings WHERE setting_key = 'agreement_config' LIMIT 1",
+    );
     if (rows && rows.length > 0) {
       const val = rows[0].setting_value;
-      const parsed = typeof val === 'string' ? JSON.parse(val) : val;
+      const parsed = typeof val === "string" ? JSON.parse(val) : val;
       let lines = parsed.lines || [];
       let changed = false;
       lines = lines.map((l: string) => {
-        if (l.includes('6개월 정기구독 유지 시 +7일') || l.includes('6개월은 +7일')) {
+        if (
+          l.includes("6개월 정기구독 유지 시 +7일") ||
+          l.includes("6개월은 +7일")
+        ) {
           changed = true;
           return '"을"이 월 이용료 정기구독 플랜을 유지하는 경우 매장 상태 및 결제 내역에 따라 추가적인 점주 혜택을 제공할 수 있다.';
         }
@@ -549,48 +629,55 @@ export async function setupDatabaseSchema(connection: any, database: string) {
       // Also ensure parsed.provider exists
       if (!parsed.provider) {
         parsed.provider = {
-          name: '주식회사 헤이스트 에이아이',
-          bizNo: '(발급 후 기재)',
-          ceo: '김성규',
-          address: '(법인 등기부상 본점 주소)',
-          phone: '1644-8999'
+          name: "주식회사 헤이스트 에이아이",
+          bizNo: "(발급 후 기재)",
+          ceo: "김성규",
+          address: "(법인 등기부상 본점 주소)",
+          phone: "1644-8999",
         };
         changed = true;
       }
       if (changed) {
-        await connection.query("UPDATE web_system_settings SET setting_value = ? WHERE setting_key = 'agreement_config'", [JSON.stringify(parsed)]);
+        await connection.query(
+          "UPDATE web_system_settings SET setting_value = ? WHERE setting_key = 'agreement_config'",
+          [JSON.stringify(parsed)],
+        );
       }
     }
   } catch (err) {
-    console.error('Failed to run migration/seeding for agreement config:', err);
+    console.error("Failed to run migration/seeding for agreement config:", err);
   }
 
   // Surgical migration of Q&A post 117 content if it contains the old text
   try {
     await connection.query(
       "UPDATE web_board_posts SET content = ? WHERE id = 117 AND content LIKE '%경직된 장기 계약 방식%'",
-      ["## 💡 헤이스트(HASTE) 스마트 파트너십 Q&A\n\n해지 위약금은 부과되지 않습니다. 헤이스트는 별도의 의무 약정 기간 족쇄나 위약금 없이 매월 결제되는 유연한 월 정기 구독제 서비스로 운영됩니다.\n\n갑작스러운 중도 해지에 따른 고액의 위약금 걱정 없이 상황에 맞게 안심하고 서비스를 이용하실 수 있습니다."]
+      [
+        "## 💡 헤이스트(HASTE) 스마트 파트너십 Q&A\n\n해지 위약금은 부과되지 않습니다. 헤이스트는 별도의 의무 약정 기간 족쇄나 위약금 없이 매월 결제되는 유연한 월 정기 구독제 서비스로 운영됩니다.\n\n갑작스러운 중도 해지에 따른 고액의 위약금 걱정 없이 상황에 맞게 안심하고 서비스를 이용하실 수 있습니다.",
+      ],
     );
   } catch (err) {
-    console.error('Failed to run migration for Q&A post 117:', err);
+    console.error("Failed to run migration for Q&A post 117:", err);
   }
 
   // Surgical migration/insertion of Q&A post 119
   try {
-    const [rows]: any = await connection.query("SELECT COUNT(*) as count FROM web_board_posts WHERE id = 119");
+    const [rows]: any = await connection.query(
+      "SELECT COUNT(*) as count FROM web_board_posts WHERE id = 119",
+    );
     const count = Number(rows[0]?.count ?? rows[0]?.COUNT ?? 0);
     if (count === 0) {
       await connection.query(
         "INSERT INTO web_board_posts (id, member_id, title, content, category, is_secret, is_notice) VALUES (119, 1, ?, ?, 'Q&A', 0, 0)",
         [
           "월구독료와 가입비는 세금계산서 발행이 되나요?",
-          "## 💡 헤이스트(HASTE) 스마트 파트너십 Q&A\n\n네, 세금계산서 발행이 가능합니다.\n\n최초 1회 발생하는 솔루션 가입비(30만 원, VAT 별도) 및 월 기술 이용료(5만 원, VAT 별도)는 부가가치세법에 의거하여 정상적으로 전자세금계산서가 발행됩니다.\n\n다만, **신용카드 정기결제**를 이용하시는 경우에는 신용카드 매입전표 자체가 세법상 적격증빙(매입세액 공제 증빙)으로 처리되므로, 부가가치세 중복 매출 신고 방지를 위해 세금계산서가 중복 발행되지 않습니다.\n\n계좌이체 또는 별도 청구 방식으로 발행이 필요하신 사장님께서는 사업자등록증 사본과 전자세금계산서를 수신하실 이메일 주소를 첨부하여 가맹지원팀(본사) 공식 카카오톡 채널로 신청해 주시면 확인 후 발급을 도와드립니다."
-        ]
+          "## 💡 헤이스트(HASTE) 스마트 파트너십 Q&A\n\n네, 세금계산서 발행이 가능합니다.\n\n최초 1회 발생하는 솔루션 가입비(30만 원, VAT 별도) 및 월 기술 이용료(5만 원, VAT 별도)는 부가가치세법에 의거하여 정상적으로 전자세금계산서가 발행됩니다.\n\n다만, **신용카드 정기결제**를 이용하시는 경우에는 신용카드 매입전표 자체가 세법상 적격증빙(매입세액 공제 증빙)으로 처리되므로, 부가가치세 중복 매출 신고 방지를 위해 세금계산서가 중복 발행되지 않습니다.\n\n계좌이체 또는 별도 청구 방식으로 발행이 필요하신 사장님께서는 사업자등록증 사본과 전자세금계산서를 수신하실 이메일 주소를 첨부하여 가맹지원팀(본사) 공식 카카오톡 채널로 신청해 주시면 확인 후 발급을 도와드립니다.",
+        ],
       );
       console.log("[DB Migration] Seeded Q&A post 119.");
     }
   } catch (err) {
-    console.error('Failed to run migration/seeding for Q&A post 119:', err);
+    console.error("Failed to run migration/seeding for Q&A post 119:", err);
   }
 
   // 3. Populate default records
@@ -598,25 +685,25 @@ export async function setupDatabaseSchema(connection: any, database: string) {
 
   // 4. PostgreSQL Sequence Sync & Auto-Heal Mechanism (Resolves sequence out of sync constraints)
   const tablesToSync = [
-    'web_membership_users',
-    'web_membership_consultations',
-    'web_board_posts',
-    'web_board_attachments',
-    'web_board_comments',
-    'web_admin_accounts',
-    'web_home_main',
-    'web_interior_layouts',
-    'web_brand_films',
-    'web_brand_sounds',
-    'web_store_licenses',
-    'web_verify_logs',
-    'web_grade_permissions',
-    'music_songs',
-    'music_covers',
-    'music_playlists',
-    'music_comments',
-    'music_posts',
-    'web_post_likes'
+    "web_membership_users",
+    "web_membership_consultations",
+    "web_board_posts",
+    "web_board_attachments",
+    "web_board_comments",
+    "web_admin_accounts",
+    "web_home_main",
+    "web_interior_layouts",
+    "web_brand_films",
+    "web_brand_sounds",
+    "web_store_licenses",
+    "web_verify_logs",
+    "web_grade_permissions",
+    "music_songs",
+    "music_covers",
+    "music_playlists",
+    "music_comments",
+    "music_posts",
+    "web_post_likes",
   ];
 
   for (const table of tablesToSync) {
@@ -626,13 +713,18 @@ export async function setupDatabaseSchema(connection: any, database: string) {
       `);
       const seqName = seqInfoRes?.[0]?.seq_name || seqInfoRes?.[0]?.SEQ_NAME;
       if (seqName) {
-        console.log(`[DB Sequence Auto-Heal] Syncing sequence for ${table} (${seqName})...`);
+        console.log(
+          `[DB Sequence Auto-Heal] Syncing sequence for ${table} (${seqName})...`,
+        );
         await connection.query(`
           SELECT setval('${seqName}', COALESCE((SELECT MAX(id) FROM ${table}), 0) + 1, false)
         `);
       }
     } catch (err: any) {
-      console.warn(`[DB Sequence Auto-Heal Warn] Table ${table} sequence sync skipped or generic database dial:`, err.message);
+      console.warn(
+        `[DB Sequence Auto-Heal Warn] Table ${table} sequence sync skipped or generic database dial:`,
+        err.message,
+      );
     }
   }
 }

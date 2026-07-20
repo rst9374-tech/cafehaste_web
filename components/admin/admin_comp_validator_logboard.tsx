@@ -126,97 +126,90 @@ export const AdminCompValidatorLogBoard: React.FC<AdminCompValidatorLogBoardProp
   }, [searchTerm, selectedStatus]);
 
   return (
-    <div className="flex flex-col bg-white border border-stone-200 rounded-3xl p-5 shadow-sm space-y-4"> {/* temp: select-none */}
-      {/* 1. 패널 상단 타이틀 부 */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
-        <div className="flex flex-col gap-1.5 text-left">
-          <p className="text-[9px] text-stone-450 font-sans leading-none">
-             ※ 본 전산 대장은 <span className="font-bold text-stone-700">24시간 누적 로그</span> 시스템이며, 매일 <span className="font-bold text-rose-600">00:00 KST 최적화 초기화</span> 됩니다.
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5 self-end sm:self-auto">
-          <button
-            type="button"
-            onClick={onRefresh}
-            disabled={isCurrentlyLoading}
-            className="w-7 h-7 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-lg flex items-center justify-center transition-all cursor-pointer active:scale-90 disabled:opacity-50"
-            title="최신 로그 갱신"
-          >
-            <RefreshCw size={11} className={isCurrentlyLoading ? 'animate-spin text-stone-800' : 'text-stone-400'} />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (window.confirm('오늘 자 실제 DB 및 디스크에 기록된 로그 전산 테이블을 정말 완전히 초기화(삭제)하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
-                handleClearDbLogs();
-              }
-            }}
-            disabled={isCurrentlyLoading}
-            className="px-2.5 h-7 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-lg flex items-center justify-center transition-all cursor-pointer active:scale-90 disabled:opacity-50 text-[10px] font-bold"
-            title="오늘 자 실제 DB 및 디스크 로그 삭제 초기화"
-          >
-            로그 초기화
-          </button>
-        </div>
+    <div className="flex flex-col bg-[#0c0a09]/90 backdrop-blur-md border border-stone-900 rounded-3xl p-5 shadow-2xl space-y-4 relative overflow-hidden">
+      {/* 1. 패널 상단 컨트롤 */}
+      <div className="flex items-center justify-end gap-1.5 border-b border-stone-900 pb-3">
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={isCurrentlyLoading}
+          className="w-7 h-7 bg-stone-900 hover:bg-stone-800 border border-stone-800 rounded-lg flex items-center justify-center transition-all cursor-pointer active:scale-90 disabled:opacity-50"
+          title="최신 로그 갱신"
+        >
+          <RefreshCw size={11} className={isCurrentlyLoading ? 'animate-spin text-stone-200' : 'text-stone-400'} />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm('오늘 자 실제 DB 및 디스크에 기록된 로그 전산 테이블을 완전히 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
+              handleClearDbLogs();
+            }
+          }}
+          disabled={isCurrentlyLoading}
+          className="px-2.5 h-7 bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 text-red-400 rounded-lg flex items-center justify-center transition-all cursor-pointer active:scale-90 disabled:opacity-50 text-[10px] font-bold"
+          title="오늘 자 로그 초기화"
+        >
+          로그 초기화
+        </button>
       </div>
 
-      {/* 2. 대형 통계판 (카드가 곧 탭 역할을 하도록 일체화) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+      {/* 2. 통계 탭 카드 */}
+      <div className="grid grid-cols-5 gap-2">
         {[
           {
             type: 'all' as const,
-            title: '전체 호출 (ALL TOTAL)',
+            title: '전체',
             count: numericLogs.length,
             icon: (size: number) => <Search size={size} />,
-            activeClass: 'bg-stone-900 border-stone-850 text-[#C5A059] ring-2 ring-stone-900/10',
+            activeClass: 'bg-stone-900 border-[#C5A059]/40 text-[#C5A059] ring-1 ring-[#C5A059]/20 font-extrabold',
             activeText: 'text-[#C5A059]',
             activeCountText: 'text-white',
             bgIconColor: 'text-stone-800/40',
-            normalBg: 'bg-stone-50/50 border-stone-200/60 hover:bg-stone-100/50 text-stone-500'
+            normalBg: 'bg-stone-950 border-stone-900 hover:bg-stone-900/35 text-stone-500'
           },
           {
             type: 'pass' as const,
-            title: '인증 정상 (APPROVED)',
+            title: '승인',
             count: stats.pass,
             icon: (size: number) => <CheckCircle2 size={size} />,
-            activeClass: 'bg-emerald-50/80 border-emerald-500/60 text-emerald-800 ring-2 ring-emerald-200/50',
-            activeText: 'text-emerald-700',
-            activeCountText: 'text-emerald-900',
-            bgIconColor: 'text-emerald-100/50',
-            normalBg: 'bg-white border-stone-200 hover:bg-stone-50 text-stone-500'
+            activeClass: 'bg-emerald-950/20 border-emerald-900/40 text-emerald-400 ring-1 ring-emerald-500/10',
+            activeText: 'text-emerald-400',
+            activeCountText: 'text-emerald-300 font-black',
+            bgIconColor: 'text-emerald-950/20',
+            normalBg: 'bg-stone-950 border-stone-900 hover:bg-stone-900/35 text-stone-500'
           },
           {
             type: 'warn' as const,
-            title: '이상 신호 (WARNING)',
+            title: '주의',
             count: stats.warn,
             icon: (size: number) => <AlertTriangle size={size} />,
-            activeClass: 'bg-amber-50/80 border-amber-500/60 text-amber-800 ring-2 ring-amber-200/50',
-            activeText: 'text-amber-700',
-            activeCountText: 'text-amber-955',
-            bgIconColor: 'text-amber-100/50',
-            normalBg: 'bg-white border-stone-200 hover:bg-stone-50 text-stone-500'
+            activeClass: 'bg-amber-950/20 border-amber-900/40 text-amber-400 ring-1 ring-amber-500/10',
+            activeText: 'text-amber-400',
+            activeCountText: 'text-amber-300 font-black',
+            bgIconColor: 'text-amber-950/20',
+            normalBg: 'bg-stone-950 border-stone-900 hover:bg-stone-900/35 text-stone-500'
           },
           {
             type: 'risk' as const,
-            title: '차단/위험 (FAIL)',
+            title: '위험',
             count: stats.risk,
             icon: (size: number) => <XCircle size={size} />,
-            activeClass: 'bg-rose-50/80 border-rose-500/60 text-rose-800 ring-2 ring-rose-200/50',
-            activeText: 'text-rose-700',
-            activeCountText: 'text-rose-900 font-extrabold',
-            bgIconColor: 'text-rose-100/50',
-            normalBg: 'bg-white border-stone-200 hover:bg-stone-50 text-stone-500'
+            activeClass: 'bg-rose-955/20 border-rose-900/40 text-rose-400 ring-1 ring-rose-500/10',
+            activeText: 'text-rose-400',
+            activeCountText: 'text-rose-300 font-black',
+            bgIconColor: 'text-rose-950/20',
+            normalBg: 'bg-stone-955/5 border-stone-900 hover:bg-stone-955/10 text-stone-500'
           },
           {
             type: 'dup' as const,
-            title: '중복 방어 (DUP. GUARDED)',
+            title: '중복 차단',
             count: stats.dup,
             icon: (size: number) => <RefreshCw size={size} />,
-            activeClass: 'bg-blue-50/80 border-blue-500/60 text-blue-800 ring-2 ring-blue-200/50',
-            activeText: 'text-blue-700',
-            activeCountText: 'text-blue-900',
-            bgIconColor: 'text-blue-100/50',
-            normalBg: 'bg-white border-stone-200 hover:bg-stone-50 text-stone-500'
+            activeClass: 'bg-blue-950/20 border-blue-900/40 text-blue-400 ring-1 ring-blue-500/10',
+            activeText: 'text-blue-400',
+            activeCountText: 'text-blue-300 font-black',
+            bgIconColor: 'text-blue-950/20',
+            normalBg: 'bg-stone-950 border-stone-900 hover:bg-stone-900/35 text-stone-500'
           }
         ].map((card) => {
           const isSelected = selectedStatus === card.type;
@@ -225,31 +218,31 @@ export const AdminCompValidatorLogBoard: React.FC<AdminCompValidatorLogBoardProp
               key={card.type}
               type="button"
               onClick={() => setSelectedStatus(card.type)}
-              className={`rounded-2xl p-3 flex flex-col justify-between text-left relative overflow-hidden group shadow-xs transition-all active:scale-[0.98] border cursor-pointer ${
+              className={`rounded-xl p-2.5 flex flex-col justify-between text-left relative overflow-hidden group transition-all active:scale-[0.98] border cursor-pointer ${
                 isSelected ? card.activeClass : card.normalBg
               }`}
             >
               <div className="flex justify-between items-center z-10 w-full">
-                <span className={`text-[10px] font-bold ${isSelected ? card.activeText : 'text-stone-600'} font-sans`}>
+                <span className={`text-[10px] font-bold ${isSelected ? card.activeText : 'text-stone-500'} font-sans`}>
                   {card.title}
                 </span>
-                <span className={isSelected ? card.activeText : 'text-stone-400'}>
-                  {card.icon(13)}
+                <span className={isSelected ? card.activeText : 'text-stone-600'}>
+                  {card.icon(12)}
                 </span>
               </div>
-              <div className="mt-2 flex items-baseline gap-1.5 z-10">
-                <span className={`text-2xl sm:text-3xl font-black tracking-tight font-mono ${isSelected ? card.activeCountText : 'text-stone-800'}`}>
+              <div className="mt-1.5 flex items-baseline gap-1 z-10">
+                <span className={`text-xl font-black tracking-tight font-mono ${isSelected ? card.activeCountText : 'text-stone-300'}`}>
                   {card.count}
                 </span>
-                <span className={`text-[10px] font-bold font-sans ${isSelected ? card.activeText : 'text-stone-500'}`}>
+                <span className={`text-[10px] font-bold font-sans ${isSelected ? card.activeText : 'text-stone-650'}`}>
                   건
                 </span>
               </div>
               {card.type === 'risk' && stats.risk > 0 && !isSelected && (
-                <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping" />
+                <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping" />
               )}
-              <div className={`absolute -right-3 -bottom-3 ${isSelected ? card.bgIconColor : 'text-stone-200/20'} group-hover:scale-110 transition-transform duration-300 pointer-events-none select-none`}>
-                {card.icon(64)}
+              <div className={`absolute -right-2 -bottom-2 ${isSelected ? card.bgIconColor : 'text-stone-900/10'} group-hover:scale-110 transition-transform duration-300 pointer-events-none select-none`}>
+                {card.icon(48)}
               </div>
             </button>
           );
@@ -268,7 +261,7 @@ export const AdminCompValidatorLogBoard: React.FC<AdminCompValidatorLogBoardProp
             placeholder="매장 ID, 아이피, 또는 메시지 내용 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full text-[11px] h-8 pl-8 pr-3 border border-stone-200 hover:border-stone-300 focus:border-[#C5A059] rounded-xl outline-none placeholder-stone-400 font-sans"
+            className="w-full text-[11px] h-8 pl-8 pr-3 border border-stone-900 hover:border-stone-800 focus:border-[#C5A059] rounded-xl bg-stone-950 text-stone-200 outline-none placeholder-stone-500 font-sans"
           />
         </div>
 
@@ -283,7 +276,7 @@ export const AdminCompValidatorLogBoard: React.FC<AdminCompValidatorLogBoardProp
                 setSelectedDate(e.target.value);
               }
             }}
-            className="border border-stone-200 rounded-lg px-2 text-[10px] font-mono font-bold text-stone-700 outline-none h-8 bg-stone-50 cursor-pointer"
+            className="border border-stone-900 rounded-lg px-2 text-[10px] font-mono font-bold text-stone-300 outline-none h-8 bg-stone-950 cursor-pointer"
             title="원하는 일자 선택"
           />
           <a
@@ -299,11 +292,11 @@ export const AdminCompValidatorLogBoard: React.FC<AdminCompValidatorLogBoardProp
       </div>
 
       {/* 4. 로그 게시판 Table (멤버십 테이블과 동일 스타일) */}
-      <div className="border border-stone-200 rounded-2xl overflow-hidden shadow-xs">
+      <div className="border border-stone-900 rounded-2xl overflow-hidden shadow-sm bg-stone-950/30">
         <div className="overflow-x-auto scrollbar-thin">
           <table className="w-full text-left border-collapse min-w-[640px] text-[11px] table-fixed">
             <thead>
-              <tr className="bg-stone-50 border-b border-stone-200 text-stone-500 font-extrabold uppercase font-sans text-[9px] tracking-wider">
+              <tr className="bg-stone-900/50 border-b border-stone-900 text-stone-400 font-extrabold uppercase font-sans text-[9px] tracking-wider">
                 <th className="py-2.5 px-3 text-center w-[8%]">No.</th>
                 <th className="py-2.5 px-3 text-center w-[14%]">시간</th>
                 <th className="py-2.5 px-3 text-left w-[17%]">매장명</th>
@@ -337,68 +330,68 @@ export const AdminCompValidatorLogBoard: React.FC<AdminCompValidatorLogBoardProp
                   return (
                     <tr 
                       key={idx} 
-                      className="border-b border-stone-100 hover:bg-stone-50/80 transition-colors duration-150 last:border-0"
+                      className="border-b border-stone-900 hover:bg-stone-900/35 transition-colors duration-150 last:border-0"
                     >
                       {/* 0. 줄번호 */}
-                      <td className="py-2.5 px-3 text-center font-mono text-stone-550 tracking-tight font-bold select-all">
+                      <td className="py-1.5 px-3 text-center font-mono text-stone-500 tracking-tight font-bold select-all">
                         {log.lineIndex ? `#${log.lineIndex}` : '-'}
                       </td>
 
                       {/* 1. 시간 */}
-                      <td className="py-2.5 px-3 text-center font-mono text-stone-400 tracking-tight font-semibold">
+                      <td className="py-1.5 px-3 text-center font-mono text-stone-450 tracking-tight font-semibold">
                         {timeStr}
                       </td>
 
                       {/* 2. 매장명 */}
-                      <td className="py-2.5 px-3 font-semibold text-stone-850 truncate font-sans">
+                      <td className="py-1.5 px-3 font-semibold text-stone-300 truncate font-sans">
                         <span>
-                          {matchedStoreName || <span className="text-stone-400 font-normal">미계약 테스트기</span>}
+                          {matchedStoreName || <span className="text-stone-500 font-normal">미계약</span>}
                         </span>
                       </td>
 
                       {/* 3. 매장 코드 */}
-                      <td className="py-2.5 px-3 font-semibold text-[#8B6E32] select-all truncate">
-                        <span className="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-[10px] text-stone-700">
+                      <td className="py-1.5 px-3 font-semibold text-[#8B6E32] select-all truncate">
+                        <span className="bg-stone-900 px-1.5 py-0.5 rounded font-mono text-[10px] text-stone-300">
                           {log.storeId || 'NONE'}
                         </span>
                       </td>
 
                       {/* 4. 접속 IP */}
-                      <td className="py-2.5 px-3 text-stone-500 font-mono tracking-tight text-[10px]">
+                      <td className="py-1.5 px-3 text-stone-500 font-mono tracking-tight text-[10px]">
                         {log.ip || '127.0.0.1'}
                       </td>
 
-                      {/* 5. 상태 뱃지 (정상/주의/위험/중복) */}
-                      <td className="py-2.5 px-3 text-center">
+                      {/* 5. 상태 뱃지 */}
+                      <td className="py-1.5 px-3 text-center">
                         {statusType === 'pass' && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md text-[10px] font-black leading-none">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-950/20 text-emerald-400 border border-emerald-900/30 rounded-md text-[10px] font-black leading-none">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            정상 PASS
+                            PASS
                           </span>
                         )}
                         {statusType === 'warn' && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-md text-[10px] font-black leading-none">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-955/20 text-amber-400 border border-amber-900/30 rounded-md text-[10px] font-black leading-none">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            주의 WARN
+                            WARN
                           </span>
                         )}
                         {statusType === 'risk' && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-md text-[10px] font-black leading-none animate-pulse">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-955/20 text-rose-400 border border-rose-900/30 rounded-md text-[10px] font-black leading-none animate-pulse">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-                            위험 FAIL
+                            FAIL
                           </span>
                         )}
                         {statusType === 'dup' && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-[10px] font-black leading-none">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-950/20 text-blue-400 border border-blue-900/30 rounded-md text-[10px] font-black leading-none">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            중복 DUP
+                            DUP
                           </span>
                         )}
                       </td>
 
                       {/* 6. 전산 메시지 */}
                       <td 
-                        className="py-2.5 px-3 text-stone-600 font-medium font-sans truncate" 
+                        className="py-1.5 px-3 text-stone-400 font-medium font-sans truncate" 
                         title={log.message}
                       >
                         {log.message}

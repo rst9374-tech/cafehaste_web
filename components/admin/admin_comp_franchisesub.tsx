@@ -89,40 +89,36 @@ export const AdminFranchiseSubTab: React.FC<AdminFranchiseSubTabProps> = ({
       {/* Status strip - Removed as per request */}
 
       {isFetchingConsultations ? (
-        <div className="py-20 text-center bg-white rounded-2xl border border-stone-200 text-stone-500 font-light text-xs flex flex-col items-center justify-center gap-3">
+        <div className="py-20 text-center bg-stone-900 rounded-2xl border border-stone-850 text-stone-400 font-light text-xs flex flex-col items-center justify-center gap-3">
           <RefreshCw size={24} className="animate-spin text-[#C5A059]" />
           <span>데이터베이스로부터 실시간 창업문의 대장을 파싱하는 중...</span>
         </div>
       ) : cloudConsultations.length > 0 ? (
         <>
-          <div className="flex items-center justify-between bg-stone-50 border border-stone-200 p-3 rounded-xl shadow-sm mb-2">
+          <div className="flex items-center justify-between bg-stone-950 border border-stone-900 p-4.5 rounded-3xl shadow-sm mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-stone-700">전체 창업문의: {cloudConsultations.length}건</span>
+              <span className="text-xs font-bold text-stone-200">전체 창업문의 대장: {cloudConsultations.length}건</span>
               {showOnlyTestConsultations && (
-                <span className="text-[10px] text-rose-600 bg-rose-50 border border-rose-200 rounded px-1.5 py-0.5 animate-pulse font-extrabold font-sans">
-                  테스트 계정 필터 적용 중 ({sortedCloudConsultations.length}건 노출)
+                <span className="text-[10px] text-rose-400 bg-rose-955/20 border border-rose-900/30 rounded-lg px-2 py-0.5 animate-pulse font-black font-sans">
+                  테스트 필터 적용 중 ({sortedCloudConsultations.length}건)
                 </span>
               )}
             </div>
             <button
               type="button"
               onClick={() => setShowOnlyTestConsultations(!showOnlyTestConsultations)}
-              className={`h-8 px-3 rounded-lg text-xs font-extrabold flex items-center gap-1.5 border transition-all cursor-pointer ${
-                showOnlyTestConsultations
-                  ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm hover:bg-rose-100'
-                  : 'bg-white border-stone-205 text-stone-650 hover:bg-stone-50'
-              }`}
+              className={showOnlyTestConsultations ? 'dashboard-btn-rose-filter !h-8.5 !text-xs !px-3.5' : 'dashboard-btn-dark-filter !h-8.5 !text-xs !px-3.5'}
             >
-              <AlertOctagon size={12} className={showOnlyTestConsultations ? "animate-pulse" : ""} />
-              <span>테스트 문의만 필터링</span>
+              <AlertOctagon size={13} className={showOnlyTestConsultations ? "animate-pulse" : ""} />
+              <span>테스트 문의 필터</span>
             </button>
           </div>
-          <div className="flex flex-col bg-white border border-stone-200 rounded-2xl shadow-sm pb-4">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[1300px] text-xs font-sans">
+          <div className="flex flex-col bg-stone-950 border border-stone-900 rounded-3xl shadow-2xl pb-4 overflow-hidden">
+            <div className="overflow-x-auto scrollbar-thin">
+              <table className="w-full text-left border-collapse min-w-[1300px] text-xs font-sans table-auto dashboard-table">
                 <thead>
-                  <tr className="bg-stone-50 border-b border-stone-200 text-stone-500 font-bold uppercase font-sans text-[10px] tracking-wider">
-                    <th className="py-4 px-4 text-center w-28 font-bold">
+                  <tr className="bg-stone-900/50 border-b border-stone-900 text-stone-400 font-extrabold uppercase font-sans text-[10px] tracking-wider select-none">
+                    <th className="py-4 px-4.5 text-center w-28 font-bold border-r border-stone-900">
                       <div className="flex items-center justify-center gap-1.5 font-bold">
                         <input 
                           type="checkbox"
@@ -136,7 +132,7 @@ export const AdminFranchiseSubTab: React.FC<AdminFranchiseSubTabProps> = ({
                               setSelectedConsultationIds(prev => prev.filter(id => !pageIds.includes(id)));
                             }
                           }}
-                          className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                          className="w-3.5 h-3.5 rounded border-stone-800 bg-stone-950 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
                         />
                         <span>선택 | 순서</span>
                       </div>
@@ -151,15 +147,15 @@ export const AdminFranchiseSubTab: React.FC<AdminFranchiseSubTabProps> = ({
                     <SortHeader label="점포유무" sortKey="hasStore" widthClass="w-24 text-center" sortConfig={sortConfig} onSort={handleSort} />
                     <SortHeader label="문의경로" sortKey="inquiryPath" widthClass="w-28" sortConfig={sortConfig} onSort={handleSort} align="left" />
                     <SortHeader label="문의내용" sortKey="content" widthClass="w-64" sortConfig={sortConfig} onSort={handleSort} align="left" />
-                    <th className="py-4 px-4 text-center w-28 text-[#C5A059] font-extrabold uppercase tracking-wider">조작 및 이전</th>
+                    <th className="py-4 px-4 text-center w-28 text-[#C5A059] font-black uppercase tracking-wider">조작</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-150">
+                <tbody className="divide-y divide-stone-900 bg-stone-950/20">
                   {currentCloudConsultationsToShow.map((c: any, relativeIdx) => {
                     const cIdx = (consultationsCloudPage - 1) * ITEMS_PER_PAGE + relativeIdx + 1;
                     return (
-                      <tr key={c.id} className="hover:bg-stone-50/50 transition-colors">
-                        <td className="py-3.5 px-4 font-mono text-[11px] text-stone-500 text-center font-bold whitespace-nowrap">
+                      <tr key={c.id} className="border-b border-stone-900 last:border-0 hover:bg-stone-900/40 transition-colors duration-150">
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-stone-500 text-center font-bold whitespace-nowrap border-r border-stone-900">
                           <div className="flex items-center justify-center gap-2">
                             <input 
                               type="checkbox"
@@ -169,10 +165,10 @@ export const AdminFranchiseSubTab: React.FC<AdminFranchiseSubTabProps> = ({
                                   prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
                                 );
                               }}
-                              className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                              className="w-3.5 h-3.5 rounded border-stone-850 bg-stone-950 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
                             />
                             {isTestMember(c) ? (
-                              <span className="text-rose-600 bg-rose-50 text-[10px] rounded-md px-1 py-0.5 border border-rose-200 font-extrabold animate-pulse whitespace-nowrap" title="테스트 전용 계정">
+                              <span className="text-rose-455 bg-rose-955/20 text-[9.5px] rounded border border-rose-900/40 px-1 py-0.5 font-black animate-pulse whitespace-nowrap" title="테스트 전용 계정">
                                 TEST
                               </span>
                             ) : (
@@ -180,49 +176,49 @@ export const AdminFranchiseSubTab: React.FC<AdminFranchiseSubTabProps> = ({
                             )}
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-stone-850 text-center text-[11px] font-bold">
+                        <td className="py-3.5 px-4.5 font-mono text-stone-400 text-center text-[11px] font-bold">
                           {c.joinDate}
                         </td>
-                        <td className="py-3.5 px-4">
-                          <span className="inline-block px-1.5 py-0.5 bg-purple-50 text-purple-700 font-bold border border-purple-200 rounded text-[11px] whitespace-nowrap">
+                        <td className="py-3.5 px-4.5 text-center">
+                          <span className="inline-block px-2 py-0.5 bg-purple-955/20 text-purple-400 font-bold border border-purple-900/30 rounded-lg text-[11px] whitespace-nowrap">
                             {c.signupPath || '창업문의'}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 font-bold text-[#422B1E] text-[11px]">
+                        <td className="py-3.5 px-4.5 font-bold text-stone-200 text-[11.5px] whitespace-nowrap">
                           {c.ownerName}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-stone-800 text-[11px] font-bold select-all">
+                        <td className="py-3.5 px-4.5 font-mono text-stone-300 text-[11px] font-bold select-all whitespace-nowrap">
                           {c.phone}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-stone-600 text-[11px] font-bold select-all">
+                        <td className="py-3.5 px-4.5 font-mono text-stone-450 text-[11px] font-semibold select-all whitespace-nowrap">
                           {c.email || '기재 안 됨'}
                         </td>
-                        <td className="py-3.5 px-4">
-                          <span className="font-bold text-stone-900 bg-stone-100 border border-stone-200 px-2 py-1 rounded text-[11px]">
+                        <td className="py-3.5 px-4.5 whitespace-nowrap">
+                          <span className="font-bold text-stone-300 bg-stone-900 border border-stone-850 px-2 py-1 rounded-xl text-[11px]">
                             {c.regionName || '전국구'}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-amber-800 font-bold text-[11px]">
+                        <td className="py-3.5 px-4.5 text-amber-500 font-bold text-[11px] whitespace-nowrap text-center">
                           {(parseInt(c.capital) || 0).toLocaleString()}만원
                         </td>
-                        <td className="py-3.5 px-4">
-                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${c.hasStore === '있음' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-stone-100 text-stone-600 border border-stone-200'}`}>
+                        <td className="py-3.5 px-4.5 whitespace-nowrap text-center">
+                          <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold ${c.hasStore === '있음' ? 'bg-amber-955/20 text-amber-400 border border-amber-900/30' : 'bg-stone-900 text-stone-500 border border-stone-850'}`}>
                             {c.hasStore}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-[11px] font-bold text-[#A57C39]">
+                        <td className="py-3.5 px-4.5 text-[11px] font-bold text-[#C5A059] whitespace-nowrap">
                           {c.inquiryPath || '기타'}
                         </td>
-                        <td className="py-3.5 px-4 max-w-sm">
-                          <div className="p-2 bg-[#FAF4EB]/50 border border-amber-900/10 rounded-lg text-stone-650 text-[11px] leading-relaxed break-all font-bold font-sans max-h-24 overflow-y-auto">
+                        <td className="py-3.5 px-4.5 max-w-sm whitespace-nowrap">
+                          <div className="p-2 bg-stone-900 border border-stone-850 rounded-xl text-stone-300 text-[11px] leading-relaxed break-all font-semibold font-sans max-h-20 overflow-y-auto">
                             {c.content || '기재 안 됨'}
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 text-center">
+                        <td className="py-3.5 px-4.5 text-center">
                           <button
                             type="button"
                             onClick={() => handleCompleteFranchiseCloud(c)}
-                            className="px-2.5 py-1.5 rounded bg-[#C5A059] text-stone-950 font-black text-[10px] hover:bg-[#b08c47] hover:scale-105 active:scale-95 transition-all cursor-pointer whitespace-nowrap shadow-sm"
+                            className="dashboard-btn-gold-compact !h-auto !py-1.5 !px-3 text-[10.5px] whitespace-nowrap"
                             title="창업 완료 및 정식멤버 등록"
                           >
                             멤버십이동
@@ -238,10 +234,10 @@ export const AdminFranchiseSubTab: React.FC<AdminFranchiseSubTabProps> = ({
           </div>
         </>
       ) : (
-        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-stone-200 text-stone-400 font-light text-xs flex flex-col justify-center items-center gap-2">
-          <Database size={24} className="text-stone-300 mb-1" />
-          <strong>클라우드 DB 창업문의 데이터가 비어 있습니다.</strong>
-          <span className="text-[10px] text-stone-400">카페 메뉴 중 'Franchise' &rarr; '스타트업 창업 설명 상담' 메뉴에서 정보를 등록해 보세요!</span>
+        <div className="text-center py-20 bg-stone-950 rounded-3xl border border-dashed border-stone-900 text-stone-400 font-light text-xs flex flex-col justify-center items-center gap-3">
+          <Database size={28} className="text-stone-700 mb-1" />
+          <strong className="text-stone-300 text-sm">클라우드 DB 창업문의 데이터가 비어 있습니다.</strong>
+          <span className="text-[10.5px] text-stone-550 max-w-sm leading-relaxed break-keep">카페 홈페이지의 'Franchise' &rarr; '스타트업 창업 설명 상담' 메뉴에서 경영주 문의를 접수해 주세요.</span>
         </div>
       )}
     </div>

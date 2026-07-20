@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { saveBase64ToFile, writeBackupFilms } from '../../database';
 import { withDbConnection, getLocalCheckpoints, saveLocalCheckpoint, deleteLocalCheckpoint } from '../../db/common-handler';
-import * as serverDefaults from '../../../serverDefaults';
+import * as serverDefaults from '../../serverDefaults';
 
 const { DEFAULT_FILMS } = serverDefaults;
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertOctagon } from 'lucide-react';
+import { AlertOctagon, Trash2, Plus } from 'lucide-react';
 import { AdminDesignTable } from './admin_comp_design_table';
 import { AdminDesignSimulator } from './admin_comp_design_simulator';
 import { AdminDesignModal } from './admin_comp_design_modal';
@@ -288,8 +288,74 @@ export const AdminDesignTab: React.FC<AdminDesignTabProps> = ({
   }, [interiors, interiorPage]);
 
   return (
-    <div className="space-y-6 animate-fadeIn font-sans">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div className="space-y-6 animate-fadeIn font-sans flex flex-col w-full">
+      {/* ① 최상단 액션 바 (새 디자인 추가 버튼 등) */}
+      <div className="flex justify-between items-center border-b border-stone-900 pb-4 gap-3 w-full">
+        <div className="text-xs text-stone-550 font-bold select-none">
+          총 {interiors.length}개의 본사 표준 인테리어 테마
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {selectedDesignIds.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setConfirmModal({
+                  message: `선택한 ${selectedDesignIds.length}개의 가맹점 인테리어를 일괄 삭제하시겠습니까?`,
+                  onConfirm: async () => {
+                    try {
+                      await Promise.all(
+                        selectedDesignIds.map(id =>
+                          fetch(`/api/interiors/${id}`, { method: 'DELETE' })
+                        )
+                      );
+                      showTemporaryToast('선택한 인테리어 디자인이 일괄 삭제되었습니다.');
+                      const updated = interiors.filter(it => !selectedDesignIds.includes(it.type_id || it.typeId || it.id));
+                      setInteriors(updated);
+                      localStorage.setItem('haste_interior_types', JSON.stringify(updated));
+                      window.dispatchEvent(new Event('haste_interior_updated'));
+                      if (onUpdateInteriors) {
+                        onUpdateInteriors(updated);
+                      }
+                      setSelectedDesignIds([]);
+                    } catch (err: any) {
+                      showTemporaryError('일괄 삭제 중 오류가 발생했습니다: ' + err.message);
+                    }
+                  }
+                });
+              }}
+              className="py-1.5 px-3 bg-rose-950/40 hover:bg-rose-900 border border-rose-900/60 text-rose-350 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
+            >
+              <Trash2 size={12} />
+              <span>선택 일괄 삭제 ({selectedDesignIds.length})</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={handleOpenCreateInterior}
+            className="py-1.5 px-3 bg-[#C5A059] hover:bg-[#B38F48] text-stone-950 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
+          >
+            <Plus size={12} />
+            <span>새 디자인 추가</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ② 상단 시뮬레이터 미리보기 영역 (892px 내에서 밀림 방지를 위해 중앙 정렬 및 위로 올림, 너비 560px로 조정) */}
+      <div className="w-full flex justify-center pb-4 border-b border-stone-900">
+        <div className="w-full max-w-[560px] shrink-0">
+          <AdminDesignSimulator
+            previewInterior={previewInterior}
+            interiors={interiors}
+            interiorImageIndex={interiorImageIndex}
+            setInteriorImageIndex={setInteriorImageIndex}
+            setPreviewInterior={setPreviewInterior}
+          />
+        </div>
+      </div>
+
+      {/* ③ 하단 인테리어 목록 테이블 (폭 100% 사용) */}
+      <div className="w-full">
         <AdminDesignTable
           interiors={interiors}
           setInteriors={setInteriors}
@@ -310,14 +376,6 @@ export const AdminDesignTab: React.FC<AdminDesignTabProps> = ({
           showTemporaryError={showTemporaryError}
           setConfirmModal={setConfirmModal}
           handleOpenCreateInterior={handleOpenCreateInterior}
-        />
-
-        <AdminDesignSimulator
-          previewInterior={previewInterior}
-          interiors={interiors}
-          interiorImageIndex={interiorImageIndex}
-          setInteriorImageIndex={setInteriorImageIndex}
-          setPreviewInterior={setPreviewInterior}
         />
       </div>
 

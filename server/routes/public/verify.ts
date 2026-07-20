@@ -5,7 +5,7 @@ import { getDbPool, readBackupLicenses, addVerifyLog, storeVerifyCache } from '.
 const router = Router();
 
 const pendingVerifications = new Map<string, Promise<any>>();
-const HASTE_SECRET_LIVE_KEY = process.env.HASTE_SECRET_LIVE_KEY || '';
+const HASTE_SECRET_LIVE_KEY = process.env.HASTE_SECRET_LIVE_KEY || 'HASTE_SECRET_LIVE_9363';
 
 // POS/Hardware Merchant Verification API Endpoint
 router.post('/api/v1/store/verify', async (req, res) => {
@@ -101,6 +101,27 @@ router.post('/api/v1/store/verify', async (req, res) => {
   // Core verification worker Promise
   const verificationPromise = (async () => {
     try {
+      // 🔽 [HASTE 임시 제어 우회 수정 지점] DB로부터 디스코드 중계 설정 1, 2 로드
+      let discordTokenPrimary = '';
+      let discordTokenSecondary = '';
+      try {
+        const dbPool = await getDbPool();
+        const [settingsRows]: any = await dbPool.query(`
+          SELECT setting_key, setting_value 
+          FROM web_system_settings 
+          WHERE setting_key IN ('discord_bot_token_primary', 'discord_bot_token_secondary')
+        `);
+        if (settingsRows && settingsRows.length > 0) {
+          settingsRows.forEach((r: any) => {
+            if (r.setting_key === 'discord_bot_token_primary') discordTokenPrimary = r.setting_value;
+            if (r.setting_key === 'discord_bot_token_secondary') discordTokenSecondary = r.setting_value;
+          });
+        }
+      } catch (err) {
+        console.warn('[License Checkpoint Warning] Failed to query discord tokens from DB, fallback to env:', err);
+        discordTokenPrimary = process.env.DISCORD_BOT_TOKEN || '';
+      }
+
       // [CASE A] 정상 승인 매장 (storex1001 - PREMIUM)
       if (storeId === "storex1001") {
         const sevenDaysLater = Date.now() + (7 * 24 * 60 * 60 * 1000);
@@ -110,12 +131,16 @@ router.post('/api/v1/store/verify', async (req, res) => {
         const successMsg = "정식 승인 통과 (강남본점 / PREMIUM)";
         addVerifyLog(storeId, req, true, successMsg);
 
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = {
           isApproved: true,
           storeGrade: "PREMIUM",
+          storeType: "헤이스트멤버십",
           storeName: "강남본점",
           expireDate: "2026-12-31",
-          offlineLicenseToken: `Haste_SecureToken_${offlineToken}`
+          offlineLicenseToken: `Haste_SecureToken_${offlineToken}`,
+          discordTokenPrimary,
+          discordTokenSecondary
         };
 
         storeVerifyCache[storeId] = {
@@ -134,12 +159,16 @@ router.post('/api/v1/store/verify', async (req, res) => {
         const successMsg = "정식 승인 통과 (역삼지점 / STANDARD)";
         addVerifyLog(storeId, req, true, successMsg);
 
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = {
           isApproved: true,
           storeGrade: "STANDARD",
+          storeType: "헤이스트멤버십",
           storeName: "역삼지점",
           expireDate: "2026-08-15",
-          offlineLicenseToken: `Haste_SecureToken_${offlineToken}`
+          offlineLicenseToken: `Haste_SecureToken_${offlineToken}`,
+          discordTokenPrimary,
+          discordTokenSecondary
         };
 
         storeVerifyCache[storeId] = {
@@ -155,11 +184,15 @@ router.post('/api/v1/store/verify', async (req, res) => {
         console.log(`⚠️ [알림] ${storeId} 매장 ${failMsg}`);
         addVerifyLog(storeId, req, false, "EXPIRED: 유예 토큰 발급");
 
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = { 
           isApproved: false, 
           reason: "EXPIRED",
+          storeType: "일반",
           allowOfflineGrace: true,
-          offlineLicenseToken: "Haste_Expired_GraceToken_Sample_9363"
+          offlineLicenseToken: "Haste_Expired_GraceToken_Sample_9363",
+          discordTokenPrimary,
+          discordTokenSecondary
         };
 
         storeVerifyCache[storeId] = {
@@ -175,11 +208,15 @@ router.post('/api/v1/store/verify', async (req, res) => {
         console.log(`🚨 [제한] ${storeId} 매장 ${failMsg}`);
         addVerifyLog(storeId, req, false, "SUSPENDED: 전산 가동 제한 완료");
 
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = { 
           isApproved: false, 
           reason: "SUSPENDED",
+          storeType: "일반",
           allowOfflineGrace: false,
-          offlineLicenseToken: null
+          offlineLicenseToken: null,
+          discordTokenPrimary,
+          discordTokenSecondary
         };
 
         storeVerifyCache[storeId] = {
@@ -195,11 +232,15 @@ router.post('/api/v1/store/verify', async (req, res) => {
         console.log(`⚠️ [대기] ${storeId} 매장 ${failMsg}`);
         addVerifyLog(storeId, req, false, "PENDING_APPROVAL: 가입 승인 대기중");
 
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = { 
           isApproved: false, 
           reason: "PENDING_APPROVAL",
+          storeType: "일반",
           allowOfflineGrace: false,
-          offlineLicenseToken: null
+          offlineLicenseToken: null,
+          discordTokenPrimary,
+          discordTokenSecondary
         };
 
         storeVerifyCache[storeId] = {
@@ -217,7 +258,21 @@ router.post('/api/v1/store/verify', async (req, res) => {
         const list = readBackupLicenses();
         licenseItem = list.find((item: any) => item.storeId === storeId);
       } else {
-        const [rows]: any = await dbPool.query('SELECT id, store_name, store_id, license_start_date, license_end_date, is_approved, store_grade FROM web_store_licenses WHERE store_id = ? LIMIT 1', [storeId]);
+        // [HASTE 임시 제어 우회 수정 지점] - 매장유형(store_type) 서브쿼리 조인 추가
+        const [rows]: any = await dbPool.query(`
+          SELECT 
+            l.id, 
+            l.store_name, 
+            l.store_id, 
+            l.license_start_date, 
+            l.license_end_date, 
+            l.is_approved, 
+            l.store_grade,
+            COALESCE((SELECT store_type FROM web_membership_users WHERE store_code = l.store_id LIMIT 1), '일반') as store_type
+          FROM web_store_licenses l
+          WHERE l.store_id = ? 
+          LIMIT 1
+        `, [storeId]);
         if (rows && rows.length > 0) {
           const r = rows[0];
           licenseItem = {
@@ -227,7 +282,8 @@ router.post('/api/v1/store/verify', async (req, res) => {
             licenseStartDate: r.license_start_date ? new Date(r.license_start_date).toISOString().split('T')[0] : '',
             licenseEndDate: r.license_end_date ? new Date(r.license_end_date).toISOString().split('T')[0] : '',
             isApproved: r.is_approved !== undefined ? Number(r.is_approved) : 1,
-            storeGrade: r.store_grade || 'PREMIUM'
+            storeGrade: r.store_grade || 'PREMIUM',
+            storeType: r.store_type || '일반'
           };
         }
       }
@@ -236,12 +292,16 @@ router.post('/api/v1/store/verify', async (req, res) => {
         const errMsg = "유효하지 않거나 등록되지 않은 매장 고유번호입니다.";
         addVerifyLog(storeId, req, false, errMsg);
         
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = {
           isApproved: false,
           reason: "UNKNOWN_STORE",
+          storeType: "일반",
           message: "유효하지 않거나 만료된 매장 번호입니다.",
           allowOfflineGrace: false,
-          offlineLicenseToken: null
+          offlineLicenseToken: null,
+          discordTokenPrimary,
+          discordTokenSecondary
         };
         
         storeVerifyCache[storeId] = {
@@ -266,12 +326,16 @@ router.post('/api/v1/store/verify', async (req, res) => {
         const tokenPayload = JSON.stringify({ storeId, expire: sevenDaysLater });
         const offlineToken = crypto.createHash('sha256').update(tokenPayload).digest('hex');
         
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = {
           isApproved: true,
           storeGrade: licenseItem.storeGrade || "PREMIUM",
+          storeType: licenseItem.storeType || "일반",
           expireDate: licenseItem.licenseEndDate,
           storeName: licenseItem.storeName,
-          offlineLicenseToken: `Haste_SecureToken_${offlineToken}`
+          offlineLicenseToken: `Haste_SecureToken_${offlineToken}`,
+          discordTokenPrimary,
+          discordTokenSecondary
         };
 
         storeVerifyCache[storeId] = {
@@ -301,9 +365,11 @@ router.post('/api/v1/store/verify', async (req, res) => {
         }
         addVerifyLog(storeId, req, false, failMessage);
         
+        // [HASTE 임시 제어 우회 수정 지점] - storeType 추가
         const payload = {
           isApproved: false,
           reason: reasonCode,
+          storeType: licenseItem.storeType || "일반",
           message: failMessage,
           allowOfflineGrace: isGraceAllowed,
           offlineLicenseToken: isGraceAllowed ? "Haste_Expired_GraceToken_Sample_9363" : null

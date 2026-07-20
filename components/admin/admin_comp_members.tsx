@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  ShieldCheck, ShieldAlert, Terminal, HelpCircle, RefreshCw, BookOpen, Settings
+  ShieldCheck, ShieldAlert, Terminal, HelpCircle, RefreshCw, Settings
 } from 'lucide-react';
 import { AdminMembershipSubTab } from './admin_comp_membershipsub';
 import { AdminFranchiseSubTab } from './admin_comp_franchisesub';
 import { AdminLicensesValidator } from './admin_comp_licenses_validator';
 import { AdminPageTestValidator } from './admin_page_test_validator';
-import { AdminLicensesGuidebook } from './admin_comp_licenses_guidebook';
 import { MemberEditModal, AdminConfirmModal } from './admin_comp_shared';
 import { useMemberLicenses } from './admin_hook_members_license';
 import { useAdminLicenses } from './admin_hook_licenses';
 import { AlertModal, CertLightbox } from './admin_comp_members_dialogs';
+import { AdminSystemHub } from './admin_comp_systemhub';
 
 interface AdminMembersTabProps {
   showTemporaryToast: (msg: string) => void;
@@ -30,6 +30,10 @@ interface AdminMembersTabProps {
   cloudError?: string | null;
   handleUpdateCloudConsultationStatus: (id: any, status: any) => Promise<void>;
   loggedUser?: any;
+
+  // External Routing support
+  activeCategory?: 'FRANCHISE_INQUIRY' | 'MEMBERSHIP_LICENSES' | 'VALIDATOR' | 'KIOSK_CONFIG' | 'API_TUNNEL';
+  setActiveCategory?: (cat: 'FRANCHISE_INQUIRY' | 'MEMBERSHIP_LICENSES' | 'VALIDATOR' | 'KIOSK_CONFIG' | 'API_TUNNEL') => void;
 }
 
 export const AdminMembersTab: React.FC<AdminMembersTabProps> = ({
@@ -49,9 +53,13 @@ export const AdminMembersTab: React.FC<AdminMembersTabProps> = ({
   handleCloudDeleteConsultation,
   cloudError,
   handleUpdateCloudConsultationStatus,
-  loggedUser
+  loggedUser,
+  activeCategory,
+  setActiveCategory
 }) => {
-  const [activeCategory, setActiveCategory] = useState<'FRANCHISE_INQUIRY' | 'MEMBERSHIP_LICENSES' | 'VALIDATOR' | 'KIOSK_CONFIG' | 'GUIDEBOOK'>('FRANCHISE_INQUIRY');
+  const [localCategory, setLocalCategory] = useState<'FRANCHISE_INQUIRY' | 'MEMBERSHIP_LICENSES' | 'VALIDATOR' | 'KIOSK_CONFIG' | 'API_TUNNEL'>('FRANCHISE_INQUIRY');
+  const currentCategory = activeCategory || localCategory;
+  const handleSetCategory = setActiveCategory || setLocalCategory;
   
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -98,10 +106,10 @@ export const AdminMembersTab: React.FC<AdminMembersTabProps> = ({
   }, []);
 
   useEffect(() => {
-    if (activeCategory === 'FRANCHISE_INQUIRY') {
+    if (currentCategory === 'FRANCHISE_INQUIRY') {
       fetchCloudConsultations();
     }
-  }, [activeCategory]);
+  }, [currentCategory]);
 
   const handleEditMemberSubmit = async (updatedFields: any) => {
     setEditingMember(null);
@@ -156,97 +164,16 @@ export const AdminMembersTab: React.FC<AdminMembersTabProps> = ({
   }, [validatorProps.apiLogs]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col md:flex-row md:items-center justify-between bg-stone-50 border border-stone-200 p-2.5 rounded-2xl shadow-sm gap-3 select-none">
-        <div className="flex flex-wrap bg-stone-100 p-1 rounded-xl border border-stone-200 gap-1">
-          <button
-            onClick={() => setActiveCategory('FRANCHISE_INQUIRY')}
-            className={`px-3.5 py-1.5 text-xs font-black transition-all rounded-lg cursor-pointer flex items-center gap-1.5 ${
-              activeCategory === 'FRANCHISE_INQUIRY'
-                ? 'bg-stone-900 text-[#C5A059] shadow-sm font-extrabold'
-                : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/40'
-            }`}
-          >
-            <HelpCircle size={12} />
-            <span>창업상담신청</span>
-          </button>
-
-          <button
-            onClick={() => setActiveCategory('MEMBERSHIP_LICENSES')}
-            className={`px-3.5 py-1.5 text-xs font-black transition-all rounded-lg cursor-pointer flex items-center gap-1.5 ${
-              activeCategory === 'MEMBERSHIP_LICENSES'
-                ? 'bg-stone-900 text-[#C5A059] shadow-sm font-extrabold'
-                : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/40'
-            }`}
-          >
-            <ShieldCheck size={12} />
-            <span>라이선스관리</span>
-          </button>
-
-          <button
-            onClick={() => setActiveCategory('VALIDATOR')}
-            className={`px-3.5 py-1.5 text-xs font-black transition-all rounded-lg cursor-pointer flex items-center gap-1.5 ${
-              activeCategory === 'VALIDATOR'
-                ? 'bg-[#E33535]/15 border border-[#E33535]/30 text-[#E33535] shadow-xs font-extrabold'
-                : 'text-stone-500 hover:text-rose-700 hover:bg-rose-50/10'
-            }`}
-          >
-            <Terminal size={12} className={activeCategory === 'VALIDATOR' ? 'animate-pulse' : ''} />
-            <span>실시간 멤버십 검증기</span>
-            {riskCount > 0 && (
-              <span className="ml-1 px-1 bg-[#E33535] text-white text-[9px] rounded-full font-mono animate-bounce self-center leading-none py-0.5">
-                {riskCount}
-              </span>
-            )}
-          </button>
- 
-          <button
-            onClick={() => setActiveCategory('KIOSK_CONFIG')}
-            className={`px-3.5 py-1.5 text-xs font-black transition-all rounded-lg cursor-pointer flex items-center gap-1.5 ${
-              activeCategory === 'KIOSK_CONFIG'
-                ? 'bg-amber-500/10 border border-amber-500/30 text-amber-500 shadow-xs font-extrabold'
-                : 'text-stone-500 hover:text-amber-500 hover:bg-amber-500/5'
-            }`}
-          >
-            <Settings size={12} className={activeCategory === 'KIOSK_CONFIG' ? 'animate-pulse' : ''} />
-            <span>키오스크 연동 설정</span>
-          </button>
-
-          <button
-            onClick={() => setActiveCategory('GUIDEBOOK')}
-            className={`px-3.5 py-1.5 text-xs font-black transition-all rounded-lg cursor-pointer flex items-center gap-1.5 ${
-              activeCategory === 'GUIDEBOOK'
-                ? 'bg-stone-900 text-[#C5A059] shadow-sm font-extrabold'
-                : 'text-stone-500 hover:text-stone-850 hover:bg-stone-200/40'
-            }`}
-          >
-            <BookOpen size={12} />
-            <span>가이드북</span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 self-end md:self-auto font-sans">
-          <button
-            type="button"
-            onClick={async () => {
-              if (activeCategory === 'FRANCHISE_INQUIRY') {
-                await fetchCloudConsultations();
-              } else {
-                await fetchIntegratedBulkData('CLOUD_SQL');
-              }
-              showTemporaryToast('실시간 클라우드 DB 데이터 갱신이 완료되었습니다.');
-            }}
-            disabled={isFetchingSub || isFetchingConsultations}
-            className="h-8 px-3.5 border border-stone-200 hover:border-stone-350 bg-white hover:bg-stone-50 rounded-xl flex items-center gap-1.5 active:scale-95 transition-all text-[11px] text-stone-600 font-bold hover:text-stone-850 cursor-pointer select-none shadow-sm"
-          >
-            <RefreshCw size={11} className={(isFetchingSub || isFetchingConsultations) ? 'animate-spin text-stone-850' : 'text-stone-400'} />
-            <span>수동 동기화 v.Bulk</span>
-          </button>
-        </div>
-      </div>
-
+    <div className="space-y-2.5">
       <div id="admin-integrated-view-segment" className="animate-fadeIn">
-        {activeCategory === 'MEMBERSHIP_LICENSES' && (
+        {currentCategory === 'API_TUNNEL' && (
+          <AdminSystemHub 
+            showTemporaryToast={showTemporaryToast}
+            showTemporaryError={showTemporaryError}
+          />
+        )}
+
+        {currentCategory === 'MEMBERSHIP_LICENSES' && (
           <AdminMembershipSubTab
             cloudDbInfo={cloudDbInfo}
             cloudMembers={bulkMembers}
@@ -272,42 +199,34 @@ export const AdminMembersTab: React.FC<AdminMembersTabProps> = ({
           />
         )}
 
-        {activeCategory === 'VALIDATOR' && (
-          <div className="bg-white text-stone-850 p-1.5 rounded-3xl border-4 border-stone-200 shadow-2xl relative">
-            <div className="absolute top-4 left-5 flex items-center gap-1.5 font-bold text-xs bg-[#E33535] text-white p-1 px-2.5 rounded-lg border border-[#ff4e4e] animate-pulse">
-              <ShieldAlert size={12} />
-              <span>실시간 하이재킹 모니터 검문소</span>
-            </div>
-            <div className="pt-10">
-              <AdminLicensesValidator
-                testStoreId={validatorProps.testStoreId}
-                setTestStoreId={validatorProps.setTestStoreId}
-                testApiKey={validatorProps.testApiKey}
-                setTestApiKey={validatorProps.setTestApiKey}
-                testResult={validatorProps.testResult}
-                isTesting={validatorProps.isTesting}
-                apiLogs={validatorProps.apiLogs}
-                isLoadingLogs={validatorProps.isLoadingLogs}
-                setIsKioskPopupOpen={validatorProps.setIsKioskPopupOpen}
-                handleClearLogs={validatorProps.handleClearLogs}
-                handleClearDbLogs={validatorProps.handleClearDbLogs}
-                handleTestVerify={validatorProps.handleTestVerify}
-                logAnalysis={validatorProps.logAnalysis}
-                fetchApiLogs={validatorProps.fetchApiLogs}
-                licenses={licenses}
-                dbSize={validatorProps.dbSize}
-              />
-            </div>
-          </div>
+        {currentCategory === 'VALIDATOR' && (
+          <AdminLicensesValidator
+            testStoreId={validatorProps.testStoreId}
+            setTestStoreId={validatorProps.setTestStoreId}
+            testApiKey={validatorProps.testApiKey}
+            setTestApiKey={validatorProps.setTestApiKey}
+            testResult={validatorProps.testResult}
+            isTesting={validatorProps.isTesting}
+            apiLogs={validatorProps.apiLogs}
+            isLoadingLogs={validatorProps.isLoadingLogs}
+            setIsKioskPopupOpen={validatorProps.setIsKioskPopupOpen}
+            handleClearLogs={validatorProps.handleClearLogs}
+            handleClearDbLogs={validatorProps.handleClearDbLogs}
+            handleTestVerify={validatorProps.handleTestVerify}
+            logAnalysis={validatorProps.logAnalysis}
+            fetchApiLogs={validatorProps.fetchApiLogs}
+            licenses={licenses}
+            dbSize={validatorProps.dbSize}
+          />
         )}
 
-        {activeCategory === 'KIOSK_CONFIG' && (
-          <div className="bg-white text-stone-850 p-2 rounded-3xl border border-stone-200 shadow-sm relative">
+        {currentCategory === 'KIOSK_CONFIG' && (
+          <div className="bg-[#070609]/95 border border-stone-900 rounded-2xl p-4">
             <AdminPageTestValidator mode="KIOSK" />
           </div>
         )}
 
-        {activeCategory === 'FRANCHISE_INQUIRY' && (
+        {currentCategory === 'FRANCHISE_INQUIRY' && (
           <AdminFranchiseSubTab
             cloudDbInfo={cloudDbInfo}
             cloudConsultations={cloudConsultations}
@@ -335,13 +254,6 @@ export const AdminMembersTab: React.FC<AdminMembersTabProps> = ({
               }
             }}
             renderPagination={renderPagination}
-          />
-        )}
-
-        {activeCategory === 'GUIDEBOOK' && (
-          <AdminLicensesGuidebook
-            cloudDbInfo={cloudDbInfo}
-            dbSize={validatorProps.dbSize}
           />
         )}
       </div>

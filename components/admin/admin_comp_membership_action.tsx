@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertOctagon, RefreshCw, Users } from 'lucide-react';
+import { AlertOctagon, RefreshCw, Users, Edit, Trash2 } from 'lucide-react';
 import { 
   bulkUpdateStoreType, 
   bulkUpdateStoreGrade, 
@@ -8,7 +8,7 @@ import {
   bulkImminentLicenses, 
   bulkSuspendMembers 
 } from './admin_comp_membership_action_handlers';
-import { AdminCompMembershipTestCreator } from './admin_comp_membership_test_creator';
+
 
 interface AdminMembershipActionProps {
   selectedMembershipIds: any[];
@@ -55,14 +55,97 @@ export const AdminMembershipAction: React.FC<AdminMembershipActionProps> = ({
 
   const [bulkStoreType, setBulkStoreType] = useState<string>('');
   const [bulkStoreGrade, setBulkStoreGrade] = useState<'STANDARD' | 'PREMIUM' | ''>('');
+  const [bulkStoreStatus, setBulkStoreStatus] = useState<string>('');
   const [isBulkUpdatingType, setIsBulkUpdatingType] = useState<boolean>(false);
   const [isBulkUpdatingGrade, setIsBulkUpdatingGrade] = useState<boolean>(false);
+  const [isBulkUpdatingCombined, setIsBulkUpdatingCombined] = useState<boolean>(false);
 
   useEffect(() => {
     setShowApproveDropdown(false);
     setBulkStoreType('');
     setBulkStoreGrade('');
+    setBulkStoreStatus('');
   }, [selectedMembershipIds.length]);
+
+  const handleBulkUpdateCombined = () => {
+    if (selectedMembershipIds.length === 0) return;
+    if (!bulkStoreType && !bulkStoreGrade && !bulkStoreStatus) return;
+
+    const parts: string[] = [];
+    if (bulkStoreType) {
+      const typeLabel = bulkStoreType === 'MEMBERSHIP' ? '멤버십' : bulkStoreType === 'HASTE_MEMBERSHIP' ? '헤이스트멤버십' : bulkStoreType === 'EXECUTIVE' ? '임원' : bulkStoreType;
+      parts.push(`매장 유형 ➔ '${typeLabel}'`);
+    }
+    if (bulkStoreGrade) {
+      const gradeLabel = bulkStoreGrade === 'PREMIUM' ? '프리미엄' : '베이직';
+      parts.push(`등급 ➔ '${gradeLabel}'`);
+    }
+    if (bulkStoreStatus) {
+      const statusLabel = 
+        bulkStoreStatus === 'APPROVE_1' ? '인증 승인 (1달)' :
+        bulkStoreStatus === 'APPROVE_3' ? '인증 승인 (3달)' :
+        bulkStoreStatus === 'APPROVE_12' ? '인증 승인 (1년)' :
+        bulkStoreStatus === 'SUSPEND' ? '가동 정지' :
+        bulkStoreStatus === 'EXPIRE' ? '인증 만료' :
+        bulkStoreStatus === 'IMMINENT' ? '종료 임박' : bulkStoreStatus;
+      parts.push(`상태 ➔ '${statusLabel}'`);
+    }
+
+    showConfirm(
+      '가맹점 일괄 정보 변경',
+      `선택한 ${selectedMembershipIds.length}개 매장의 [${parts.join(', ')}] 변경을 진행하시겠습니까?`,
+      async () => {
+        setIsBulkUpdatingCombined(true);
+        try {
+          const promises: Promise<any>[] = [];
+          if (bulkStoreType) {
+            promises.push(bulkUpdateStoreType(selectedMembershipIds, bulkStoreType));
+          }
+          if (bulkStoreGrade) {
+            promises.push(bulkUpdateStoreGrade(selectedMembershipIds, bulkStoreGrade));
+          }
+          if (bulkStoreStatus) {
+            if (bulkStoreStatus === 'APPROVE_1') {
+              promises.push(bulkApproveLicenses(selectedMembershipIds, 1));
+            } else if (bulkStoreStatus === 'APPROVE_3') {
+              promises.push(bulkApproveLicenses(selectedMembershipIds, 3));
+            } else if (bulkStoreStatus === 'APPROVE_12') {
+              promises.push(bulkApproveLicenses(selectedMembershipIds, 12));
+            } else if (bulkStoreStatus === 'SUSPEND') {
+              promises.push(bulkSuspendMembers(selectedMembershipIds, true));
+            } else if (bulkStoreStatus === 'EXPIRE') {
+              promises.push(bulkExpireLicenses(selectedMembershipIds));
+            } else if (bulkStoreStatus === 'IMMINENT') {
+              promises.push(bulkImminentLicenses(selectedMembershipIds));
+            }
+          }
+
+          const results = await Promise.all(promises);
+          const allSuccess = results.every(res => res.success);
+          
+          if (allSuccess) {
+            showAlert('변경 완료', '선택한 가맹점의 유형/등급/상태 변경이 정상적으로 일괄 적용되었습니다.');
+            setSelectedMembershipIds([]);
+            setBulkStoreType('');
+            setBulkStoreGrade('');
+            setBulkStoreStatus('');
+            if (fetchIntegratedBulkData) {
+              await fetchIntegratedBulkData('CLOUD_SQL');
+            } else {
+              await fetchCloudMembers();
+            }
+          } else {
+            const failMsg = results.map(res => res.message || '오류').join(', ');
+            showAlert('변경 실패', '일부 변경 중 실패가 발생했습니다: ' + failMsg);
+          }
+        } catch (err: any) {
+          showAlert('통신 에러', '일괄 변경 처리에 실패했습니다: ' + err.message);
+        } finally {
+          setIsBulkUpdatingCombined(false);
+        }
+      }
+    );
+  };
 
   const handleBulkUpdateStoreType = () => {
     if (selectedMembershipIds.length === 0 || !bulkStoreType) return;
@@ -292,88 +375,20 @@ export const AdminMembershipAction: React.FC<AdminMembershipActionProps> = ({
   };
 
   return (
-    <div className={`flex flex-wrap justify-between items-center gap-2 bg-transparent ${isBottom ? 'pt-2.5 mt-2 border-t' : 'pb-2 mb-2 border-b'} border-dashed border-stone-200/60 select-none`}>
+    <div className={`flex flex-wrap justify-between items-center gap-2 bg-transparent ${isBottom ? 'pt-2.5 mt-2 border-t' : 'pb-2 mb-2 border-b'} border-dashed border-stone-855 select-none`}>
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap items-center gap-1.5 px-0 py-1 select-none">
-          <span className="text-[10px] font-extrabold text-stone-800 px-1 tracking-wider whitespace-nowrap">
+          <span className="text-[10px] font-extrabold text-stone-300 px-1 tracking-wider whitespace-nowrap">
             ⚡ 라이선스 조작 {selectedMembershipIds.length > 0 ? `(${selectedMembershipIds.length}건)` : ''}
           </span>
           
-          <div className="relative inline-block text-left">
-            <button
-              type="button"
-              onClick={() => {
-                if (selectedMembershipIds.length > 0) {
-                  setShowApproveDropdown(!showApproveDropdown);
-                }
-              }}
-              disabled={isBulkApproving || selectedMembershipIds.length === 0}
-              className="h-6 px-2.5 rounded-lg text-[10px] font-bold bg-[#C5A059] hover:bg-[#b08e4d] border border-[#b08e4d]/40 disabled:bg-stone-200/60 disabled:text-stone-500 disabled:border-stone-300 text-stone-950 transition-all cursor-pointer flex items-center gap-1 active:scale-95 disabled:opacity-50"
-            >
-              <span>인증 승인</span>
-            </button>
-            {showApproveDropdown && selectedMembershipIds.length > 0 && (
-              <div className={`absolute right-0 ${isBottom ? 'bottom-full mb-1' : 'mt-1'} w-24 origin-${isBottom ? 'bottom-right' : 'top-right'} rounded-lg bg-white border border-stone-200 shadow-xl z-50 divide-y divide-stone-100 select-none`}>
-                <div className="py-1">
-                  <button
-                    type="button"
-                    onClick={() => handleBulkApprove(1)}
-                    className="w-full text-left px-2.5 py-1.5 text-[10px] font-bold text-stone-700 hover:text-stone-950 hover:bg-stone-50 transition-all block cursor-pointer"
-                  >
-                    1달 승인
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleBulkApprove(3)}
-                    className="w-full text-left px-2.5 py-1.5 text-[10px] font-bold text-stone-700 hover:text-stone-950 hover:bg-stone-50 transition-all block cursor-pointer"
-                  >
-                    3달 승인
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleBulkApprove(12)}
-                    className="w-full text-left px-2.5 py-1.5 text-[10px] font-bold text-[#C5A059] hover:text-[#b08e4d] hover:bg-stone-50 transition-all block cursor-pointer"
-                  >
-                    1년 승인
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleBulkSuspend}
-            disabled={isBulkSuspending || selectedMembershipIds.length === 0}
-            className="h-6 px-2.5 rounded-lg text-[10px] font-bold bg-red-600 hover:bg-red-700 border border-red-700/30 disabled:bg-stone-200/60 disabled:text-stone-500 disabled:border-stone-300 text-white transition-all cursor-pointer flex items-center gap-1 active:scale-95 disabled:opacity-50"
-          >
-            <span>가동 정지</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleBulkExpire}
-            disabled={isBulkApproving || selectedMembershipIds.length === 0}
-            className="h-6 px-2.5 rounded-lg text-[10px] font-bold bg-amber-500 hover:bg-amber-600 border border-amber-600/30 disabled:bg-stone-200/60 disabled:text-stone-500 disabled:border-stone-300 text-white transition-all cursor-pointer flex items-center gap-1 active:scale-95 disabled:opacity-50"
-          >
-            <span>인증 만료</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleBulkImminent}
-            disabled={isBulkApproving || selectedMembershipIds.length === 0}
-            className="h-6 px-2.5 rounded-lg text-[10px] font-bold bg-orange-600 hover:bg-orange-700 border border-orange-700/30 disabled:bg-stone-200/60 disabled:text-stone-500 disabled:border-stone-300 text-white transition-all cursor-pointer flex items-center gap-1 active:scale-95 disabled:opacity-50"
-          >
-            <span>종료 임박</span>
-          </button>
-
           <button
             type="button"
             onClick={handleEditSelected}
             disabled={selectedMembershipIds.length !== 1}
-            className="h-6 px-2.5 rounded-lg text-[10px] font-bold bg-amber-600 hover:bg-amber-700 border border-amber-700/30 disabled:bg-stone-200/60 disabled:text-stone-500 disabled:border-stone-300 text-white transition-all cursor-pointer flex items-center gap-1 active:scale-95 disabled:opacity-50"
+            className="admin-btn-action-edit !h-6 !text-[10px] !px-2.5 flex items-center gap-1 disabled:opacity-30 disabled:pointer-events-none"
           >
+            <Edit size={10} />
             <span>수정</span>
           </button>
 
@@ -381,58 +396,68 @@ export const AdminMembershipAction: React.FC<AdminMembershipActionProps> = ({
             type="button"
             onClick={handleBulkDelete}
             disabled={selectedMembershipIds.length === 0}
-            className="h-6 px-2.5 rounded-lg text-[10px] font-bold bg-[#422B1E] hover:bg-[#5b3d2b] border border-[#422B1E]/30 disabled:bg-stone-200/60 disabled:text-stone-500 disabled:border-stone-300 text-white transition-all cursor-pointer flex items-center gap-1 active:scale-95 disabled:opacity-50"
+            className="admin-btn-action-delete !h-6 !text-[10px] !px-2.5 flex items-center gap-1 disabled:opacity-30 disabled:pointer-events-none"
           >
+            <Trash2 size={10} />
             <span>삭제</span>
           </button>
 
-          {/* 매장 유형 일괄 변경 */}
-          <div className="flex items-center gap-1 border-l border-stone-200 pl-1.5 ml-0.5">
+          {/* 매장 유형 & 등급 & 상태 일괄 변경 병합 탭 */}
+          <div className="flex items-center gap-1.5 border-l border-stone-800 pl-2 ml-0.5">
             <select
               value={bulkStoreType}
               onChange={(e) => setBulkStoreType(e.target.value)}
-              disabled={selectedMembershipIds.length === 0 || isBulkUpdatingType}
-              className="h-6 px-1.5 text-[9.5px] font-bold rounded border border-stone-300 bg-white focus:outline-none focus:ring-1 focus:ring-stone-500 cursor-pointer disabled:opacity-50 disabled:bg-stone-100 disabled:cursor-not-allowed"
+              disabled={selectedMembershipIds.length === 0 || isBulkUpdatingCombined}
+              className="dashboard-select !h-6 !py-0 text-[9.5px] font-bold"
             >
               <option value="">유형 일괄선택</option>
               <option value="MEMBERSHIP">멤버십</option>
               <option value="HASTE_MEMBERSHIP">헤이스트멤버십</option>
               <option value="EXECUTIVE">임원</option>
             </select>
-            <button
-              type="button"
-              onClick={handleBulkUpdateStoreType}
-              disabled={!bulkStoreType || selectedMembershipIds.length === 0 || isBulkUpdatingType}
-              className="h-6 px-2 rounded-lg text-[9.5px] font-bold bg-[#C5A059] hover:bg-[#b08e4d] border border-[#b08e4d]/40 disabled:bg-stone-200/60 disabled:text-stone-500 text-stone-950 transition-all cursor-pointer disabled:opacity-50 active:scale-95"
-            >
-              <span>{isBulkUpdatingType ? '변경중...' : '유형 변경'}</span>
-            </button>
-          </div>
 
-          {/* 솔루션 등급 일괄 변경 */}
-          <div className="flex items-center gap-1 border-l border-stone-200 pl-1.5 ml-0.5">
+            <span className="text-stone-500 text-[10px] font-bold select-none">⇅</span>
+
             <select
               value={bulkStoreGrade}
               onChange={(e) => setBulkStoreGrade(e.target.value as any)}
-              disabled={selectedMembershipIds.length === 0 || isBulkUpdatingGrade}
-              className="h-6 px-1.5 text-[9.5px] font-bold rounded border border-stone-300 bg-white focus:outline-none focus:ring-1 focus:ring-stone-500 cursor-pointer disabled:opacity-50 disabled:bg-stone-100 disabled:cursor-not-allowed"
+              disabled={selectedMembershipIds.length === 0 || isBulkUpdatingCombined}
+              className="dashboard-select !h-6 !py-0 text-[9.5px] font-bold"
             >
               <option value="">등급 일괄선택</option>
               <option value="STANDARD">베이직</option>
               <option value="PREMIUM">프리미엄</option>
             </select>
+
+            <span className="text-stone-500 text-[10px] font-bold select-none">⇅</span>
+
+            <select
+              value={bulkStoreStatus}
+              onChange={(e) => setBulkStoreStatus(e.target.value)}
+              disabled={selectedMembershipIds.length === 0 || isBulkUpdatingCombined}
+              className="dashboard-select !h-6 !py-0 text-[9.5px] font-bold"
+            >
+              <option value="">상태 일괄선택</option>
+              <option value="APPROVE_1">인증 승인 (1달)</option>
+              <option value="APPROVE_3">인증 승인 (3달)</option>
+              <option value="APPROVE_12">인증 승인 (1년)</option>
+              <option value="SUSPEND">가동 정지</option>
+              <option value="EXPIRE">인증 만료</option>
+              <option value="IMMINENT">종료 임박</option>
+            </select>
+
             <button
               type="button"
-              onClick={handleBulkUpdateStoreGrade}
-              disabled={!bulkStoreGrade || selectedMembershipIds.length === 0 || isBulkUpdatingGrade}
-              className="h-6 px-2 rounded-lg text-[9.5px] font-bold bg-[#C5A059] hover:bg-[#b08e4d] border border-[#b08e4d]/40 disabled:bg-stone-200/60 disabled:text-stone-500 text-stone-950 transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+              onClick={handleBulkUpdateCombined}
+              disabled={(!bulkStoreType && !bulkStoreGrade && !bulkStoreStatus) || selectedMembershipIds.length === 0 || isBulkUpdatingCombined}
+              className="dashboard-btn-gold-compact"
             >
-              <span>{isBulkUpdatingGrade ? '변경중...' : '등급 변경'}</span>
+              <span>{isBulkUpdatingCombined ? '변경중...' : '유형/등급/상태 변경'}</span>
             </button>
           </div>
         </div>
         {!isBottom && showOnlyTestMembers && (
-          <span className="text-[9px] text-rose-600 bg-rose-50 border border-rose-200/50 rounded px-1.5 py-0.5 animate-pulse font-bold font-sans">
+          <span className="text-[9px] text-rose-400 bg-rose-955/20 border border-rose-900/30 rounded px-1.5 py-0.5 animate-pulse font-bold font-sans">
             테스트 전용 필터 적용
           </span>
         )}
@@ -444,23 +469,12 @@ export const AdminMembershipAction: React.FC<AdminMembershipActionProps> = ({
       </div>
       {!isBottom && (
         <div className="flex items-center gap-2">
-          <AdminCompMembershipTestCreator
-            isBulkCreating={isBulkCreating}
-            setIsBulkCreating={setIsBulkCreating}
-            fetchIntegratedBulkData={fetchIntegratedBulkData}
-            fetchCloudMembers={fetchCloudMembers}
-            setSelectedMembershipIds={setSelectedMembershipIds}
-            showAlert={showAlert}
-          />
+
 
           <button
             type="button"
             onClick={toggleTestMembersFilter}
-            className={`h-7 px-2.5 rounded-lg text-[10px] font-bold flex items-center gap-1 border transition-all cursor-pointer ${
-              showOnlyTestMembers
-                ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm hover:bg-rose-100'
-                : 'bg-white border-stone-200 text-stone-550 hover:bg-stone-50 shadow-xs'
-            }`}
+            className={showOnlyTestMembers ? 'dashboard-btn-rose-filter' : 'dashboard-btn-dark-filter'}
           >
             <AlertOctagon size={11} className={showOnlyTestMembers ? "animate-pulse" : ""} />
             <span>테스트 대조 필터</span>
@@ -469,11 +483,7 @@ export const AdminMembershipAction: React.FC<AdminMembershipActionProps> = ({
           <button
             type="button"
             onClick={toggleSkipTestMembers}
-            className={`h-7 px-2.5 rounded-lg text-[10px] font-bold flex items-center gap-1 border transition-all cursor-pointer ${
-              skipTestMembers
-                ? 'bg-[#C5A059]/15 border-[#C5A059]/40 text-[#C5A059] shadow-sm hover:bg-[#C5A059]/25'
-                : 'bg-white border-stone-200 text-stone-550 hover:bg-stone-50 shadow-xs'
-            }`}
+            className={skipTestMembers ? 'dashboard-btn-gold-filter' : 'dashboard-btn-dark-filter'}
           >
             <AlertOctagon size={11} className={skipTestMembers ? "animate-pulse" : ""} />
             <span>테스트생략</span>

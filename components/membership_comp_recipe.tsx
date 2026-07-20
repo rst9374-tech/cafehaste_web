@@ -440,7 +440,7 @@ export const MembershipCompRecipe: React.FC = () => {
       {/* 하단 버전 정보 */}
       <div className="text-[9.5px] text-stone-600 border-t border-stone-900 pt-2.5 mt-3.5 flex justify-between font-sans">
         <span>VERSION: v4.1.2-STABLE (김포운양역점 특화 펌웨어 스펙)</span>
-        <span>SYS PORT: 8085</span>
+        <span>SYS PORT: 8080</span>
       </div>
     </div>
   );

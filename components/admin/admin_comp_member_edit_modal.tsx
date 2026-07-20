@@ -114,116 +114,130 @@ export const MemberEditModal: React.FC<MemberEditModalProps> = ({ member, licens
   };
 
   return (
-    <div className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs">
+    <div className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-stone-955/80 backdrop-blur-xs member-edit-modal-wrapper">
       <div 
         onClick={onClose}
         className="fixed inset-0 cursor-pointer" 
       />
-      <div className="relative bg-[#FAF4EB] border-2 border-stone-400 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden z-50 flex flex-col max-h-[90vh]">
+      <div className="relative dashboard-modal w-full max-w-xl z-50 flex flex-col max-h-[90vh] bg-[#F4EADB] border border-stone-300 shadow-2xl" style={{ backgroundColor: '#F4EADB' }}>
         {/* Header */}
-        <div className="bg-[#422B1E] text-[#C5A059] px-6 py-4 flex justify-between items-center shrink-0">
+        <div className="dashboard-header shrink-0 border-b border-stone-800" style={{ backgroundColor: '#1c1917' }}>
           <div className="flex items-center gap-2">
-            <span className="text-base">📝</span>
-            <h3 className="font-serif font-black text-sm tracking-tight text-white">
-              멤버 정보 수정대장 <span className="font-mono text-xs text-[#C5A059]">({member.id})</span>
+            <h3 className="font-serif font-black text-sm tracking-tight text-white font-sans">
+              멤버십정보 수정 <span className="font-mono text-xs text-[#C5A059]">({member.id})</span>
             </h3>
           </div>
           <button 
             type="button"
             onClick={onClose}
-            className="text-stone-300 hover:text-white transition-colors font-bold text-sm"
+            className="text-stone-400 hover:text-white transition-colors font-bold text-sm"
           >
             ✕
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1 text-left">
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1 text-left bg-[#F4EADB]" style={{ backgroundColor: '#F4EADB' }}>
           {/* Row 1: 매장 정보 */}
-          <div className="space-y-3">
-            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider border-b border-stone-200 pb-1 flex items-center gap-1.5">
-              <span>🏢</span>
+          <div className="space-y-4">
+            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider pb-1 border-b border-stone-300 font-sans">
               <span>매장 기본 정보</span>
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">매장명 *</label>
-                <input 
-                  type="text" 
-                  value={storeName}
-                  onChange={(e) => setStoreName(e.target.value)}
-                  className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1 font-sans">매장 코드</label>
-                <input 
-                  type="text" 
-                  value={storeCode}
-                  onChange={(e) => setStoreCode(e.target.value)}
-                  placeholder="예: 123456"
-                  className="w-full text-xs font-mono font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
-                />
-              </div>
+            
+            {/* 매장명 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                매장명 *
+              </span>
+              <input 
+                type="text" 
+                value={storeName}
+                onChange={(e) => setStoreName(e.target.value)}
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
+                required
+              />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">설치 주소 *</label>
+
+            {/* 매장 코드 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                매장 코드
+              </span>
+              <input 
+                type="text" 
+                value={storeCode}
+                onChange={(e) => setStoreCode(e.target.value)}
+                placeholder="예: 123456"
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans font-mono"
+              />
+            </div>
+
+            {/* 설치 주소 & 상세 주소 (한 줄에 묶어 가로 배치) */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans leading-tight">
+                매장 주소 *
+              </span>
+              <div className="flex flex-col sm:flex-row gap-2 w-full">
                 <input 
                   type="text" 
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
+                  placeholder="설치 주소 입력"
+                  className="w-full sm:w-2/3 rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-805 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">상세 주소 (오른쪽)</label>
                 <input 
                   type="text" 
                   value={addressDetail}
                   onChange={(e) => setAddressDetail(e.target.value)}
-                  placeholder="예: 2층 201호"
-                  className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
+                  placeholder="상세주소 입력 (예: 2층)"
+                  className="w-full sm:w-1/3 rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-805 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
                 />
               </div>
             </div>
           </div>
 
           {/* Row 2: 점주 정보 */}
-          <div className="space-y-3 pt-2">
-            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider border-b border-stone-200 pb-1 flex items-center gap-1.5">
-              <span>👤</span>
+          <div className="space-y-4 pt-2">
+            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider pb-1 border-b border-stone-300 font-sans">
               <span>점주 정보변경</span>
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">점주 성함 *</label>
-                <input 
-                  type="text" 
-                  value={ownerName}
-                  onChange={(e) => setOwnerName(e.target.value)}
-                  className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">사업자등록번호</label>
-                <input 
-                  type="text" 
-                  value={businessNumber}
-                  onChange={(e) => setBusinessNumber(e.target.value)}
-                  placeholder="예: 1234567890"
-                  className="w-full text-xs font-mono font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
-                />
-              </div>
+
+            {/* 점주 성함 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                점주 성함 *
+              </span>
+              <input 
+                type="text" 
+                value={ownerName}
+                onChange={(e) => setOwnerName(e.target.value)}
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
+                required
+              />
             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">사업자등록증 첨부 및 수정</label>
-                <div className="flex flex-col gap-1">
+
+            {/* 사업자 번호 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                사업자 번호
+              </span>
+              <input 
+                type="text" 
+                value={businessNumber}
+                onChange={(e) => setBusinessNumber(e.target.value)}
+                placeholder="예: 1234567890"
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans font-mono"
+              />
+            </div>
+
+            {/* 등록증 이미지 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans leading-tight">
+                등록증 이미지
+              </span>
+              <div className="flex flex-col sm:flex-row gap-2 w-full items-center">
+                <div className="relative w-full">
                   <input 
                     type="file" 
                     accept="image/*"
@@ -233,87 +247,101 @@ export const MemberEditModal: React.FC<MemberEditModalProps> = ({ member, licens
                   />
                   <label 
                     htmlFor="admin-cert-upload-input"
-                    className="w-full text-center text-[10px] font-bold bg-[#422B1E] hover:bg-[#5b3d2b] text-white py-2 px-3 rounded-lg cursor-pointer transition-all shadow-xs leading-none flex items-center justify-center min-h-[32px]"
+                    className="w-full text-center text-xs font-bold bg-[#422B1E]/10 hover:bg-[#422B1E]/20 text-[#422B1E] py-2.5 px-5 rounded-full cursor-pointer transition-all shadow-sm leading-none flex items-center justify-center min-h-[38px] border border-[#422B1E]/30"
                   >
-                    {isFileCompressing ? '처리 중...' : businessCertName ? `선택됨: ${businessCertName.substring(0, 15)}` : '등록증 이미지 변경'}
+                    {isFileCompressing ? '처리 중...' : businessCertName ? `선택됨: ${businessCertName.substring(0, 20)}...` : '등록증 이미지 변경'}
                   </label>
-                  {businessCertPath && !businessCertName && (
-                    <div className="text-[9px] text-stone-500 truncate text-center">
-                      기존 등록증 존재 (<a href={businessCertPath} target="_blank" rel="noopener noreferrer" className="text-amber-700 underline font-semibold">보기</a>)
-                    </div>
-                  )}
                 </div>
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">연락처 *</label>
-                <input 
-                  type="text" 
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="예: 01088745211"
-                  className="w-full text-xs font-mono font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
-                  required
-                />
+                {businessCertPath && !businessCertName && (
+                  <div className="text-[11px] text-stone-600 font-bold shrink-0 whitespace-nowrap">
+                    기존 등록증 존재 (<a href={businessCertPath} target="_blank" rel="noopener noreferrer" className="text-[#C5A059] hover:text-[#b08e4d] underline font-semibold">보기</a>)
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">이메일 주소</label>
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-xs font-mono font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">점주 비밀번호 변경</label>
-                <input 
-                  type="password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="변경 시에만 입력"
-                  className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
-                />
-              </div>
+            {/* 연락처 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans font-mono">
+                연락처 *
+              </span>
+              <input 
+                type="text" 
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="예: 01088745211"
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans font-mono"
+                required
+              />
+            </div>
+
+            {/* 이메일 주소 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans font-mono">
+                이메일 주소
+              </span>
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans font-mono"
+              />
+            </div>
+
+            {/* 비밀번호 변경 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                비밀번호 변경
+              </span>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="변경 시에만 입력"
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
+              />
             </div>
           </div>
 
           {/* Row 2.5: 라이선스 인증 기간 설정 (1달, 3달, 1년 빠른 세팅) */}
-          <div className="space-y-3 pt-2">
-            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider border-b border-stone-200 pb-1 flex items-center gap-1.5">
-              <span>📅</span>
+          <div className="space-y-4 pt-2">
+            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider pb-1 border-b border-stone-300 font-sans">
               <span>인증 라이선스 기간 관리</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1">인증 시작일</label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+                <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                  인증 시작일
+                </span>
                 <input 
                   type="date" 
                   value={licenseStartDate}
                   onChange={(e) => setLicenseStartDate(e.target.value)}
-                  className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-[#422B1E] focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
+                  className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-805 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
                 />
               </div>
-              <div>
-                <label className="block text-[10px] font-bold text-stone-500 mb-1 font-sans">인증 종료일</label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+                <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                  인증 종료일
+                </span>
                 <input 
                   type="date" 
                   value={licenseEndDate}
                   onChange={(e) => setLicenseEndDate(e.target.value)}
-                  className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-[#422B1E] focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
+                  className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-805 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
                 />
               </div>
             </div>
             
             {/* 매장 유형 선택 추가 (솔루션 등급 위) */}
-            <div>
-              <label className="block text-[10px] font-bold text-stone-500 mb-1">매장 유형</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                매장 유형
+              </span>
               <select
                 value={storeType}
                 onChange={(e) => setStoreType(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
               >
                 <option value="HASTE_MEMBERSHIP">헤이스트멤버십</option>
                 <option value="MEMBERSHIP">멤버십</option>
@@ -322,18 +350,20 @@ export const MemberEditModal: React.FC<MemberEditModalProps> = ({ member, licens
             </div>
 
             {/* 솔루션 등급 선택 추가 */}
-            <div>
-              <label className="block text-[10px] font-bold text-stone-500 mb-1">솔루션 등급</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5 w-full">
+              <span className="text-[10px] font-bold text-white bg-[#422B1E] py-2 px-4 rounded-full w-full sm:w-32 text-center shrink-0 select-none font-sans">
+                솔루션 등급
+              </span>
               <select
                 value={storeGrade}
                 onChange={(e) => setStoreGrade(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E]"
+                className="w-full rounded-full border border-stone-250 bg-white py-2 px-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
               >
                 <option value="STANDARD">베이직</option>
                 <option value="PREMIUM">프리미엄</option>
               </select>
             </div>
-            
+
             {/* 1달, 3달, 1년 빠른 설정 버튼 */}
             <div className="flex flex-wrap gap-1.5 pt-1">
               <button
@@ -350,7 +380,7 @@ export const MemberEditModal: React.FC<MemberEditModalProps> = ({ member, licens
                   setLicenseStartDate(startStr);
                   setLicenseEndDate(endStr);
                 }}
-                className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-extrabold rounded-lg border border-stone-305 leading-none cursor-pointer transition-all active:scale-95 whitespace-nowrap"
+                className="px-3 py-1.5 bg-[#422B1E] hover:bg-[#342217] text-[#C5A059] text-[10px] font-extrabold rounded-lg border-0 leading-none cursor-pointer transition-all active:scale-95 whitespace-nowrap font-mono shadow-sm"
               >
                 1달 설정
               </button>
@@ -368,7 +398,7 @@ export const MemberEditModal: React.FC<MemberEditModalProps> = ({ member, licens
                   setLicenseStartDate(startStr);
                   setLicenseEndDate(endStr);
                 }}
-                className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-extrabold rounded-lg border border-stone-305 leading-none cursor-pointer transition-all active:scale-95 whitespace-nowrap"
+                className="px-3 py-1.5 bg-[#422B1E] hover:bg-[#342217] text-[#C5A059] text-[10px] font-extrabold rounded-lg border-0 leading-none cursor-pointer transition-all active:scale-95 whitespace-nowrap font-mono shadow-sm"
               >
                 3달 설정
               </button>
@@ -386,7 +416,7 @@ export const MemberEditModal: React.FC<MemberEditModalProps> = ({ member, licens
                   setLicenseStartDate(startStr);
                   setLicenseEndDate(endStr);
                 }}
-                className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] font-extrabold rounded-lg border border-stone-305 leading-none cursor-pointer transition-all active:scale-95 whitespace-nowrap"
+                className="px-3 py-1.5 bg-[#422B1E] hover:bg-[#342217] text-[#C5A059] text-[10px] font-extrabold rounded-lg border-0 leading-none cursor-pointer transition-all active:scale-95 whitespace-nowrap font-mono shadow-sm"
               >
                 1년 설정
               </button>
@@ -394,35 +424,34 @@ export const MemberEditModal: React.FC<MemberEditModalProps> = ({ member, licens
           </div>
 
           {/* Row 3: 메모 */}
-          <div className="space-y-2 pt-2">
-            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider border-b border-stone-200 pb-1 flex items-center gap-1.5">
-              <span>💬</span>
+          <div className="space-y-4 pt-2">
+            <h4 className="text-[11px] font-extrabold text-[#422B1E] uppercase tracking-wider pb-1 border-b border-stone-300 font-sans">
               <span>비고 및 가입문의사항</span>
             </h4>
-            <div>
+            <div className="flex flex-col gap-1.5 w-full">
               <textarea 
                 rows={3}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2 border border-stone-300 rounded-lg bg-white text-stone-900 focus:outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] resize-none"
+                className="w-full rounded-2xl border border-stone-250 bg-white p-3.5 text-xs font-semibold text-stone-800 outline-none focus:border-[#422B1E] focus:ring-1 focus:ring-[#422B1E] transition-all shadow-sm font-sans"
               />
             </div>
           </div>
 
           {/* Footer Buttons */}
-          <div className="flex justify-end gap-2 pt-4 border-t border-stone-200 shrink-0">
+          <div className="flex justify-end gap-2 pt-4 border-t border-stone-300 shrink-0">
             <button
               type="button"
               onClick={onClose}
               disabled={isSaving}
-              className="px-4 py-2 border border-stone-300 text-stone-500 rounded-xl font-bold text-xs hover:bg-stone-100 hover:text-stone-850 transition-colors cursor-pointer select-none"
+              className="px-4 py-2 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
             >
               취소
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="px-5 py-2 bg-stone-900 hover:bg-stone-800 disabled:opacity-50 text-white rounded-xl font-black text-xs transition-colors cursor-pointer shadow-sm select-none"
+              className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-[#C5A059] text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
             >
               {isSaving ? '저장 처리 중...' : '정보 저장 완료'}
             </button>

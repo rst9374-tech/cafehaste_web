@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
-import { HeroDraft } from '../../types';
+import { HeroDraft } from '../home_types';
 
 interface AdminDraftsPreviewProps {
   previewDraft: HeroDraft | null;
@@ -28,7 +28,7 @@ export const AdminDraftsPreview: React.FC<AdminDraftsPreviewProps> = ({
   }
 
   return (
-    <div className="bg-stone-950 rounded-2xl border border-stone-850 overflow-hidden shadow-2xl relative shadow-stone-950/20">
+    <div className="bg-stone-955 rounded-2xl overflow-hidden shadow-2xl relative shadow-stone-950/20">
       <div className="relative aspect-[16/9] w-full bg-stone-950 overflow-hidden flex flex-col justify-end p-6 select-none group">
         <div className="absolute inset-0">
           <img
@@ -45,7 +45,7 @@ export const AdminDraftsPreview: React.FC<AdminDraftsPreviewProps> = ({
             e.stopPropagation();
             handlePrevPreview();
           }}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-stone-950/70 backdrop-blur-md border border-white/10 hover:border-white/30 text-[#FAF9F6] hover:text-[#C5A059] flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-stone-950/70 backdrop-blur-md border border-stone-800 hover:border-[#C5A059] text-[#FAF9F6] hover:text-[#C5A059] flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
         >
           <ChevronLeft size={16} />
         </button>
@@ -54,14 +54,14 @@ export const AdminDraftsPreview: React.FC<AdminDraftsPreviewProps> = ({
             e.stopPropagation();
             handleNextPreview();
           }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-stone-950/70 backdrop-blur-md border border-white/10 hover:border-white/30 text-[#FAF9F6] hover:text-[#C5A059] flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-stone-950/70 backdrop-blur-md border border-stone-800 hover:border-[#C5A059] text-[#FAF9F6] hover:text-[#C5A059] flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
         >
           <ChevronRight size={16} />
         </button>
 
         <div className="relative z-10 flex flex-col gap-1.5 text-left">
           <div>
-            <span className="font-mono text-[8px] font-extrabold tracking-widest uppercase bg-[#C5A059] text-stone-950 px-2 py-0.5 rounded shadow-sm">
+            <span className="font-mono text-[8px] font-extrabold tracking-widest uppercase bg-[#C5A059] text-stone-955 px-2 py-0.5 rounded shadow-sm">
               {activePreview.tag || 'HASTE DESIGN'}
             </span>
           </div>
@@ -76,14 +76,14 @@ export const AdminDraftsPreview: React.FC<AdminDraftsPreviewProps> = ({
           </p>
         </div>
 
-        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-stone-950/70 backdrop-blur-md px-2 py-1 rounded-full border border-white/5">
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-stone-950/70 backdrop-blur-md px-2 py-1 rounded-full border border-stone-850">
           <span className="font-mono text-[8px] text-emerald-400 font-bold uppercase tracking-wider">
             PREVIEWING
           </span>
         </div>
       </div>
 
-      <div className="bg-stone-900 px-4 py-2.5 border-t border-stone-850 text-[10px] font-sans text-stone-400 flex items-center justify-between">
+      <div className="bg-stone-900 px-4 py-2.5 text-[10px] font-sans text-stone-400 flex items-center justify-between">
         <span>장착: <strong className="text-white">{activePreview.tag || '없음'}</strong></span>
         <div className="flex items-center gap-2">
           {activePreview.bgImage && (

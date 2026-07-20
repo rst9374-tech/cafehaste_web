@@ -8,7 +8,6 @@ interface UseAdminMenuProps {
   setAdminMenuItems: (items: any[]) => void;
   showTemporaryToast: (msg: string) => void;
   showTemporaryError: (msg: string) => void;
-  isMenuAll?: boolean;
 }
 
 const MENU_ITEMS_PER_PAGE = 200;
@@ -19,8 +18,7 @@ export const useAdminMenu = ({
   adminMenuItems,
   setAdminMenuItems,
   showTemporaryToast,
-  showTemporaryError,
-  isMenuAll = false
+  showTemporaryError
 }: UseAdminMenuProps) => {
   const { processAndUpload } = useImageUpload();
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<'ALL' | string>('ALL');
@@ -40,7 +38,7 @@ export const useAdminMenu = ({
   // Menu Items Form Modals state
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
   const [menuFormMode, setMenuFormMode] = useState<'CREATE' | 'EDIT'>('CREATE');
-  const [menuFormId, setMenuFormId] = useState('');
+  const [menuFormId, setMenuFormId] = useState<string | number>('');
   const [menuFormName, setMenuFormName] = useState('');
   const [menuFormNameKr, setMenuFormNameKr] = useState('');
   const [menuFormCategory, setMenuFormCategory] = useState('');
@@ -92,8 +90,7 @@ export const useAdminMenu = ({
 
   const fetchAdminMenuItemsLocally = async () => {
     try {
-      const url = isMenuAll ? '/api/menu-items-all/raw' : '/api/menu-items';
-      const res = await fetch(url);
+      const res = await fetch('/api/menu-items');
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -107,7 +104,7 @@ export const useAdminMenu = ({
 
   useEffect(() => {
     fetchAdminMenuItemsLocally();
-  }, [isMenuAll]);
+  }, []);
 
   const handleBulkImageUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,6 +130,40 @@ export const useAdminMenu = ({
           setSelectedMenuIds([]);
           setIsBulkImageModalOpen(false);
           setBulkImageValue('');
+        } else {
+          showTemporaryError(data.message || '일괄 수정 실패');
+        }
+      } else {
+        showTemporaryError('일괄 수정 네트워크 통신 실패');
+      }
+    } catch (err: any) {
+      showTemporaryError(err.message);
+    } finally {
+      setIsBulkLoading(false);
+    }
+  };
+
+  const handleBulkSignatureUpdate = async (isSig: boolean) => {
+    if (selectedMenuIds.length === 0) {
+      showTemporaryError('선택된 음료가 없습니다.');
+      return;
+    }
+    setIsBulkLoading(true);
+    try {
+      const res = await fetch('/api/menu-items/bulk-signature', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ids: selectedMenuIds,
+          isSignature: isSig
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          showTemporaryToast(`${selectedMenuIds.length}개 메뉴 품목의 시그니처 설정을 성공적으로 일괄 ${isSig ? '등록' : '해제'}했습니다.`);
+          await fetchAdminMenuItemsLocally();
+          setSelectedMenuIds([]);
         } else {
           showTemporaryError(data.message || '일괄 수정 실패');
         }
@@ -204,12 +235,43 @@ export const useAdminMenu = ({
       setIsUploading(true);
       try {
         const categoryPayloadId = (typeof menuFormId === 'string' && menuFormId) ? menuFormId : 'MENU_ITEM';
+        
+        // 폼 정보를 수집하여 표준 파일명 자동 조립 (NFC 자모 정규화 보장)
+        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'png';
+        const cleanName = (menuFormNameKr || '음료제품').trim();
+        
+        // 1. 온도 판별 (기본 HOT)
+        const isIced = cleanName.includes('아이스') || cleanName.includes('ICE') || cleanName.includes('ICED');
+        const tempPrefix = isIced ? 'ICED' : 'HOT';
+        
+        // 2. 원두 종류 판별 (커피류 카테고리일 때만 적용)
+        let beanPrefix = '';
+        const isCoffee = menuFormCategory === 'AMERICANO' || menuFormCategory === 'COFFEE_LATTE';
+        if (isCoffee) {
+          if (cleanName.includes('디카페인') || cleanName.includes('(D)')) {
+            beanPrefix = '(D)';
+          } else if (cleanName.includes('프리미엄') || cleanName.includes('(P)')) {
+            beanPrefix = '(P)';
+          }
+        }
+        
+        // 3. 중복 키워드 정돈 및 순수 이름 추출
+        let pureName = cleanName
+          .replace(/^(아이스|핫|ICE|ICED|HOT)\s*/i, '') // 시작하는 온도 제거
+          .replace(/(아이스|핫|ICE|ICED|HOT)/gi, '') // 중간 온도 제거
+          .replace(/(디카페인|프리미엄|\(D\)|\(P\))/g, '') // 원두 제거
+          .replace(/\s+/g, '') // 공백 제거
+          .trim();
+          
+        const customFilename = `${tempPrefix}_${beanPrefix}${pureName}.${fileExt}`.normalize('NFC');
+
         const uploadedUrl = await processAndUpload(file, {
           maxWidth: 1024,
           maxHeight: 1024,
           quality: 0.82,
           boardName: 'menu',
-          categoryId: categoryPayloadId
+          categoryId: categoryPayloadId,
+          customFilename
         });
         setValue(uploadedUrl);
         showTemporaryToast(
@@ -231,17 +293,24 @@ export const useAdminMenu = ({
 
   const handleSaveMenuItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!menuFormId || !menuFormNameKr) {
-      showTemporaryError('메뉴 코드 ID와 한글 명칭은 필수값입니다.');
+    if (menuFormMode === 'EDIT' && !menuFormId) {
+      showTemporaryError('메뉴 코드 ID는 필수값입니다.');
+      return;
+    }
+    if (!menuFormNameKr) {
+      showTemporaryError('한글 명칭은 필수값입니다.');
       return;
     }
     try {
-      const url = isMenuAll ? '/api/menu-items-all' : '/api/menu-items';
+      const url = '/api/menu-items';
+      const sendId = menuFormMode === 'EDIT'
+        ? (typeof menuFormId === 'string' ? menuFormId.toUpperCase().replace(/\s+/g, '_') : menuFormId)
+        : '';
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: menuFormId.toUpperCase().replace(/\s+/g, '_'),
+          id: sendId,
           name: menuFormName,
           nameKr: menuFormNameKr,
           category: menuFormCategory,
@@ -292,7 +361,7 @@ export const useAdminMenu = ({
     try {
       const isSig = item.isSignature === 1 || item.isSignature === true || (item as any).is_signature === 1 || (item as any).is_signature === true;
       const nextSigValue = isSig ? 0 : 1;
-      const url = isMenuAll ? '/api/menu-items-all' : '/api/menu-items';
+      const url = '/api/menu-items';
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -327,7 +396,8 @@ export const useAdminMenu = ({
 
   const filteredList = useMemo(() => {
     let list = adminMenuItems.filter(item => {
-      const matchesCategory = selectedCategoryFilter === 'ALL' || item.category === selectedCategoryFilter;
+      const matchesCategory = selectedCategoryFilter === 'ALL' || 
+        (item.category || '').trim().toUpperCase() === (selectedCategoryFilter || '').trim().toUpperCase();
       if (!matchesCategory) return false;
 
       if (!adminSearchQuery || adminSearchQuery.trim() === '') return true;
@@ -395,6 +465,7 @@ export const useAdminMenu = ({
     isLargeImages, setIsLargeImages,
     
     handleBulkImageUpdate,
+    handleBulkSignatureUpdate,
     handleSaveCategory,
     handleDeleteCategory,
     handleFileChange,

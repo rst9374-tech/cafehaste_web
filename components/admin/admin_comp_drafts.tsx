@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { AdminSystemHub } from './admin_comp_systemhub';
-import { HeroDraft } from '../../types';
+import { HeroDraft } from '../home_types';
 import { DraftsModal } from './admin_comp_drafts_modal';
 import { AdminDraftsTable } from './admin_comp_drafts_table';
 import { AdminDraftsPreview } from './admin_comp_drafts_preview';
@@ -258,110 +258,91 @@ export const AdminDraftsTab: React.FC<AdminDraftsTabProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <div className="flex justify-end items-center border-b border-stone-150 pb-4 mb-5 gap-3">
-            <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0 flex-wrap">
-              {selectedDraftIds.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setConfirmModal({
-                      message: `선택한 ${selectedDraftIds.length}개의 디자인 게시글을 일괄 삭제하시겠습니까?`,
-                      onConfirm: async () => {
-                        try {
-                          await Promise.all(
-                            selectedDraftIds.map(id =>
-                              fetch(`/api/hero-drafts/${id}`, { method: 'DELETE' })
-                            )
-                          );
-                          showTemporaryToast('선택한 디자인 게시글이 일괄 삭제되었습니다.');
-                          const updated = heroDrafts.filter(d => !selectedDraftIds.includes(d.id));
-                          onUpdateDrafts(updated);
-                          localStorage.setItem('haste_hero_drafts', JSON.stringify(updated));
-                          setSelectedDraftIds([]);
-                        } catch (err: any) {
-                          showTemporaryError('일괄 삭제 중 오류: ' + err.message);
-                        }
-                      }
-                    });
-                  }}
-                  className="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 border border-rose-250 text-rose-600 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
-                >
-                  <Trash2 size={12} />
-                  <span>선택 일괄 삭제 ({selectedDraftIds.length})</span>
-                </button>
-              )}
-
-              {/* 배너 랜덤 노출 토글 스위치 */}
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl shadow-sm text-xs font-semibold text-stone-600 select-none mr-2">
-                <span>배너 랜덤 노출</span>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const nextVal = !draftRandomShow;
+    <div className="space-y-6 flex flex-col w-full">
+      {/* ① 최상단 액션 바 (배너 랜덤 노출 + 새 디자인 추가 버튼) */}
+      <div className="flex justify-between items-center border-b border-stone-900 pb-4 gap-3 w-full">
+        <div className="text-xs text-stone-550 font-bold select-none">
+          총 {heroDrafts.length}개의 메인 배너 디자인
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {selectedDraftIds.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setConfirmModal({
+                  message: `선택한 ${selectedDraftIds.length}개의 디자인 게시글을 일괄 삭제하시겠습니까?`,
+                  onConfirm: async () => {
                     try {
-                      const res = await fetch('/api/hero-drafts/settings', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ draftRandomShow: nextVal })
-                      });
-                      if (res.ok) {
-                        const data = await res.json();
-                        if (data.success) {
-                          setDraftRandomShow(nextVal);
-                          showTemporaryToast(nextVal ? '배너 이미지가 이제 랜덤으로 정렬되어 노출됩니다!' : '배너 이미지가 지정된 고정 순서대로 노출됩니다.');
-                        }
-                      }
+                      await Promise.all(
+                        selectedDraftIds.map(id =>
+                          fetch(`/api/hero-drafts/${id}`, { method: 'DELETE' })
+                        )
+                      );
+                      showTemporaryToast('선택한 디자인 게시글이 일괄 삭제되었습니다.');
+                      const updated = heroDrafts.filter(d => !selectedDraftIds.includes(d.id));
+                      onUpdateDrafts(updated);
+                      localStorage.setItem('haste_hero_drafts', JSON.stringify(updated));
+                      setSelectedDraftIds([]);
                     } catch (err: any) {
-                      showTemporaryError('설정 저장 중 오류: ' + err.message);
+                      showTemporaryError('일괄 삭제 중 오류: ' + err.message);
                     }
-                  }}
-                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${draftRandomShow ? 'bg-[#C5A059]' : 'bg-stone-300'}`}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${draftRandomShow ? 'translate-x-4' : 'translate-x-0'}`}
-                  />
-                </button>
-              </div>
+                  }
+                });
+              }}
+              className="py-1.5 px-3 bg-rose-950/40 hover:bg-rose-900 border border-rose-900/60 text-rose-350 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
+            >
+              <Trash2 size={12} />
+              <span>선택 일괄 삭제 ({selectedDraftIds.length})</span>
+            </button>
+          )}
 
-              <AdminSystemHub 
-                showTemporaryToast={showTemporaryToast}
-                showTemporaryError={showTemporaryError}
-                activeAdminTab="DRAFTS"
+          {/* 배너 랜덤 노출 토글 스위치 */}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-stone-900 rounded-xl shadow-sm text-xs font-semibold text-stone-400 select-none">
+            <span>배너 랜덤 노출</span>
+            <button
+              type="button"
+              onClick={async () => {
+                const nextVal = !draftRandomShow;
+                try {
+                  const res = await fetch('/api/hero-drafts/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ draftRandomShow: nextVal })
+                  });
+                  if (res.ok) {
+                    const data = await res.json();
+                    if (data.success) {
+                      setDraftRandomShow(nextVal);
+                      showTemporaryToast(nextVal ? '배너 이미지가 이제 랜덤으로 정렬되어 노출됩니다!' : '배너 이미지가 지정된 고정 순서대로 노출됩니다.');
+                    }
+                  }
+                } catch (err: any) {
+                  showTemporaryError('설정 저장 중 오류: ' + err.message);
+                }
+              }}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${draftRandomShow ? 'bg-white' : 'bg-[#3F3F46]'}`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out ${draftRandomShow ? 'translate-x-5' : 'translate-x-0'}`}
+                style={{ backgroundColor: draftRandomShow ? '#18181b' : '#ffffff' }}
               />
-
-              <button
-                type="button"
-                onClick={handleOpenCreateDraft}
-                className="py-1.5 px-3 bg-[#C5A059] hover:bg-[#B38F48] text-stone-950 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
-              >
-                <Plus size={12} />
-                <span>새 디자인 추가</span>
-              </button>
-            </div>
+            </button>
           </div>
 
-          <AdminDraftsTable
-            currentDraftsToShow={currentDraftsToShow}
-            selectedDraftIds={selectedDraftIds}
-            setSelectedDraftIds={setSelectedDraftIds}
-            draggedIdx={draggedIdx}
-            setDraggedIdx={setDraggedIdx}
-            heroDrafts={heroDrafts}
-            draftPage={draftPage}
-            ITEMS_PER_PAGE={ITEMS_PER_PAGE}
-            onUpdateDrafts={onUpdateDrafts}
-            setPreviewDraft={setPreviewDraft}
-            handleOpenEditDraft={handleOpenEditDraft}
-            handleDeleteDraft={handleDeleteDraft}
-          />
-
-          {renderPagination(draftPage, totalDraftPages, setDraftPage)}
+          <button
+            type="button"
+            onClick={handleOpenCreateDraft}
+            className="py-1.5 px-3 bg-[#C5A059] hover:bg-[#B38F48] text-stone-950 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
+          >
+            <Plus size={12} />
+            <span>새 디자인 추가</span>
+          </button>
         </div>
+      </div>
 
-        <div className="lg:col-span-4 sticky top-28 flex flex-col gap-6">
+      {/* ② 상단 미리보기 영역 (미리보기 카드를 560px 너비로 키움) */}
+      <div className="w-full flex justify-center pb-4 border-b border-stone-900">
+        <div className="w-full max-w-[560px] shrink-0">
           <AdminDraftsPreview
             previewDraft={previewDraft}
             heroDrafts={heroDrafts}
@@ -370,6 +351,25 @@ export const AdminDraftsTab: React.FC<AdminDraftsTabProps> = ({
             setPreviewDraft={setPreviewDraft}
           />
         </div>
+      </div>
+
+      {/* ③ 하단 디자인 목록 테이블 (폭 100% 사용) */}
+      <div className="w-full flex flex-col gap-4">
+        <AdminDraftsTable
+          currentDraftsToShow={currentDraftsToShow}
+          selectedDraftIds={selectedDraftIds}
+          setSelectedDraftIds={setSelectedDraftIds}
+          draggedIdx={draggedIdx}
+          setDraggedIdx={setDraggedIdx}
+          heroDrafts={heroDrafts}
+          draftPage={draftPage}
+          ITEMS_PER_PAGE={ITEMS_PER_PAGE}
+          onUpdateDrafts={onUpdateDrafts}
+          setPreviewDraft={setPreviewDraft}
+          handleOpenEditDraft={handleOpenEditDraft}
+          handleDeleteDraft={handleDeleteDraft}
+        />
+        {renderPagination(draftPage, totalDraftPages, setDraftPage)}
       </div>
 
       <DraftsModal

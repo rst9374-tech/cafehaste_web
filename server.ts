@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 try {
-  const envContent = fs.readFileSync(path.resolve(process.cwd(), '.env'), 'utf-8');
+  let envPath = path.resolve(process.cwd(), '.env');
+  if (!fs.existsSync(envPath)) {
+    envPath = path.resolve(process.cwd(), '../../conf/.env');
+  }
+  const envContent = fs.readFileSync(envPath, 'utf-8');
   envContent.split(/\r?\n/).forEach((line: string) => {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) return;
@@ -26,7 +30,7 @@ import {
   writeBackupCategories,
   writeBackupMenuItems
 } from './server/database';
-import * as serverDefaults from './serverDefaults';
+import * as serverDefaults from './server/serverDefaults';
 
 const { DEFAULT_CATEGORIES, DEFAULT_MENU_ITEMS } = serverDefaults;
 
@@ -59,6 +63,7 @@ try {
     if (file.startsWith('.')) continue;
     const srcPath = path.join(UPLOADS_DIR, file);
     const destPath = path.join(EXTERNAL_DIR, file);
+    if (fs.statSync(srcPath).isDirectory()) continue;
     if (!fs.existsSync(destPath)) {
       fs.copyFileSync(srcPath, destPath);
     }
@@ -263,6 +268,23 @@ async function startServer() {
       appType: "spa",
     });
     app.use(vite.middlewares);
+
+    // SPA Fallback: API나 정적 리소스가 아닌 가상 클라이언트 경로 진입 시 index.html을 로드하여 변환 서빙
+    app.use(async (req, res, next) => {
+      if (req.method !== 'GET') return next();
+      const url = req.originalUrl;
+      if (url.startsWith('/api/') || url.startsWith('/uploads/') || url.startsWith('/assets/') || /\.[a-zA-Z0-9]+$/.test(url)) {
+        return next();
+      }
+      try {
+        let template = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+      } catch (e) {
+        vite.ssrFixStacktrace(e as Error);
+        next(e);
+      }
+    });
   } else {
     const distPath = path.join(process.cwd(), 'dist');
 
@@ -375,13 +397,103 @@ async function startServer() {
       try {
         console.log('[Startup Async] Initializing Database Pool in background...');
         const dbPool = await getDbPool();
+        
+        // [HASTE 임시 제어 우회 수정 지점] - 예약 배포 스케줄 테이블 생성 쿼리 추가
+        await dbPool.query(`
+          CREATE TABLE IF NOT EXISTS web_board_store_deploy_schedule (
+            id SERIAL PRIMARY KEY,
+            version_id INT NOT NULL,
+            target_store VARCHAR(255) NOT NULL DEFAULT 'ALL',
+            scheduled_at TIMESTAMP NOT NULL,
+            status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+            error_message TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (version_id) REFERENCES web_board_store_version(id) ON DELETE CASCADE
+          );
+        `);
+        
         await convertExistingBase64ToFiles(dbPool);
         console.log('[Startup Async] Cloud SQL Pool & active base64 migration completed.');
+        
+        // [HASTE 임시 제어 우회 수정 지점] - 백그라운드 예약 배포 스케줄러 가동
+        startDeploymentScheduler(dbPool);
       } catch (err: any) {
         console.error('[Startup Migration Warn] Database initialization threat/check deferred:', err.message);
       }
     })();
   });
+}
+
+// [HASTE 임시 제어 우회 수정 지점] - 예약 배포 백그라운드 폴링 스케줄러 (30초 주기)
+function startDeploymentScheduler(dbPool: any) {
+  console.log('[Deploy Scheduler] Starting background deployment polling task...');
+  setInterval(async () => {
+    try {
+      const [schedules]: any = await dbPool.query(
+        `SELECT s.id, s.version_id, s.target_store, s.scheduled_at, v.title, v.file_url 
+         FROM web_board_store_deploy_schedule s
+         JOIN web_board_store_version v ON s.version_id = v.id
+         WHERE s.status = 'PENDING' AND s.scheduled_at <= NOW()
+         ORDER BY s.scheduled_at ASC`
+      );
+
+      if (!schedules || schedules.length === 0) return;
+
+      for (const schedule of schedules) {
+        console.log(`[Deploy Scheduler] Scheduled deploy triggered! ID: ${schedule.id}, Version: ${schedule.title}, Target: ${schedule.target_store}`);
+        
+        try {
+          // 🔽 [HASTE 임시 제어 우회 수정 지점] DB로부터 주서버 중계 토큰을 동적으로 가져옴
+          let activeToken = 'MTUyNjI0MDE2NTg2ODIxMjQ0NQ.GAfCVA.p5QmUbvqKZGMhZT4GSdsAX89OQBNIhAe9TIDEs';
+          try {
+            const [settingsRows]: any = await dbPool.query("SELECT setting_value FROM web_system_settings WHERE setting_key = 'discord_bot_token_primary' LIMIT 1");
+            if (settingsRows && settingsRows.length > 0 && settingsRows[0].setting_value) {
+              activeToken = settingsRows[0].setting_value;
+            }
+          } catch (_) {}
+          
+          const guildsResponse = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+            headers: { 'Authorization': `Bot ${activeToken}` }
+          });
+          if (!guildsResponse.ok) throw new Error('디스코드 중계 서버 목록 조회 실패');
+          const guilds: any = await guildsResponse.json();
+          const targetGuildId = guilds[0].id;
+
+          const channelsResponse = await fetch(`https://discord.com/api/v10/guilds/${targetGuildId}/channels`, {
+            headers: { 'Authorization': `Bot ${activeToken}` }
+          });
+          const channels: any = await channelsResponse.json();
+          const textChannel = channels.find((c: any) => c.type === 0);
+          if (!textChannel) throw new Error('디스코드 중계 채널을 찾을 수 없습니다.');
+
+          const postResponse = await fetch(`https://discord.com/api/v10/channels/${textChannel.id}/messages`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bot ${activeToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: `!업데이트 ${schedule.title} ${schedule.file_url} ${schedule.target_store}` })
+          });
+
+          if (!postResponse.ok) throw new Error('디스코드 중계망 릴레이 메시지 전송 실패');
+
+          await dbPool.query(
+            "UPDATE web_board_store_deploy_schedule SET status = 'SENT' WHERE id = ?",
+            [schedule.id]
+          );
+          console.log(`[Deploy Scheduler] Scheduled deploy completed! ID: ${schedule.id}`);
+        } catch (err: any) {
+          console.error(`[Deploy Scheduler Error] ID: ${schedule.id} deploy failed:`, err.message);
+          await dbPool.query(
+            "UPDATE web_board_store_deploy_schedule SET status = 'FAILED', error_message = ? WHERE id = ?",
+            [err.message, schedule.id]
+          );
+        }
+      }
+    } catch (err: any) {
+      console.error('[Deploy Scheduler Polling Error]', err.message);
+    }
+  }, 30000);
 }
 
 startServer();

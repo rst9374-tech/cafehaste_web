@@ -51,22 +51,22 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div 
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
+            animate={{ opacity: 0.45 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsInteriorModalOpen(false)}
-            className="absolute inset-0 bg-stone-900" 
+            className="absolute inset-0 bg-stone-955/40 backdrop-blur-xs" 
           />
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            className="relative bg-white border border-stone-200 rounded-3xl p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl z-10"
+            className="relative dashboard-modal p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto z-10"
           >
             <div className="mb-6">
               <span className="text-[10px] font-mono tracking-widest text-[#C5A059] font-bold uppercase block mb-1">
                 Franchise Design Board Form
               </span>
-              <h3 className="font-serif text-xl font-bold text-stone-900">
+              <h3 className="font-serif text-xl font-bold text-stone-100">
                 {interiorFormMode === 'EDIT' ? '디자인 게시글 수정하기' : '새로운 디자인 게시글 글쓰기'}
               </h3>
             </div>
@@ -82,7 +82,7 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
                     disabled={interiorFormMode === 'EDIT'}
                     value={interiorFormId}
                     onChange={(e) => setInteriorFormId(e.target.value)}
-                    className="w-full text-xs font-semibold p-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400 disabled:opacity-50 text-stone-900"
+                    className="dashboard-input disabled:opacity-50"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -93,7 +93,7 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
                     placeholder="타입 03: 가든 포레스트 사색"
                     value={interiorFormTitle}
                     onChange={(e) => setInteriorFormTitle(e.target.value)}
-                    className="w-full text-xs font-semibold p-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400 text-stone-900"
+                    className="dashboard-input"
                   />
                 </div>
               </div>
@@ -105,7 +105,7 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
                   value={interiorFormSubtitle}
                   onChange={(e) => setInteriorFormSubtitle(e.target.value)}
                   placeholder="싱그러운 식물군과 프라이빗 아늑한 조명"
-                  className="w-full text-xs font-semibold p-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400 text-stone-900"
+                  className="dashboard-input"
                 />
               </div>
 
@@ -116,7 +116,7 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
                   value={interiorFormDesc}
                   onChange={(e) => setInteriorFormDesc(e.target.value)}
                   placeholder="자연미와 우디 오크 상판 하프를 레이어한 전산 제어형 매장 배치 공간 테마 구성입니다."
-                  className="w-full text-xs font-light p-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400 leading-relaxed text-stone-900"
+                  className="dashboard-textarea"
                 />
               </div>
 
@@ -127,20 +127,20 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
                   value={interiorFormTags}
                   onChange={(e) => setInteriorFormTags(e.target.value)}
                   placeholder="아이보리 미장, 노출 콘크리트, 황동 에칭 데칼"
-                  className="w-full text-xs font-semibold p-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400 text-stone-900"
+                  className="dashboard-input"
                 />
               </div>
 
-              <div className="flex flex-col gap-2.5 pt-2 border-t border-stone-100">
+              <div className="flex flex-col gap-2.5 pt-2 dashboard-border-t">
                 <label className="text-[10px] font-bold text-stone-400 font-mono tracking-wider uppercase block">
                   완공 매장 사진 최대 3장 파일 첨부 (Attach Photos)
                 </label>
                 
                 {[0, 1, 2].map((gIdx) => (
-                  <div key={gIdx} className="flex flex-col gap-2 p-3 bg-stone-50 border border-stone-150 rounded-xl">
+                  <div key={gIdx} className="flex flex-col gap-2 p-3 bg-stone-955 border border-stone-850 rounded-xl">
                     <div className="flex gap-3 items-center text-xs">
                       <span className="w-4 text-stone-400 font-mono font-bold">{gIdx + 1}</span>
-                      <label className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 border border-stone-250 rounded-lg cursor-pointer text-[11px] font-semibold text-stone-700 transition-colors select-none shrink-0">
+                      <label className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-900 hover:bg-stone-850 border border-stone-800 rounded-lg cursor-pointer text-[11px] font-semibold text-stone-300 transition-colors select-none shrink-0">
                         <Upload size={12} />
                         <span>사진 올리기</span>
                         <input 
@@ -154,7 +154,7 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
                         {interiorFormGallery[gIdx]?.startsWith('data:') ? '✓ 첨부 완불' : interiorFormGallery[gIdx] ? '기본 이미지 장착' : '비어있음'}
                       </div>
                       {interiorFormGallery[gIdx] && (
-                        <div className="w-10 h-8 rounded border overflow-hidden bg-stone-150 shrink-0">
+                        <div className="w-10 h-8 rounded border overflow-hidden border-stone-800 bg-stone-900 shrink-0">
                           <img src={interiorFormGallery[gIdx]} alt="interior" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         </div>
                       )}
@@ -174,25 +174,25 @@ export const AdminDesignModal: React.FC<AdminDesignModalProps> = ({
                             return copied;
                           });
                         }}
-                        className="flex-1 text-[10px] font-semibold p-1.5 bg-white border border-stone-200 rounded-lg focus:outline-none focus:border-stone-400 text-stone-900"
+                        className="flex-1 text-[10px] font-semibold p-1.5 bg-stone-955 border border-stone-800 rounded-lg focus:outline-none focus:border-stone-700 text-stone-200 placeholder-stone-600"
                       />
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="flex gap-2.5 justify-end pt-4 border-t border-stone-100 mt-4">
+              <div className="flex gap-2.5 justify-end pt-4 dashboard-border-t mt-4">
                 <button
                   type="button"
                   onClick={() => setIsInteriorModalOpen(false)}
-                  className="px-4 py-2.5 border border-stone-250 text-stone-600 hover:bg-stone-50 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                  className="dashboard-btn-dark px-4 py-2.5"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={isUploading}
-                  className="px-5 py-2.5 bg-stone-900 hover:bg-stone-850 text-[#C5A059] text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-md disabled:bg-stone-400 disabled:text-stone-200 disabled:cursor-not-allowed flex items-center gap-1.5"
+                  className="dashboard-btn-gold px-5 py-2.5 disabled:bg-stone-800 disabled:text-stone-500 disabled:cursor-not-allowed"
                 >
                   {isUploading ? (
                     <>

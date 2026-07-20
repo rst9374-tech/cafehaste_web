@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import * as serverDefaults from '../../serverDefaults';
+import * as serverDefaults from '../serverDefaults';
 
 // Ensure uploads directory exists on disk for hosting uploaded design assets and blueprints
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
@@ -72,7 +72,7 @@ const DEFAULT_LICENSES = serverDefaults.DEFAULT_LICENSES;
 const DEFAULT_CATEGORIES = serverDefaults.DEFAULT_CATEGORIES;
 const DEFAULT_MENU_ITEMS = serverDefaults.DEFAULT_MENU_ITEMS;
 const DEFAULT_FILMS = serverDefaults.DEFAULT_FILMS;
-const DEFAULT_DRAFTS = serverDefaults.DEFAULT_DRAFTS;
+const DEFAULT_DRAFTS: any[] = [];
 const DEFAULT_INTERIORS = serverDefaults.DEFAULT_INTERIORS;
 const DEFAULT_CONSULTATIONS = serverDefaults.DEFAULT_CONSULTATIONS;
 const DEFAULT_ADMINS = serverDefaults.DEFAULT_ADMINS;

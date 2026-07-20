@@ -3,6 +3,7 @@ import { ApiLog } from './admin_hook_licenses';
 import { AdminCompValidatorLogBoard } from './admin_comp_validator_logboard';
 import { useAdminSimulator } from './admin_hook_sim';
 import { AdminValidatorControl } from './admin_comp_validator_control';
+import { ShieldAlert, Eye, EyeOff } from 'lucide-react';
 
 interface AdminLicensesValidatorProps {
   testStoreId: string;
@@ -62,6 +63,7 @@ export const AdminLicensesValidator: React.FC<AdminLicensesValidatorProps> = ({
   const [hasFlushed, setHasFlushed] = useState<boolean>(false);
   const isInitialLoad = useRef<boolean>(true);
   const useRefInitial = useRef<boolean>(true);
+  const [isMonitorOpen, setIsMonitorOpen] = useState<boolean>(false);
 
   // Adopt simulator logic hook
   const sim = useAdminSimulator(testStoreId, licenses, fetchApiLogs);
@@ -184,60 +186,148 @@ export const AdminLicensesValidator: React.FC<AdminLicensesValidatorProps> = ({
   const totalTerminalPages = Math.ceil(rightLogs.length / 100) || 1;
   const isCurrentlyLoading = isLoadingLogs || isLoadingLocal;
 
+  // Filter and compute status for test accounts store123456 ~ store123460
+  const testAccounts = useMemo(() => {
+    const targets = ['store123456', 'store123457', 'store123458', 'store123459', 'store123460'];
+    return targets.map(storeId => {
+      const found = licenses.find(l => (l.storeId || '').toLowerCase() === storeId.toLowerCase());
+      
+      let storeName = '미지정 매장';
+      let storeGrade = 'PREMIUM';
+      let statusLabel = '미등록';
+      let statusColor = 'text-stone-400 bg-stone-100 border-stone-200';
+      let expireDate = '-';
+
+      if (found) {
+        storeName = found.storeName;
+        storeGrade = found.storeGrade || 'PREMIUM';
+        expireDate = found.licenseEndDate || '-';
+        
+        const isNotExpired = expireDate !== '-' ? (new Date(`${expireDate}T23:59:59`).getTime() >= Date.now()) : false;
+        
+        if (Number(found.isApproved) === 1 && isNotExpired) {
+          statusLabel = '인증 완료';
+          statusColor = 'text-emerald-700 bg-emerald-50 border-emerald-200';
+        } else if (Number(found.isApproved) === 1 && !isNotExpired) {
+          statusLabel = '기간 만료';
+          statusColor = 'text-amber-700 bg-amber-50 border-amber-200';
+        } else if (Number(found.isApproved) === 0) {
+          statusLabel = '가동 정지중';
+          statusColor = 'text-rose-700 bg-rose-50 border-rose-200';
+        } else if (Number(found.isApproved) === 2) {
+          statusLabel = '인증 대기';
+          statusColor = 'text-blue-700 bg-blue-50 border-blue-200';
+        }
+      } else {
+        // Fallback mockup values if DB fetch fails or has not loaded yet
+        if (storeId === 'store123456') { storeName = '테스트강남본점'; statusLabel = '인증 완료'; statusColor = 'text-emerald-700 bg-emerald-50 border-emerald-200'; expireDate = '2026-12-31'; }
+        else if (storeId === 'store123457') { storeName = '테스트역삼지점'; storeGrade = 'STANDARD'; statusLabel = '인증 완료'; statusColor = 'text-emerald-700 bg-emerald-50 border-emerald-200'; expireDate = '2026-08-15'; }
+        else if (storeId === 'store123458') { storeName = '테스트홍대입구역점'; statusLabel = '기간 만료'; statusColor = 'text-amber-700 bg-amber-50 border-amber-200'; expireDate = '2026-05-01'; }
+        else if (storeId === 'store123459') { storeName = '테스트부산서면점'; statusLabel = '가동 정지중'; statusColor = 'text-rose-700 bg-rose-50 border-rose-200'; expireDate = '2027-03-01'; }
+        else if (storeId === 'store123460') { storeName = '테스트신규가맹점'; statusLabel = '인증 대기'; statusColor = 'text-blue-700 bg-blue-50 border-blue-200'; expireDate = '2027-06-01'; }
+      }
+
+      return {
+        storeId,
+        storeName,
+        storeGrade,
+        statusLabel,
+        statusColor,
+        expireDate
+      };
+    });
+  }, [licenses]);
+
   return (
-    <div id="admin-licenses-validator-container" className="grid grid-cols-1 xl:grid-cols-12 gap-5 text-left"> {/* temp: select-none */}
-      <div className="xl:col-span-7">
-        <AdminCompValidatorLogBoard
-          displayLogs={leftLogs}
-          isCurrentlyLoading={isCurrentlyLoading}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          handleFlushLogs={handleFlushLogs}
-          flushStatus={flushStatus}
-          isSavingLogs={isSavingLogs}
-          hasFlushed={hasFlushed}
-          logDays={logDays}
-          licenses={licenses}
-          onRefresh={() => {
-            fetchApiLogs();
-            if (fetchLicenses) fetchLicenses();
-          }}
-          handleClearLogs={() => {
-            sim.handleClearSimulation();
-            handleClearLogs();
-          }}
-          handleClearDbLogs={() => {
-            sim.handleClearSimulation();
-            handleClearDbLogs();
-          }}
-        />
+    <div className="space-y-4 w-full max-w-[1400px] mx-auto text-left">
+      <div className="flex items-center justify-between border-b border-stone-900 pb-2 mb-2 select-none">
+        <div className="flex items-center gap-1.5 font-bold text-xs bg-[#E33535] text-white p-1.5 px-3 rounded-lg border border-[#ff4e4e] animate-pulse">
+          <ShieldAlert size={12} />
+          <span>실시간 하이재킹 모니터 검문소</span>
+        </div>
+        
+        {/* Toggle button to open/hide right monitor control panel */}
+        <button
+          type="button"
+          onClick={() => setIsMonitorOpen(prev => !prev)}
+          className="flex items-center gap-1 px-3 py-1.5 bg-stone-900 hover:bg-stone-850 text-stone-300 hover:text-white border border-stone-800 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+        >
+          {isMonitorOpen ? (
+            <>
+              <EyeOff size={13} className="text-[#C5A059]" />
+              <span>검증 모니터 접기</span>
+            </>
+          ) : (
+            <>
+              <Eye size={13} className="text-[#C5A059]" />
+              <span>검증 모니터 열기</span>
+            </>
+          )}
+        </button>
       </div>
 
-      <AdminValidatorControl
-        testStoreId={testStoreId}
-        setTestStoreId={setTestStoreId}
-        testApiKey={testApiKey}
-        setTestApiKey={setTestApiKey}
-        handleTestVerify={handleTestVerify}
-        isTesting={isTesting}
-        isLoadingLogs={isLoadingLogs}
-        dbSize={dbSize}
-        logAnalysis={logAnalysis}
-        setIsKioskPopupOpen={setIsKioskPopupOpen}
-        handleClearLogs={() => {
-          sim.handleClearSimulation();
-          handleClearLogs();
-        }}
-        handleClearSimulation={sim.handleClearSimulation}
-        isSimulating={sim.isSimulating}
-        simSpeed={sim.simSpeed}
-        setSimSpeed={sim.setSimSpeed}
-        simProgress={sim.simProgress}
-        runDbSimulation={sim.runDbSimulation}
-        fetchApiLogs={fetchApiLogs}
-        fetchLicenses={fetchLicenses}
-        testResult={testResult}
-      />
+      <div
+        id="admin-licenses-validator-container"
+        className={`grid grid-cols-1 ${isMonitorOpen ? 'lg:grid-cols-10' : 'w-full'} gap-5 w-full`}
+      >
+        <div className={isMonitorOpen ? 'lg:col-span-7' : 'w-full'}>
+          <AdminCompValidatorLogBoard
+            displayLogs={leftLogs}
+            isCurrentlyLoading={isCurrentlyLoading}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            handleFlushLogs={handleFlushLogs}
+            flushStatus={flushStatus}
+            isSavingLogs={isSavingLogs}
+            hasFlushed={hasFlushed}
+            logDays={logDays}
+            licenses={licenses}
+            onRefresh={() => {
+              fetchApiLogs();
+              if (fetchLicenses) fetchLicenses();
+            }}
+            handleClearLogs={() => {
+              sim.handleClearSimulation();
+              handleClearLogs();
+            }}
+            handleClearDbLogs={() => {
+              sim.handleClearSimulation();
+              handleClearDbLogs();
+            }}
+          />
+        </div>
+
+        {isMonitorOpen && (
+          <div className="lg:col-span-3">
+            <AdminValidatorControl
+              testStoreId={testStoreId}
+              setTestStoreId={setTestStoreId}
+              testApiKey={testApiKey}
+              setTestApiKey={setTestApiKey}
+              handleTestVerify={handleTestVerify}
+              isTesting={isTesting}
+              isLoadingLogs={isLoadingLogs}
+              dbSize={dbSize}
+              logAnalysis={logAnalysis}
+              setIsKioskPopupOpen={setIsKioskPopupOpen}
+              handleClearLogs={() => {
+                sim.handleClearSimulation();
+                handleClearLogs();
+              }}
+              handleClearSimulation={sim.handleClearSimulation}
+              isSimulating={sim.isSimulating}
+              simSpeed={sim.simSpeed}
+              setSimSpeed={sim.setSimSpeed}
+              simProgress={sim.simProgress}
+              runDbSimulation={sim.runDbSimulation}
+              fetchApiLogs={fetchApiLogs}
+              fetchLicenses={fetchLicenses}
+              testResult={testResult}
+              testAccounts={testAccounts}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -2,8 +2,12 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// .env 파일 읽기 및 파싱
-const envPath = path.resolve(process.cwd(), '.env');
+// .env 파일 읽기 및 파싱 (conf/.env 우선 조회)
+let envPath = path.resolve(process.cwd(), '../../conf/.env');
+if (!fs.existsSync(envPath)) {
+  envPath = path.resolve(process.cwd(), '.env');
+}
+
 if (!fs.existsSync(envPath)) {
   console.error('.env 파일이 존재하지 않습니다. 배포를 중단합니다.');
   process.exit(1);
@@ -41,8 +45,8 @@ for (const key of required) {
 // deploy 스크립트 실행 환경변수 문자열 조합
 const envVarsStr = `DB_HOST=${envVars.DB_HOST},DB_PORT=${envVars.DB_PORT},DB_USER=${envVars.DB_USER},DB_PASSWORD=${envVars.DB_PASSWORD},DB_NAME=${envVars.DB_NAME},DB_CONNECTION_LIMIT=${envVars.DB_CONNECTION_LIMIT},SUPABASE_URL=${envVars.SUPABASE_URL},SUPABASE_KEY=${envVars.SUPABASE_KEY},HASTE_SECRET_LIVE_KEY=${envVars.HASTE_SECRET_LIVE_KEY},NODE_ENV=production`;
 
-// 배포 명령어 구성
-const deployCmd = `gcloud run deploy cafehaste-web-sdb --source . --region asia-northeast1 --allow-unauthenticated --project cafehaste-zero --set-env-vars "${envVarsStr}"`;
+// 배포 명령어 구성 (--quiet 비대화형 옵션 추가하여 프롬프트 무한대기 방지)
+const deployCmd = `gcloud run deploy cafehaste-web-sdb --source . --region asia-northeast1 --allow-unauthenticated --project cafehaste-zero --set-env-vars "${envVarsStr}" --quiet`;
 
 console.log('로컬 빌드(npm run build) 가동 중...');
 try {

@@ -46,66 +46,12 @@ export const AdminDesignTable: React.FC<AdminDesignTableProps> = ({
   handleOpenCreateInterior
 }) => {
   return (
-    <div className="lg:col-span-8 bg-white border border-stone-200 rounded-3xl p-6 shadow-sm">
-      <div className="flex justify-end items-center border-b border-stone-150 pb-4 mb-5 gap-3">
-        <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0 flex-wrap">
-          {selectedDesignIds.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                setConfirmModal({
-                  message: `선택한 ${selectedDesignIds.length}개의 가맹점 인테리어를 일괄 삭제하시겠습니까?`,
-                  onConfirm: async () => {
-                    try {
-                      await Promise.all(
-                        selectedDesignIds.map(id =>
-                          fetch(`/api/interiors/${id}`, { method: 'DELETE' })
-                        )
-                      );
-                      showTemporaryToast('선택한 인테리어 디자인이 일괄 삭제되었습니다.');
-                      const updated = interiors.filter(it => !selectedDesignIds.includes(it.type_id || it.typeId || it.id));
-                      setInteriors(updated);
-                      localStorage.setItem('haste_interior_types', JSON.stringify(updated));
-                      window.dispatchEvent(new Event('haste_interior_updated'));
-                      if (onUpdateInteriors) {
-                        onUpdateInteriors(updated);
-                      }
-                      setSelectedDesignIds([]);
-                    } catch (err: any) {
-                      showTemporaryError('일괄 삭제 중 오류가 발생했습니다: ' + err.message);
-                    }
-                  }
-                });
-              }}
-              className="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 border border-rose-250 text-rose-600 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
-            >
-              <Trash2 size={12} />
-              <span>선택 일괄 삭제 ({selectedDesignIds.length})</span>
-            </button>
-          )}
-
-          <AdminSystemHub 
-            showTemporaryToast={showTemporaryToast}
-            showTemporaryError={showTemporaryError}
-            activeAdminTab="INQUIRY"
-          />
-
-          <button
-            type="button"
-            onClick={handleOpenCreateInterior}
-            className="py-1.5 px-3 bg-[#C5A059] hover:bg-[#B38F48] text-stone-950 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
-          >
-            <Plus size={12} />
-            <span>새 디자인 추가</span>
-          </button>
-        </div>
-      </div>
-
+    <div className="w-full bg-[#070609]/95 border border-stone-900 rounded-3xl p-4 shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse text-xs">
+        <table className="w-full text-left border-collapse text-xs table-fixed">
           <thead>
-            <tr className="bg-stone-50 border-b border-stone-200 text-stone-500 font-bold font-sans text-[10px] tracking-wider uppercase">
-              <th className="py-3 px-3 text-center w-[140px] text-stone-500">
+            <tr className="bg-stone-900 border-b border-stone-800 text-stone-400 font-bold font-sans text-[12px] tracking-wider uppercase">
+              <th className="py-3 px-3 text-center w-[100px] text-stone-500">
                 <div className="flex items-center justify-center gap-1.5">
                   <input 
                     type="checkbox"
@@ -119,27 +65,25 @@ export const AdminDesignTable: React.FC<AdminDesignTableProps> = ({
                         setSelectedDesignIds(prev => prev.filter(id => !pageIds.includes(id)));
                       }
                     }}
-                    className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                    className="w-3.5 h-3.5 rounded border-stone-800 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer bg-stone-950"
                   />
                   <span>선택 | 순서</span>
                 </div>
               </th>
-              <th className="py-3 px-3 text-center w-16 font-bold">노출</th>
-              <th className="py-3 px-3 text-center w-[110px] font-bold">디자인 코드</th>
-              <th className="py-3 px-3 text-center w-16 font-bold">완공이미지</th>
-              <th className="py-3 px-3 font-bold">인테리어 스타일 명칭 (Title)</th>
-              <th className="py-3 px-3 font-bold">공간해설 컨셉 (Description)</th>
-              <th className="py-3 px-3 font-bold">태그 분류</th>
-              <th className="py-3 px-3 text-right pr-4 font-bold">조작 제어</th>
+              <th className="py-3 px-3 text-center w-[60px] font-bold">노출</th>
+              <th className="py-3 px-3 text-center w-[90px] font-bold">디자인 코드</th>
+              <th className="py-3 px-3 text-center w-[80px] font-bold">완공이미지</th>
+              <th className="py-3 px-3 w-[200px] font-bold">인테리어 스타일 명칭 (Title)</th>
+              <th className="py-3 px-3 text-right pr-4 w-[140px] font-bold">조작 제어</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-150">
+          <tbody className="divide-y divide-stone-850">
             {currentInteriorsToShow.map((item, relativeIdx) => {
               const originalIdx = (interiorPage - 1) * 5 + relativeIdx;
               return (
                 <tr 
                   key={item.id} 
-                  className={`hover:bg-stone-50/50 transition-all duration-150 ${draggedIdx === originalIdx ? 'opacity-35 bg-stone-100 border-2 border-dashed border-[#C5A059]/30 scale-[0.995]' : ''}`}
+                  className={`hover:bg-stone-850/50 transition-all duration-150 ${draggedIdx === originalIdx ? 'opacity-35 bg-stone-955 border-2 border-dashed border-[#C5A059]/30 scale-[0.995]' : ''}`}
                   draggable
                   onDragStart={(e) => {
                     setDraggedIdx(originalIdx);
@@ -187,7 +131,7 @@ export const AdminDesignTable: React.FC<AdminDesignTableProps> = ({
                             prev.includes(targetId) ? prev.filter(id => id !== targetId) : [...prev, targetId]
                           );
                         }}
-                        className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                        className="w-3.5 h-3.5 rounded border-stone-800 bg-stone-950 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
                       />
                       <span>{originalIdx + 1}</span>
                     </div>
@@ -218,54 +162,40 @@ export const AdminDesignTable: React.FC<AdminDesignTableProps> = ({
                             console.error('Failed to toggle interior visibility in DB:', err);
                           }
                         }}
-                        className="w-3.5 h-3.5 rounded border-stone-300 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
+                        className="w-3.5 h-3.5 rounded border-stone-800 bg-stone-950 text-[#C5A059] focus:ring-[#C5A059] cursor-pointer"
                       />
                     </div>
                   </td>
-                  <td className="py-3.5 px-3 text-center font-mono font-black text-stone-800 break-all select-all">
+                  <td className="py-3.5 px-3 text-center font-mono font-bold text-stone-400 break-all select-all">
                     {item.type_id || item.typeId || item.id}
                   </td>
                   <td className="py-3 px-3 text-center">
                     <div className="flex gap-0.5 justify-center">
                       {item.gallery && item.gallery.slice(0, 3).map((img: string, gIdx: number) => (
-                        <div key={gIdx} className="w-6 h-6 rounded overflow-hidden border border-stone-200 bg-stone-100 flex-shrink-0">
+                        <div key={gIdx} className="w-6 h-6 rounded overflow-hidden border border-stone-850 bg-stone-900 flex-shrink-0">
                           {img ? (
                             <img src={img} alt="store gallery" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
-                            <div className="w-full h-full bg-stone-100" />
+                            <div className="w-full h-full bg-stone-950" />
                           )}
                         </div>
                       ))}
                     </div>
                   </td>
-                  <td className="py-3.5 px-3">
-                    <div className="font-bold text-stone-900 text-xs">
+                  <td className="py-3.5 px-3 w-[200px] truncate">
+                    <div className="font-bold text-stone-200 text-[13px] truncate" title={item.title}>
                       {item.title}
                     </div>
-                    <div className="text-[10px] text-stone-400 font-light mt-0.5">
+                    <div className="text-[11px] text-stone-450 font-normal mt-0.5 truncate" title={item.subtitle}>
                       {item.subtitle}
                     </div>
                   </td>
-                  <td className="py-3.5 px-3 max-w-[250px]">
-                    <div className="text-[11px] text-stone-500 line-clamp-2 leading-relaxed">
-                      {item.desc}
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-3 max-w-[120px] whitespace-normal">
-                    <div className="flex flex-wrap gap-1">
-                      {item.tags && item.tags.map((t: string, tIdx: number) => (
-                        <span key={tIdx} className="text-[9px] font-sans text-stone-500 bg-stone-150 px-1.5 py-0.5 rounded leading-none inline-block">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-3 text-right pr-4">
+                  <td className="py-3.5 px-3 text-right pr-4 w-[140px]">
                     <div className="flex justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={() => setPreviewInterior(item)}
-                        className="p-1 px-2 border border-stone-200 text-stone-500 hover:text-stone-900 hover:border-stone-300 rounded text-[10px] font-semibold bg-white transition-colors cursor-pointer flex items-center gap-1"
+                        className="p-1 px-2 border border-stone-800 text-stone-300 hover:text-white hover:border-stone-700 rounded text-[11px] font-semibold bg-stone-900 transition-colors cursor-pointer flex items-center gap-1"
                         title="시뮬레이터 로드"
                       >
                         <Eye size={11} />
@@ -274,18 +204,18 @@ export const AdminDesignTable: React.FC<AdminDesignTableProps> = ({
                       <button
                         type="button"
                         onClick={() => handleOpenEditInterior(item)}
-                        className="p-1 px-1.5 border border-stone-200 text-[#C5A059] hover:bg-[#C5A059]/5 hover:border-[#C5A059] rounded text-[10px] font-semibold bg-white transition-colors cursor-pointer"
+                        className="admin-btn-action-edit"
                         title="수정하기"
                       >
-                        <Edit size={11} />
+                        <Edit size={12} />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDeleteInterior(item.type_id || item.typeId || item.id)}
-                        className="p-1 px-1.5 border border-stone-200 text-red-500 hover:bg-red-50 hover:border-red-300 rounded text-[10px] font-semibold bg-white transition-colors cursor-pointer"
+                        className="admin-btn-action-delete"
                         title="삭제하기"
                       >
-                        <Trash2 size={11} />
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   </td>

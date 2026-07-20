@@ -32,7 +32,22 @@ router.get('/api/licenses', async (req, res) => {
     if (dbPool.isFallback) {
       return res.json({ success: true, count: readBackupLicenses().length, licenses: readBackupLicenses() });
     } else {
-      const [rows]: any = await dbPool.query('SELECT id, store_name, store_id, license_start_date, license_end_date, is_approved, store_grade, password FROM web_store_licenses ORDER BY id DESC');
+      // [HASTE 임시 제어 우회 수정 지점] - 매장유형(store_type) 및 마지막확인시간(last_checked) 서브쿼리 조인 적용
+      const [rows]: any = await dbPool.query(`
+        SELECT 
+          l.id, 
+          l.store_name, 
+          l.store_id, 
+          l.license_start_date, 
+          l.license_end_date, 
+          l.is_approved, 
+          l.store_grade, 
+          l.password,
+          COALESCE((SELECT store_type FROM web_membership_users WHERE store_code = l.store_id LIMIT 1), '일반') as store_type,
+          (SELECT MAX(created_at) FROM web_verify_logs WHERE store_id = l.store_id) as last_checked
+        FROM web_store_licenses l
+        ORDER BY l.id DESC
+      `);
       const mapped = rows.map((r: any) => ({
         id: r.id,
         storeName: r.store_name,
@@ -41,7 +56,9 @@ router.get('/api/licenses', async (req, res) => {
         licenseEndDate: r.license_end_date ? new Date(r.license_end_date).toISOString().split('T')[0] : '',
         isApproved: r.is_approved ? 1 : 0,
         storeGrade: r.store_grade || 'PREMIUM',
-        password: r.password || ''
+        password: r.password || '',
+        storeType: r.store_type || '일반',
+        lastChecked: r.last_checked || null
       }));
       res.json({ success: true, count: mapped.length, licenses: mapped });
     }

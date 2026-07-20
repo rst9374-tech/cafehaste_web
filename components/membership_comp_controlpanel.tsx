@@ -121,7 +121,7 @@ export const HasteControlPanel: React.FC<HasteControlPanelProps> = ({ user }) =>
               </div>
               <div className="text-[10px] text-stone-500 border-t border-stone-850 pt-3 flex justify-between font-mono">
                 <span>최종 연결 수신: {new Date().toLocaleDateString()}</span>
-                <span>자바 로컬 포트: 8085</span>
+                <span>자바 로컬 포트: 8080</span>
               </div>
             </div>
           )}

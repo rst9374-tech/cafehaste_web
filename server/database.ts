@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import pg from 'pg';
-import { FallbackDbPool } from './db/simulator';
 import { setupDatabaseSchema } from './db/schema-setup';
 import { formatSql, translateSqlToPg } from './db/dialect-translator';
 import { saveBase64ToFile } from './db/asset-helper';
@@ -74,9 +73,6 @@ export {
 
 export type { StoreVerifyCacheItem } from './db/cache-io';
 
-// Re-exports of Simulators
-export { FallbackDbPool } from './db/simulator';
-
 // Re-exports of Helpers
 export { formatSql, translateSqlToPg } from './db/dialect-translator';
 export { saveBase64ToFile, convertExistingBase64ToFiles } from './db/asset-helper';
@@ -88,7 +84,7 @@ const SUPABASE_KEY = (process.env.SUPABASE_KEY || 'placeholder-key').trim();
 
 export let pool: any = null;
 export let isCloudSqlConnected = false;
-export let dbType: 'supabase_rpc' | 'supabase_direct' | 'fallback' = 'fallback';
+export let dbType: 'supabase_rpc' | 'supabase_direct' = 'supabase_direct';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -268,10 +264,14 @@ export async function getDbPool(forceReconnect = false) {
       dbType = 'supabase_direct';
       isCloudSqlConnected = true;
 
-      const conn = await pool.getConnection();
-      await setupDatabaseSchema(conn, 'postgres');
-      console.log('[DB Seeding] Schema setup and updates synced successfully across Supabase Tables!');
-      conn.release();
+      if (process.env.NODE_ENV === 'production') {
+        const conn = await pool.getConnection();
+        await setupDatabaseSchema(conn, 'postgres');
+        console.log('[DB Seeding] Schema setup and updates synced successfully across Supabase Tables!');
+        conn.release();
+      } else {
+        console.log('[DB Sandbox Isolation] Local environment detected. Skipping direct PG schema migration.');
+      }
 
     } catch (pgDirectErr: any) {
       console.error(`[DB Initialization Error] Direct pg connection failed: ${pgDirectErr.message || pgDirectErr}`);
@@ -291,10 +291,14 @@ export async function getDbPool(forceReconnect = false) {
         dbType = 'supabase_rpc';
         isCloudSqlConnected = true;
 
-        const conn = await pool.getConnection();
-        await setupDatabaseSchema(conn, 'postgres');
-        console.log('[DB Seeding] Schema setup and updates synced successfully via REST RPC!');
-        conn.release();
+        if (process.env.NODE_ENV === 'production') {
+          const conn = await pool.getConnection();
+          await setupDatabaseSchema(conn, 'postgres');
+          console.log('[DB Seeding] Schema setup and updates synced successfully via REST RPC!');
+          conn.release();
+        } else {
+          console.log('[DB Sandbox Isolation] Local environment detected. Skipping RPC schema migration.');
+        }
       }
 
     } catch (rpcErr: any) {
@@ -302,6 +306,23 @@ export async function getDbPool(forceReconnect = false) {
       if (!pool) {
         throw new Error(`Database connection failed: Direct PG and RPC tunnel are both unavailable.`);
       }
+    }
+  }
+
+  if (pool) {
+    try {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS store_connections (
+          store_id VARCHAR(100) PRIMARY KEY,
+          ws_connected BOOLEAN DEFAULT false,
+          serialport_connected BOOLEAN DEFAULT false,
+          local_api_connected BOOLEAN DEFAULT false,
+          thirdparty_connected BOOLEAN DEFAULT false,
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+    } catch (err: any) {
+      console.log('ℹ️ [DB Schema Info] Failed to dynamically verify store_connections (probably due to restricted user privileges):', err.message);
     }
   }
 

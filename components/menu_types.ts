@@ -19,6 +19,10 @@ export interface MenuItem {
   isSignature?: boolean | number;
   videoUrl?: string;
   autoPlayVideo?: boolean;
+  nameEn?: string;
+  originalId?: string;
+  original_id?: string;
+  bean_type?: string;
 }
 
 export interface CartItem {

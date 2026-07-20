@@ -23,6 +23,7 @@ interface ValidatorControlProps {
   fetchApiLogs: () => void;
   fetchLicenses?: () => void;
   testResult: any;
+  testAccounts?: any[];
 }
 
 export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
@@ -45,11 +46,12 @@ export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
   runDbSimulation,
   fetchApiLogs,
   fetchLicenses,
-  testResult
+  testResult,
+  testAccounts
 }) => {
 
   return (
-    <div className="xl:col-span-5 bg-stone-900 border border-stone-850 rounded-3xl p-5 shadow-lg flex flex-col gap-4 text-left">
+    <div className="w-full bg-stone-900 border border-stone-850 rounded-3xl p-4 shadow-lg flex flex-col gap-3 text-left">
       <div className="flex items-center justify-between border-b border-stone-800 pb-2">
         <div className="flex items-center gap-1.5 font-semibold text-xs text-white">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -111,7 +113,7 @@ export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
 
       <div className="bg-stone-950/60 p-3.5 rounded-xl border border-emerald-500/40 space-y-3 shadow-[0_0_10px_rgba(16,185,129,0.05)]">
         <h4 className="text-[10px] text-stone-400 font-extrabold uppercase tracking-wider block font-sans">
-          ■ API 검증기 간편 테스트 (Test Checker)
+          API 간편 테스트
         </h4>
         <div className="flex flex-col gap-2 font-mono">
           <div className="flex flex-col sm:flex-row gap-2">
@@ -145,7 +147,7 @@ export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
 
         <div className="flex items-center justify-between pt-2.5 border-t border-stone-850/60">
           <span className="text-[10px] text-stone-400 font-sans font-extrabold select-none">
-            ⚙️ 시뮬레이션/시험 배속 선택 (Speed Factor)
+            배속
           </span>
           <div className="flex items-center gap-1 bg-stone-905 border border-stone-800 p-0.5 rounded-lg font-mono">
             {[1, 2, 4].map((mult) => (
@@ -168,14 +170,14 @@ export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
         <div className="flex flex-col gap-1.5 pt-2 border-t border-stone-850/50">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-[#C5A059] font-sans font-extrabold select-none">
-              🖧 실제 DB 연동 트래픽 시뮬레이터 (멤버십 DB 연동)
+              DB 트래픽 시뮬레이터
             </span>
             <span className="text-[9px] text-stone-500 font-mono font-bold">
               속도: 회/{(10 / simSpeed).toFixed(simSpeed === 4 ? 1 : 0)}초
             </span>
           </div>
           <div className="grid grid-cols-4 gap-1.5 font-mono">
-            {[1, 10, 100, 500].map((count) => (
+            {[10, 100, 500, 1000].map((count) => (
               <button
                 key={`db-${count}`}
                 type="button"
@@ -183,26 +185,26 @@ export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
                 disabled={isSimulating || isTesting}
                 className="bg-stone-900 border border-[#C5A059]/20 hover:border-[#C5A059]/50 text-stone-300 hover:text-[#C5A059] py-1 px-1 rounded text-[10px] font-mono font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-40"
               >
-                {count}회 DB시험
+                {count}회
               </button>
             ))}
           </div>
         </div>
 
         {simProgress.total > 0 && (
-          <div className="bg-stone-950 border border-stone-850 p-2.5 rounded-lg space-y-2 font-mono text-[10px] text-stone-300">
-            <div className="flex items-center justify-between border-b border-stone-800 pb-1.5 select-none text-[10.5px]">
+          <div className="bg-stone-950 border border-stone-850 p-2 rounded-lg space-y-1.5 font-mono text-[10px] text-stone-300">
+            <div className="flex items-center justify-between border-b border-stone-800 pb-1 select-none text-[10.5px]">
               <span className="font-sans font-extrabold text-[#C5A059]">
-                📊 DB 연동 실시간 누락 검출기 성적표 (이번 회차)
+                이번 회차 결과
               </span>
               <span className="font-bold text-stone-400">
-                진척도: {simProgress.current} / {simProgress.total} (X{simSpeed} 배속)
+                {simProgress.current} / {simProgress.total} (X{simSpeed} 배속)
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-center text-[10.5px]">
-              <div className="bg-emerald-950/30 border border-emerald-900/20 p-2 rounded-lg text-emerald-400 flex flex-col justify-center">
+              <div className="bg-emerald-950/30 border border-emerald-900/20 p-1.5 rounded-lg text-emerald-400 flex flex-col justify-center">
                 <div className="font-sans font-bold text-stone-400 text-[10px] mb-0.5 flex flex-col items-center justify-center gap-1 shrink-0">
-                  <span>정상 인증군 (Expected Approved)</span>
+                  <span>정상 인증군</span>
                   {simProgress.expectedApproved - simProgress.approvedSuccess > 0 && (
                     <span className="text-[8.5px] bg-rose-950 text-rose-450 px-1 py-0.2 rounded font-mono font-black animate-pulse leading-normal">
                       <span>누락 {simProgress.expectedApproved - simProgress.approvedSuccess}건</span>
@@ -217,9 +219,9 @@ export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
                   <span className="text-emerald-500">{simProgress.expectedApproved}</span>
                 </div>
               </div>
-              <div className="bg-rose-950/30 border border-rose-900/20 p-2 rounded-lg text-rose-400 flex flex-col justify-center">
+              <div className="bg-rose-950/30 border border-rose-900/20 p-1.5 rounded-lg text-rose-400 flex flex-col justify-center">
                 <div className="font-sans font-bold text-stone-400 text-[10px] mb-0.5 flex flex-col items-center justify-center gap-1 shrink-0">
-                  <span>미인증/정지군 (Expected Denied)</span>
+                  <span>미인증/정지군</span>
                   {simProgress.expectedDenied - simProgress.deniedSuccess > 0 && (
                     <span className="text-[8.5px] bg-amber-950 text-amber-500 px-1 py-0.2 rounded font-mono font-black leading-normal">
                       <span>이상 {simProgress.expectedDenied - simProgress.deniedSuccess}건</span>
@@ -257,10 +259,49 @@ export const AdminValidatorControl: React.FC<ValidatorControlProps> = ({
             </pre>
           </div>
         )}
+      {testAccounts && testAccounts.length > 0 && (
+        <>
+          <div className="border-t border-stone-800/80 my-3" />
+          <div className="space-y-2 text-left">
+            <h4 className="text-[10px] font-bold text-stone-400 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059]" />
+              <span>테스트용 계정 실시간 인증상태</span>
+            </h4>
+            <div className="border border-stone-850 rounded-xl overflow-hidden text-[10px] bg-stone-950">
+              <table className="w-full text-left text-stone-300 bg-stone-950 leading-normal">
+                <thead>
+                  <tr className="bg-stone-900 border-b border-stone-850 text-stone-500 font-extrabold text-[8.5px] tracking-wider uppercase">
+                    <th className="p-2 pl-3">계정코드</th>
+                    <th className="p-2">매장명</th>
+                    <th className="p-2">상태</th>
+                    <th className="p-2 pr-3">만료일</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {testAccounts.map((acc, index) => (
+                    <tr key={index} className="border-b border-stone-900/60 last:border-0 hover:bg-stone-900/20">
+                      <td className="p-2 pl-3 font-mono font-bold text-stone-200">{acc.storeId}</td>
+                      <td className="p-2 font-medium text-stone-300">
+                        {acc.storeName} <span className="text-[8.5px] text-stone-500">({acc.storeGrade})</span>
+                      </td>
+                      <td className="p-2">
+                        <span className={`inline-block px-1.5 py-0.2 rounded border text-[9px] font-bold ${acc.statusColor}`}>
+                          {acc.statusLabel}
+                        </span>
+                      </td>
+                      <td className="p-2 pr-3 font-mono text-stone-400">{acc.expireDate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
       </div>
 
-      <p className="text-[9px] text-stone-500 font-sans leading-normal italic select-none">
-        ※ 실제 자바 프로그램 연동 시 REST API 헤더에 마스터 시크릿 키를 동봉하지 않거나 Timestamp 불일치 또는 미등록 매장 정보인 경우 즉시 FAIL 로깅 차단 제어됩니다.
+      <p className="text-[9.5px] text-stone-500 font-sans leading-normal italic select-none">
+        ※ API 호출 시 마스터 보안 키 헤더(X-Haste-API-Key) 주입이 필수적입니다.
       </p>
     </div>
   );

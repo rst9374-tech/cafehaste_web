@@ -80,7 +80,7 @@ export function translateSqlToPg(sql: string): string {
     const tableNameMatch = pgSql.match(/INSERT\s+INTO\s+([a-zA-Z0-9_"#]+)/i);
     if (tableNameMatch) {
       const uTab = tableNameMatch[1].replace(/"/g, '').toLowerCase();
-      if (uTab !== 'web_menu_categories' && uTab !== 'web_menu_items') {
+      if (uTab !== 'web_menu_categories' && uTab !== 'web_menu_items' && uTab !== 'web_system_settings' && uTab !== 'store_connections') {
         pgSql = pgSql.trim();
         if (pgSql.endsWith(';')) {
           pgSql = pgSql.substring(0, pgSql.length - 1) + ' RETURNING id;';

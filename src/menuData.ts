@@ -5,8 +5,6 @@ export interface MenuItemRaw {
   nameEng: string;
 }
 
-import { ITEM_IMAGES } from './menu_images';
-
 export const MENU_CATEGORIES = [
   { id: 'AMERICANO', name: '아메리카노', desc: '스마트 바리스타 시스템이 전하는 엄선된 아메리카노 패밀리' },
   { id: 'COFFEE_LATTE', name: '커피라떼', desc: '고소한 우유와 에스프레소 샷의 부드러운 만남' },
@@ -209,12 +207,8 @@ export const getPresetImageAndFlavor = (id: string, nameKr: string) => {
   let body = 1;
   let bitterness = 1;
 
-  // Real distinctive Supabase storage mapped images - strictly showing only the 14 user-specified items
-  const itemImages: Record<string, string> = ITEM_IMAGES;
-
-  if (itemImages[id]) {
-    image = itemImages[id];
-  }
+  // Mapped images dynamically from DB, local fallback remains empty
+  image = '';
 
   if (nameKr.includes('아메리카노') || nameKr.includes('도피오') || nameKr.includes('아샷추')) {
     acidity = 2;

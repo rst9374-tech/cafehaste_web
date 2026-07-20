@@ -3,7 +3,6 @@ import JSZip from 'jszip';
 import { 
   Plus, Edit, Trash2, Search, X, Image as ImageIcon, RefreshCw, Download
 } from 'lucide-react';
-import { AdminSystemHub } from './admin_comp_systemhub';
 import { AdminMenuTable } from './admin_comp_menu_table';
 import { AdminCategoryModal } from './admin_comp_category_modal';
 import { AdminMenuModal } from './admin_comp_menu_modal';
@@ -73,6 +72,7 @@ export const AdminMenuTab: React.FC<AdminMenuTabProps> = ({
     totalPages,
     
     handleBulkImageUpdate,
+    handleBulkSignatureUpdate,
     handleSaveCategory,
     handleDeleteCategory,
     handleFileChange,
@@ -88,8 +88,7 @@ export const AdminMenuTab: React.FC<AdminMenuTabProps> = ({
     adminMenuItems,
     setAdminMenuItems,
     showTemporaryToast,
-    showTemporaryError,
-    isMenuAll
+    showTemporaryError
   });
 
   const [isDownloadingZip, setIsDownloadingZip] = React.useState(false);
@@ -153,122 +152,148 @@ export const AdminMenuTab: React.FC<AdminMenuTabProps> = ({
     }
   };
 
+  // 수정 버튼 클릭(EDIT 모달 오픈) 시 배경을 완벽한 검정(#000000)으로 전환
+  React.useEffect(() => {
+    if (isMenuModalOpen && menuFormMode === 'EDIT') {
+      const originalBodyBg = document.body.style.backgroundColor;
+      const originalBodyTransition = document.body.style.transition;
+      
+      // 1. Body 배경을 검정으로 변경
+      document.body.style.transition = 'background-color 0.3s ease-in-out';
+      document.body.style.backgroundColor = '#000000';
+
+      // 2. 어드민 콘솔 래퍼 요소들을 찾아서 배경을 검정으로 변경
+      const consoleWrappers = document.querySelectorAll('.admin-console-wrapper, #admin-view-wrapper, .admin-page-container');
+      const originalWrappersBg = Array.from(consoleWrappers).map(el => (el as HTMLElement).style.backgroundColor);
+      
+      consoleWrappers.forEach(el => {
+        (el as HTMLElement).style.setProperty('background-color', '#000000', 'important');
+      });
+
+      return () => {
+        // 복구
+        document.body.style.backgroundColor = originalBodyBg;
+        document.body.style.transition = originalBodyTransition;
+        consoleWrappers.forEach((el, idx) => {
+          (el as HTMLElement).style.removeProperty('background-color');
+          if (originalWrappersBg[idx]) {
+            (el as HTMLElement).style.backgroundColor = originalWrappersBg[idx];
+          }
+        });
+      };
+    }
+  }, [isMenuModalOpen, menuFormMode]);
+
   return (
     <div className="animate-fadeIn font-sans">
-      <div className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm space-y-3.5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-stone-100 pb-3">
-          <div className="flex flex-wrap items-center gap-1.5 animate-fadeIn">
-            <button
-              onClick={() => setSelectedCategoryFilter('ALL')}
-              className={`h-8 px-3 border transition-all cursor-pointer rounded-full text-xs font-bold flex items-center focus:outline-none ${
-                selectedCategoryFilter === 'ALL'
-                  ? 'bg-stone-900 border-[#1c1613] text-white shadow-sm'
-                  : 'bg-stone-50 hover:bg-stone-100 border-stone-250 text-stone-700'
-              }`}
-            >
-              <span>전체 ({adminMenuItems.length})</span>
-            </button>
+      <div className="bg-stone-950 border border-stone-900 rounded-2xl p-4 shadow-sm space-y-3.5">
+        {/* 첫 번째 줄: 카테고리 가로 스크롤 탭 */}
+        <div className="flex flex-nowrap items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-3 border-b border-stone-900 animate-fadeIn select-none">
+          <button
+            onClick={() => setSelectedCategoryFilter('ALL')}
+            className={`h-8 px-3 border transition-all cursor-pointer rounded-full text-xs font-bold flex items-center focus:outline-none ${
+              selectedCategoryFilter === 'ALL'
+                ? 'bg-stone-900 border-[#C5A059]/40 text-white shadow-sm'
+                : 'bg-stone-950 hover:bg-stone-900 border-stone-900 text-stone-400'
+            }`}
+          >
+            <span>전체 ({adminMenuItems.length})</span>
+          </button>
 
-            {adminCategories.map((cat) => {
-              const associatedCount = adminMenuItems.filter(item => item.category === cat.id).length;
-              const isSelected = selectedCategoryFilter === cat.id;
-              return (
-                <div
-                  key={cat.id}
-                  className={`flex items-center gap-1.5 border rounded-full transition-all h-8 pl-3 pr-1.5 text-xs font-bold ${
-                    isSelected
-                      ? 'bg-stone-900 border-[#1c1613] text-white shadow-sm'
-                      : 'bg-stone-50/50 hover:bg-stone-100 border-stone-200/80 text-stone-700'
-                  }`}
-                >
-                  <button
-                    onClick={() => setSelectedCategoryFilter(cat.id)}
-                    className="focus:outline-none text-left cursor-pointer flex items-center h-full text-inherit"
-                    title={cat.desc || cat.name}
-                  >
-                    <span>{cat.name} ({associatedCount})</span>
-                  </button>
-
-                  <div className="flex gap-0.5 items-center shrink-0 border-l border-current/15 pl-1.5">
-                    <button
-                      onClick={() => {
-                        setCategoryFormMode('EDIT');
-                        setCategoryFormId(cat.id);
-                        setCategoryFormName(cat.name);
-                        setCategoryFormDesc(cat.desc || '');
-                        setCategoryFormVisible(cat.visible === 1 || cat.visible === true);
-                        setIsCategoryModalOpen(true);
-                      }}
-                      className={`p-0.5 rounded-full cursor-pointer transition-all ${
-                        isSelected 
-                          ? 'text-stone-300 hover:text-white hover:bg-stone-880' 
-                          : 'text-stone-500 hover:text-stone-950 hover:bg-stone-200'
-                      }`}
-                      title="카테고리 수정"
-                    >
-                      <Edit size={10} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCategory(cat.id)}
-                      className={`p-0.5 rounded-full cursor-pointer transition-all ${
-                        isSelected 
-                          ? 'text-rose-300 hover:text-rose-100 hover:bg-stone-880' 
-                          : 'text-rose-600 hover:text-rose-800 hover:bg-rose-50'
-                      }`}
-                      title="카테고리 삭제"
-                    >
-                      <Trash2 size={10} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-
-            <div className="relative ml-2 w-48 sm:w-56 flex-shrink-0">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-3 w-3 text-stone-400" />
-              </div>
-              <input
-                id="admin-menu-search-input"
-                type="text"
-                value={adminSearchQuery}
-                onChange={(e) => setAdminSearchQuery(e.target.value)}
-                placeholder="음료명, 영문명, 맛 검색..."
-                className="block w-full pl-8 pr-8 py-1.5 border border-stone-200 rounded-full bg-[var(--haste-body-bg)] text-[11px] font-semibold placeholder-stone-400 focus:outline-[#C5A059] transition-all shadow-xs text-stone-900"
-              />
-              {adminSearchQuery && (
+          {adminCategories.map((cat) => {
+            const associatedCount = adminMenuItems.filter(item => (item.category || '').trim().toUpperCase() === (cat.id || '').trim().toUpperCase()).length;
+            const isSelected = selectedCategoryFilter === cat.id;
+            return (
+              <div
+                key={cat.id}
+                className={`flex items-center gap-1.5 border rounded-full transition-all h-8 pl-3 pr-1.5 text-xs font-bold ${
+                  isSelected
+                    ? 'bg-stone-900 border-[#C5A059]/40 text-white shadow-sm'
+                    : 'bg-stone-950 hover:bg-stone-900 border-stone-900 text-stone-400'
+                }`}
+              >
                 <button
-                  type="button"
-                  onClick={() => setAdminSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-2.5 flex items-center cursor-pointer text-stone-400 hover:text-stone-600"
+                  onClick={() => setSelectedCategoryFilter(cat.id)}
+                  className="focus:outline-none text-left cursor-pointer flex items-center h-full text-inherit"
+                  title={cat.desc || cat.name}
                 >
-                  <X size={12} />
+                  <span>{cat.name} ({associatedCount})</span>
                 </button>
-              )}
+
+                <div className="flex gap-0.5 items-center shrink-0 border-l border-current/15 pl-1.5">
+                  <button
+                    onClick={() => {
+                      setCategoryFormMode('EDIT');
+                      setCategoryFormId(cat.id);
+                      setCategoryFormName(cat.name);
+                      setCategoryFormDesc(cat.desc || '');
+                      setCategoryFormVisible(cat.visible === 1 || cat.visible === true);
+                      setIsCategoryModalOpen(true);
+                    }}
+                    className={`p-0.5 rounded-full cursor-pointer transition-all ${
+                      isSelected 
+                        ? 'text-stone-300 hover:text-white hover:bg-stone-800' 
+                        : 'text-stone-500 hover:text-stone-300 hover:bg-stone-900'
+                    }`}
+                    title="카테고리 수정"
+                  >
+                    <Edit size={10} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteCategory(cat.id)}
+                    className={`p-0.5 rounded-full cursor-pointer transition-all ${
+                      isSelected 
+                        ? 'text-rose-300 hover:text-rose-100 hover:bg-stone-800' 
+                        : 'text-rose-500 hover:text-rose-300 hover:bg-rose-950/30'
+                    }`}
+                    title="카테고리 삭제"
+                  >
+                    <Trash2 size={10} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 두 번째 줄: 검색어 입력창 (맨 왼쪽) & 제어 버튼 그룹 (맨 오른쪽) */}
+        <div className="flex flex-wrap items-center justify-between gap-1.5 pt-0.5 animate-fadeIn">
+          
+          {/* 검색어 입력창 (왼쪽 배치) */}
+          <div className="relative w-32 sm:w-36 flex-shrink-0 mr-0.5">
+            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+              <Search className="h-3 w-3 text-stone-550" />
             </div>
+            <input
+              id="admin-menu-search-input"
+              type="text"
+              value={adminSearchQuery}
+              onChange={(e) => setAdminSearchQuery(e.target.value)}
+              placeholder="맛/메뉴 검색..."
+              className="block w-full pl-7 pr-7 py-1.5 border border-stone-900 rounded-full bg-stone-950 text-[10px] font-semibold placeholder-stone-500 focus:outline-[#C5A059] transition-all shadow-xs text-stone-200"
+            />
+            {adminSearchQuery && (
+              <button
+                type="button"
+                onClick={() => setAdminSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-2 flex items-center cursor-pointer text-stone-400 hover:text-stone-600"
+              >
+                <X size={10} />
+              </button>
+            )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 ml-auto shrink-0 animate-fadeIn">
-            <AdminSystemHub 
-              showTemporaryToast={showTemporaryToast}
-              showTemporaryError={showTemporaryError}
-              activeAdminTab="MENU_CATEGORIES"
-            />
-
-
+          {/* 제어 버튼 그룹 (오른쪽 정렬 배치) */}
+          <div className="flex flex-wrap items-center gap-1.5 shrink-0">
             {isMenuAll && (
               <button
                 type="button"
                 onClick={() => setIsLargeImages(prev => !prev)}
-                className={`py-1.5 px-3 border text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md select-none active:scale-95 mr-1.5 ${
-                  isLargeImages
-                    ? 'bg-stone-900 text-[#C5A059] border-stone-900'
-                    : 'bg-white hover:bg-stone-50 border-stone-200 text-stone-700'
-                }`}
-                title="음료 이미지 미리보기를 크게 활성화합니다."
+                className="dashboard-btn-dark py-1 px-2.5 rounded-lg text-[10px] flex items-center justify-center gap-1 shrink-0"
+                title="음료 이미지 미리보기 크게"
               >
-                <ImageIcon size={12} />
-                <span>{isLargeImages ? '기본 이미지 크기' : '이미지 크게 보기'}</span>
+                <ImageIcon size={10} />
+                <span>{isLargeImages ? '기본' : '크게'}</span>
               </button>
             )}
 
@@ -276,36 +301,41 @@ export const AdminMenuTab: React.FC<AdminMenuTabProps> = ({
               type="button"
               onClick={handleDownloadZip}
               disabled={isDownloadingZip}
-              className="py-1.5 px-3 bg-stone-700 hover:bg-stone-800 disabled:bg-stone-300 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md select-none active:scale-95 disabled:scale-100 mr-1.5"
-              title="모든 음료 이미지를 카테고리별 폴더로 분류한 ZIP 압축파일로 다운로드합니다."
+              className="dashboard-btn-dark py-1 px-2.5 rounded-lg text-[10px] flex items-center justify-center gap-1 shrink-0"
+              title="전체 음료 이미지 다운로드"
             >
-              <Download size={12} className={isDownloadingZip ? "animate-pulse" : ""} />
-              <span>{isDownloadingZip ? '압축 파일 생성 중...' : '전체메뉴 다운로드(ZIP)'}</span>
+              <Download size={10} className={isDownloadingZip ? "animate-pulse" : ""} />
+              <span>{isDownloadingZip ? '압축 중...' : 'ZIP 다운'}</span>
             </button>
 
-            <button
-              onClick={() => {
-                setMenuFormMode('CREATE');
-                setMenuFormId('DRINK_' + Date.now().toString().slice(-6));
-                setMenuFormName('');
-                setMenuFormNameKr('');
-                setMenuFormCategory(selectedCategoryFilter === 'ALL' ? (adminCategories[0]?.id || 'AMERICANO') : selectedCategoryFilter);
-                setMenuFormImage('');
-                setMenuFormDesc('');
-                setMenuFormAcidity(1);
-                setMenuFormSweetness(3);
-                setMenuFormBody(2);
-                setMenuFormBitterness(1);
-                setMenuFormVisible(true);
-                setMenuFormIsSignature(false);
-                setMenuFormVideoUrl('');
-                setIsMenuModalOpen(true);
-              }}
-              className="py-1.5 px-3 bg-[#C5A059] hover:bg-[#B38F48] text-stone-955 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
-            >
-              <Plus size={12} />
-              <span>음료 추가하기</span>
-            </button>
+            {selectedMenuIds.length > 0 && (
+              <div className="flex items-center gap-1 bg-stone-900/40 p-0.5 rounded-xl border border-stone-850">
+                <button
+                  type="button"
+                  onClick={() => setIsBulkImageModalOpen(true)}
+                  className="dashboard-btn-dark py-1 px-2 rounded-lg text-[10px] flex items-center gap-1 shrink-0"
+                >
+                  <ImageIcon size={10} />
+                  <span>이미지</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleBulkSignatureUpdate(true)}
+                  className="dashboard-btn-dark py-1 px-2 rounded-lg text-[10px] flex items-center gap-1 shrink-0"
+                >
+                  <span>시그니처</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleBulkSignatureUpdate(false)}
+                  className="dashboard-btn-dark py-1 px-2 rounded-lg text-[10px] flex items-center gap-1 shrink-0 border border-stone-800"
+                >
+                  <span>해제</span>
+                </button>
+              </div>
+            )}
+
+            {/* 카테고리 추가 버튼 (삭제의 바로 왼쪽에 렌더링되도록 배치) */}
             <button
               onClick={() => {
                 setCategoryFormMode('CREATE');
@@ -315,48 +345,39 @@ export const AdminMenuTab: React.FC<AdminMenuTabProps> = ({
                 setCategoryFormVisible(true);
                 setIsCategoryModalOpen(true);
               }}
-              className="py-1.5 px-3 bg-stone-900 hover:bg-stone-850 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
+              className="dashboard-btn-dark py-1 px-2.5 rounded-lg text-[10px] flex items-center justify-center gap-1 shrink-0"
+              title="새로운 카테고리 추가"
             >
-              <Plus size={12} />
+              <Plus size={10} />
               <span>카테고리 추가</span>
             </button>
 
+            {/* 선택 일괄 삭제 버튼 */}
             {selectedMenuIds.length > 0 && (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsBulkImageModalOpen(true)}
-                  className="py-1.5 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-250 text-amber-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
-                >
-                  <ImageIcon size={11} />
-                  <span>이미지 일괄 수정 ({selectedMenuIds.length})</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setConfirmModal({
-                      message: `선택한 ${selectedMenuIds.length}개의 음료 품목을 일괄 삭제하시겠습니까?`,
-                      onConfirm: async () => {
-                        try {
-                          await Promise.all(
-                            selectedMenuIds.map(id =>
-                              fetch(`/api/menu-items/${id}`, { method: 'DELETE' })
-                            )
-                          );
-                          showTemporaryToast('선택한 음료 목록들이 일괄 삭제되었습니다.');
-                          setSelectedMenuIds([]);
-                          window.dispatchEvent(new Event('haste_menu_items_updated'));
-                        } catch (err: any) {
-                          showTemporaryError('일괄 삭제 중 오류가 발생했습니다: ' + err.message);
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmModal({
+                    message: `선택하신 ${selectedMenuIds.length}개의 음료 품목을 데이터베이스에서 영구 삭제하시겠습니까?`,
+                    onConfirm: async () => {
+                      try {
+                        for (const id of selectedMenuIds) {
+                          await handleDeleteMenuItem(String(id));
                         }
+                        showTemporaryToast('선택한 음료 목록들이 일괄 삭제되었습니다.');
+                        setSelectedMenuIds([]);
+                        window.dispatchEvent(new Event('haste_menu_items_updated'));
+                      } catch (err: any) {
+                        showTemporaryError('일괄 삭제 중 오류가 발생했습니다: ' + err.message);
                       }
-                    });
-                  }}
-                  className="py-1.5 px-3 bg-rose-50 hover:bg-rose-105 border border-rose-250 text-rose-600 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-md select-none"
-                >
-                  <Trash2 size={11} />
-                  <span>선택 일괄 삭제 ({selectedMenuIds.length})</span>
-                </button>
-              </div>
+                    }
+                  });
+                }}
+                className="py-1 px-2.5 rounded-lg text-[10px] bg-rose-950/20 border border-rose-900/30 text-rose-450 hover:bg-rose-950/45 hover:text-rose-350 transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+              >
+                <Trash2 size={10} />
+                <span>삭제 ({selectedMenuIds.length})</span>
+              </button>
             )}
           </div>
         </div>
@@ -392,6 +413,33 @@ export const AdminMenuTab: React.FC<AdminMenuTabProps> = ({
           sortByName={sortByName}
           setSortByName={setSortByName}
         />
+
+        {/* 음료 추가 버튼 오른쪽 아래 배치 */}
+        <div className="flex justify-end pt-1">
+          <button
+            onClick={() => {
+              setMenuFormMode('CREATE');
+              setMenuFormId('DRINK_' + Date.now().toString().slice(-6));
+              setMenuFormName('');
+              setMenuFormNameKr('');
+              setMenuFormCategory(selectedCategoryFilter === 'ALL' ? (adminCategories[0]?.id || 'AMERICANO') : selectedCategoryFilter);
+              setMenuFormImage('');
+              setMenuFormDesc('');
+              setMenuFormAcidity(1);
+              setMenuFormSweetness(3);
+              setMenuFormBody(2);
+              setMenuFormBitterness(1);
+              setMenuFormVisible(true);
+              setMenuFormIsSignature(false);
+              setMenuFormVideoUrl('');
+              setIsMenuModalOpen(true);
+            }}
+            className="dashboard-btn-gold-compact py-2.5 px-5 !rounded-xl"
+          >
+            <Plus size={14} />
+            <span>음료 추가하기</span>
+          </button>
+        </div>
       </div>
 
       <AdminCategoryModal

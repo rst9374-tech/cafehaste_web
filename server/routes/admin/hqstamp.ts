@@ -122,7 +122,7 @@ router.get('/api/public/agreement', async (req, res) => {
     }
 
     // Fallback to static defaults
-    const { AGREEMENT_TITLE, AGREEMENT_SUBTITLE, AGREEMENT_LINES } = require('../../../serverDefaults');
+    const { AGREEMENT_TITLE, AGREEMENT_SUBTITLE, AGREEMENT_LINES } = require('../../serverDefaults');
     res.json({
       success: true,
       title: AGREEMENT_TITLE,
@@ -139,7 +139,7 @@ router.get('/api/public/agreement', async (req, res) => {
   } catch (err: any) {
     console.error('[API error] Fetch agreement failed:', err);
     try {
-      const { AGREEMENT_TITLE, AGREEMENT_SUBTITLE, AGREEMENT_LINES } = require('../../../serverDefaults');
+      const { AGREEMENT_TITLE, AGREEMENT_SUBTITLE, AGREEMENT_LINES } = require('../../serverDefaults');
       return res.json({
         success: true,
         title: AGREEMENT_TITLE,
