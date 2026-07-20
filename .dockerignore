@@ -3,3 +3,10 @@ node_modules
 .env
 Dockerfile
 .dockerignore
+temp_restored_files
+public/temp_unzip
+public/uploads
+external_uploads
+dist/temp_unzip
+dist/uploads
+dist/videos

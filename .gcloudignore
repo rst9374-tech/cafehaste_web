@@ -5,14 +5,9 @@
 node_modules/
 /uploads/
 /external_uploads/
-dist/uploads/
-dist/uploads/**
-!public/uploads/
-!public/uploads/**
 *.log
 *.ps1
 *.py
-*.js
 scratch/
 .gemini/
 brain/
@@ -21,13 +16,6 @@ logs/
 .env*
 local_*.json
 build_error_*.log
-!dist/
-!dist/**/*.js
-!dist/**/*.css
-!dist/**/*.html
-!dist/**/*.svg
-!dist/**/*.jpg
-!dist/**/*.png
 
 # Exclude source code and configurations not needed on Cloud Run runtime
 src/
@@ -44,3 +32,11 @@ kakao/
 
 # Exclude heavy menu images backup directory from GCP deployment
 cafehaste_menu_images_2026-07-12/
+
+# Exclude untracked temp and restored heavy resources
+temp_restored_files/
+public/temp_unzip/
+public/uploads/releases/
+analysis_report.txt
+local_hero_drafts.json
+local_films.json

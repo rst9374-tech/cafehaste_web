@@ -17,6 +17,9 @@ export function useAppController(
     if (normPath === '/admin') {
       return 'ADMIN';
     }
+    if (normPath === '/did') {
+      return 'DID';
+    }
 
     if (normPath === '/music/admin') {
       return 'MUSIC_ADMIN';

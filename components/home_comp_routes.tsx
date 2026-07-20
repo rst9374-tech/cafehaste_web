@@ -17,6 +17,7 @@ const HasteBoard = React.lazy(() => import('./board_page_main').then(m => ({ def
 const HasteControl = React.lazy(() => import('./membership_page_control').then(m => ({ default: m.HasteControlPage })));
 const HasteLillyDashboard = React.lazy(() => import('./lilly_dashboard/lilly_dashboard_main').then(m => ({ default: m.HasteLillyDashboard })));
 const AdminPageTestValidator = React.lazy(() => import('./admin/admin_page_test_validator').then(m => ({ default: m.AdminPageTestValidator })));
+const HasteDidClient = React.lazy(() => import('./did/haste_comp_didmain').then(m => ({ default: m.HasteDidClient })));
 
 
 // Mobile equivalents of primary application routes
@@ -125,6 +126,14 @@ export function HomeCompRoutes({
     return (
       <Suspense fallback={<FallbackLoader />}>
         <MusicStandaloneApp />
+      </Suspense>
+    );
+  }
+
+  if (ctrl.currentRoute === 'DID') {
+    return (
+      <Suspense fallback={<FallbackLoader />}>
+        <HasteDidClient />
       </Suspense>
     );
   }

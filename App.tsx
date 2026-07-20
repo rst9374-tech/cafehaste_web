@@ -23,6 +23,11 @@ export default function App() {
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
 
+      // DID 전광판 화면은 매장 노출용 공용 화면이므로 점검 잠금 없이 항상 무인 바이패스 개방합니다.
+      if (pathname.toLowerCase() === '/did') {
+        return true;
+      }
+
       const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
       // 1. 로컬 개발 환경은 항상 허용 (단, 실제 모바일 디바이스 접속 시에는 잠금 화면 테스트를 위해 로컬 바이패스를 미적용)

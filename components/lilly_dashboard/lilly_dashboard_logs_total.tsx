@@ -22,8 +22,6 @@ export function LogTotal({ storeCode }: { storeCode: string }) {
 
   useEffect(() => {
     fetchLogs();
-    const interval = setInterval(fetchLogs, 4000);
-    return () => clearInterval(interval);
   }, [storeCode]);
 
   useEffect(() => {

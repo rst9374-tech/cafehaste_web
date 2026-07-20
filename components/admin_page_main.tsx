@@ -16,6 +16,7 @@ import { AdminMembersTab } from './admin/admin_comp_members';
 import { AdminPagination } from './admin/admin_comp_pagination';
 import { AdminLogin } from './admin/admin_comp_login';
 import { AdminStoreVersionTab } from './admin/admin_comp_storeversion';
+import { AdminDidManageTab } from './admin/admin_comp_didmanage';
 
 interface HasteAdminProps {
   heroDrafts: HeroDraft[];
@@ -108,7 +109,7 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
 
   // 3대 마스터 대메뉴 & 하부 서브 탭 로컬 상태 관리 (BOARDS/소통망 완전 소거)
   const [currentMainTab, setCurrentMainTab] = useState<'PAGES' | 'LEDGERS'>('PAGES');
-  const [subTabPages, setSubTabPages] = useState<'FILMS' | 'DRAFTS' | 'INQUIRY' | 'MENU' | 'MENU_ALL' | 'VERSION'>('FILMS');
+  const [subTabPages, setSubTabPages] = useState<'FILMS' | 'DRAFTS' | 'INQUIRY' | 'MENU' | 'MENU_ALL' | 'VERSION' | 'DID'>('FILMS');
   const [subTabLedgers, setSubTabLedgers] = useState<'FRANCHISE_INQUIRY' | 'MEMBERSHIP_LICENSES' | 'VALIDATOR' | 'KIOSK_CONFIG' | 'API_TUNNEL'>('FRANCHISE_INQUIRY');
 
   useEffect(() => {
@@ -141,6 +142,7 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
       if (subTabPages === 'DRAFTS' || subTabPages === 'MENU') return { title: '메인 디자인 관리', desc: '홈페이지 최상단 영웅 섹션의 슬라이드 드래프트 정보와 텍스트를 관리합니다.' };
       if (subTabPages === 'INQUIRY') return { title: '인테리어 관리', desc: '창업 희망자가 참고할 수 있는 본사 공인 인테리어 도면 및 카탈로그 사양을 편집합니다.' };
       if (subTabPages === 'VERSION') return { title: '릴리즈 버전 관리대장', desc: '본사 및 매장 릴리 기기 버전의 SemVer 배포 내역과 업데이트 정책을 관리합니다.' };
+      if (subTabPages === 'DID') return { title: 'DID 전광판 화면 관리', desc: '원격 DID 전광판 화면에 재생되는 동영상과 안내 이미지를 영화 필름처럼 실시간 편집하고 시뮬레이션합니다.' };
       return { title: '음료 메뉴 관리', desc: '점포 주문용 키오스크 및 모바일 카트에 바인딩될 표준 음료 레시피와 단가를 총괄합니다.' };
     }
     if (currentMainTab === 'LEDGERS') {
@@ -296,7 +298,8 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
                       { id: 'DRAFTS', label: '메인 디자인' },
                       { id: 'INQUIRY', label: '인테리어 관리' },
                       { id: 'MENU_ALL', label: '음료 메뉴 관리' },
-                      { id: 'VERSION', label: '버전 관리' }
+                      { id: 'VERSION', label: '버전 관리' },
+                      { id: 'DID', label: 'DID 화면 관리' }
                     ].map((sub) => {
                       const isActive = currentMainTab === 'PAGES' && subTabPages === sub.id;
                       return (
@@ -439,7 +442,7 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
             {/* 우측 퀵 헤더 인포 칩 */}
             <div className="flex items-center gap-2">
               <span className="text-[9px] font-bold font-mono bg-stone-900 text-stone-300 border border-stone-900 px-2.5 py-1 rounded-md tracking-wider select-none">
-                HASTE HQ ADMIN PORTAL v2.5.4
+                v2.6.5
               </span>
             </div>
           </header>
@@ -525,6 +528,12 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
                 )}
                 {subTabPages === 'VERSION' && (
                   <AdminStoreVersionTab 
+                    showTemporaryToast={showTemporaryToast}
+                    showTemporaryError={showTemporaryError}
+                  />
+                )}
+                {subTabPages === 'DID' && (
+                  <AdminDidManageTab 
                     showTemporaryToast={showTemporaryToast}
                     showTemporaryError={showTemporaryError}
                   />

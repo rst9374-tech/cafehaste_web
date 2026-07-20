@@ -93,8 +93,6 @@ export function LillyDashboardDevice({ storeCode }: { storeCode: string }) {
 
   useEffect(() => {
     fetchLogs();
-    const interval = setInterval(fetchLogs, 3000);
-    return () => clearInterval(interval);
   }, [activeStoreCode, activeTestId]);
 
   // 로컬 API 테스트용 JSON 본문 자동 구성

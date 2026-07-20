@@ -18,14 +18,15 @@ import musicRouter from "./public/music";
 import commentsRouter from "./public/comments";
 import rssRouter from "./public/rss";
 import storeVersionRouter from "./public/store_version";
+import didCallbackRouter from "./public/did_callback";
 
 const router = Router();
 
-// 매장별 로컬 DID 및 원격 DID 기동 상태 임시 캐시 (E2E 상호 배타 스위칭 지원)
-const storeDidStatusMap = new Map<
-  string,
-  { local: boolean; remote: boolean }
->();
+// [HASTE 임시 제어 우회 수정 지점] 매장별 DID 가동 모드 통합 저장소 (local | remote)
+const storeDidModeMap = new Map<string, 'local' | 'remote'>();
+
+// [HASTE 임시 제어 우회 수정 지점] 매장별 최근 대시보드 제어 전환 타임스탬프 (기기 멱살잡이 역동기화 덮어쓰기 방지용 쿨타임 락)
+const storeDidLastControlTimeMap = new Map<string, number>();
 
 function getFormattedTimestamp(): string {
   const now = new Date();
@@ -884,8 +885,7 @@ router.post("/api/remote/v3/did/open/local", async (req, res) => {
   }
 
   const storeCodeClean = storeCode.trim();
-  const activeApiKey =
-    storeCodeClean === "HASTE-HQS-ADMIN" ? "store075575" : storeCodeClean;
+  const activeApiKey = storeCodeClean;
   const originUrl = `${req.protocol}://${req.get("host")}`;
   const isLocalTestEnv = process.env.NODE_ENV !== "production";
 
@@ -900,11 +900,10 @@ router.post("/api/remote/v3/did/open/local", async (req, res) => {
         },
       });
       if (response.ok) {
-        storeDidStatusMap.set(storeCodeClean, { local: true, remote: false });
+        storeDidModeMap.set(storeCodeClean, 'local');
         return res.json({
           success: true,
-          message:
-            "[Local Direct] HASTE 로컬 제어 코어로 직접 로컬 DID를 기동했습니다.",
+          message: "LOCAL DID START SUCCESS",
         });
       }
     } catch (err: any) {
@@ -912,7 +911,7 @@ router.post("/api/remote/v3/did/open/local", async (req, res) => {
     }
     return res.status(500).json({
       success: false,
-      message: "HASTE 로컬 제어 코어 통신에 실패했습니다.",
+      message: "LOCAL DID START FAILED",
     });
   } else {
     // [Case B] 실서버 운영 환경: 디스코드 1 (Primary) ➔ 디스코드 2 (Secondary) 순서로 릴레이 노킹 (중계 루트)
@@ -923,7 +922,7 @@ router.post("/api/remote/v3/did/open/local", async (req, res) => {
       originUrl,
     );
     if (relaySuccess) {
-      storeDidStatusMap.set(storeCodeClean, { local: true, remote: false });
+      storeDidModeMap.set(storeCodeClean, 'local');
       return res.json({
         success: true,
         message:
@@ -948,8 +947,7 @@ router.post("/api/remote/v3/did/open/remote", async (req, res) => {
   }
 
   const storeCodeClean = storeCode.trim();
-  const activeApiKey =
-    storeCodeClean === "HASTE-HQS-ADMIN" ? "store075575" : storeCodeClean;
+  const activeApiKey = storeCodeClean;
   const originUrl = `${req.protocol}://${req.get("host")}`;
   const isLocalTestEnv = process.env.NODE_ENV !== "production";
 
@@ -972,11 +970,11 @@ router.post("/api/remote/v3/did/open/remote", async (req, res) => {
       });
       if (response.ok) {
         if (targetEndpoint === "/v3/did/open/remote") {
-          storeDidStatusMap.set(storeCodeClean, { local: false, remote: true });
+          storeDidModeMap.set(storeCodeClean, 'remote');
         }
         return res.json({
           success: true,
-          message: `[Local Direct] HASTE 로컬 제어 코어로 직접 명령(${targetEndpoint})을 반영했습니다.`,
+          message: "REMOTE DID START SUCCESS",
         });
       }
     } catch (err: any) {
@@ -984,7 +982,7 @@ router.post("/api/remote/v3/did/open/remote", async (req, res) => {
     }
     return res.status(500).json({
       success: false,
-      message: "HASTE 로컬 제어 코어 통신에 실패했습니다.",
+      message: "REMOTE DID START FAILED",
     });
   } else {
     // [Case B] 실서버 운영 환경: 디스코드 1 (Primary) ➔ 디스코드 2 (Secondary) 순서로 릴레이 노킹 (중계 루트)
@@ -996,7 +994,7 @@ router.post("/api/remote/v3/did/open/remote", async (req, res) => {
     );
     if (relaySuccess) {
       if (targetEndpoint === "/v3/did/open/remote") {
-        storeDidStatusMap.set(storeCodeClean, { local: false, remote: true });
+        storeDidModeMap.set(storeCodeClean, 'remote');
       }
       return res.json({
         success: true,
@@ -1290,20 +1288,21 @@ router.get("/api/remote/status", async (req, res) => {
       .json({ success: false, message: "storeCode가 필요합니다." });
   }
   const storeCodeClean = storeCode.trim();
-  const didState = storeDidStatusMap.get(storeCodeClean) || {
-    local: false,
-    remote: false,
-  };
 
   const isLocalTestEnv = process.env.NODE_ENV !== "production";
 
   // 1. 로컬 개발 환경인 경우: 릴리 로컬 API 127.0.0.1:8080 을 직접 프록시 조회
   if (isLocalTestEnv) {
     try {
-      // 최고관리자('HASTE-HQS-ADMIN')일 경우 릴리 로컬 API 찌르기용 토큰만 테스트 매장 코드('store075575')로 우회 대입
-      const activeApiKey =
-        storeCodeClean === "HASTE-HQS-ADMIN" ? "store075575" : storeCodeClean;
+      const activeApiKey = storeCodeClean;
       const lillyUrl = "http://127.0.0.1:8080/v3/status";
+      
+      // [HASTE 임시 제어 우회 수정 지점] 릴리 기기 API 송수신 상세 관제 패킷 정보 로그 인쇄
+      console.log(`\n---------------------------------------------------------`);
+      console.log(`🔍 [릴리 API 조회 송신] ➔ GET ${lillyUrl}`);
+      console.log(`🔑 인증 토큰: Bearer ${activeApiKey}`);
+      console.log(`---------------------------------------------------------`);
+
       const response = await fetch(lillyUrl, {
         headers: {
           Authorization: `Bearer ${activeApiKey}`,
@@ -1312,8 +1311,68 @@ router.get("/api/remote/status", async (req, res) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(`🟢 [릴리 API 조회 수신] ➔ HTTP ${response.status}`);
+        console.log(`📦 응답 바디:`, JSON.stringify(data));
+        console.log(`---------------------------------------------------------\n`);
+
         if (data.success && data.status) {
           const s = data.status;
+          
+          const didL = s.did === true || s.didConnected === true;
+          
+          // [HASTE 임시 제어 우회 수정 지점] 홈페이지 캐시가 비어있는 최초 로드 시점에만 릴리 기기의 물리 가동 상태를 읽어와 설정을 자동 초기화
+          if (!storeDidModeMap.has(storeCodeClean)) {
+            const initialMode = didL ? 'local' : 'remote';
+            storeDidModeMap.set(storeCodeClean, initialMode);
+            console.log(`🔑 [최초 역동기화] 매장: ${storeCodeClean} ➔ 릴리 기기 상태로부터 최초 모드 설정 상속 초기화: ${initialMode}`);
+          }
+
+          const updatedTargetMode = storeDidModeMap.get(storeCodeClean) || (s.did ? 'local' : s.remoteDid ? 'remote' : 'local');
+          
+          // [HASTE 임시 제어 우회 수정 지점] 홈페이지 관점과 릴리 기기 관점의 1:1 대칭 명칭 통일 ('설정 상태', 'DID 상태')
+          const isApiConnected = !!(s.api ?? s.local_api_connected);
+          const isWsConnected = !!(s.ws ?? s.ws_connected);
+
+          const apiState = isApiConnected ? "🟢 ALIVE" : "🔴 DEAD";
+          const orderState = isWsConnected ? "🟢 CONNECTED" : "🔴 DISCONNECTED";
+
+          // 1. 홈페이지 기준 상태값 정의
+          const hqTargetMode = updatedTargetMode.toUpperCase(); // 'LOCAL' | 'REMOTE'
+          const hqDidState = updatedTargetMode === 'local' 
+            ? "🟢 LOCAL" 
+            : updatedTargetMode === 'remote' 
+              ? "🔵 REMOTE" 
+              : "⚪ CLOSED";
+
+          // 2. 릴리프로그램 기준 상태값 정의
+          const lillyDeviceMode = String(s.didMode || "local").toUpperCase(); // 'LOCAL' | 'REMOTE'
+          const lillyDidState = s.did 
+            ? "🟢 LOCAL" 
+            : s.remoteDid 
+              ? "🔵 REMOTE" 
+              : "⚪ CLOSED";
+
+          // 3. 실시간 조회 타임스탬프 생성 (YYYY.MM.DD HH:mm:ss)
+          const now = new Date();
+          const pad = (n: number) => String(n).padStart(2, "0");
+          const formattedTime = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+          console.log(`\n┌────────────────────── HASTE 런타임 상태 ──────────────────────┐`);
+          console.log(`  매장 고유 ID     : ${storeCodeClean}`);
+          console.log(`  ─────────────────────────── [홈페이지] ───────────────────────────`);
+          console.log(`  설정 상태        : ${hqTargetMode}`);
+          console.log(`  API 포트         : ${apiState}`);
+          console.log(`  주문 수신        : ${orderState}`);
+          console.log(`  DID 상태         : ${hqDidState}`);
+          console.log(`  조회 시간        : ${formattedTime}`);
+          console.log(`  ──────────────────────── [릴리프로그램] ───────────────────────────`);
+          console.log(`  설정 상태        : ${lillyDeviceMode}`);
+          console.log(`  API 포트         : ${apiState}`);
+          console.log(`  주문 수신        : ${orderState}`);
+          console.log(`  DID 상태         : ${lillyDidState}`);
+          console.log(`  조회 시간        : ${formattedTime}`);
+          console.log(`└──────────────────────────────────────────────────────────────────┘\n`);
+
           return res.json({
             success: true,
             status: {
@@ -1321,22 +1380,17 @@ router.get("/api/remote/status", async (req, res) => {
               serialport_connected: s.serialport ? 1 : 0,
               local_api_connected: s.api ? 1 : 0,
               thirdparty_connected: s.thirdparty ? 1 : 0,
-              did_connected:
-                s.did === true || s.didConnected === true || didState.local
-                  ? 1
-                  : 0,
-              remote_did_connected:
-                s.remoteDid === true ||
-                s.remoteDidConnected === true ||
-                didState.remote
-                  ? 1
-                  : 0,
+              did_connected: s.did ? 1 : 0,
+              remote_did_connected: s.remoteDid ? 1 : 0,
+              didMode: s.did ? 'local' : s.remoteDid ? 'remote' : updatedTargetMode,
+              target_did_mode: updatedTargetMode
             },
           });
         }
       }
       throw new Error(`릴리 API 서버 응답 실패 (HTTP: ${response.status})`);
     } catch (err: any) {
+      const targetMode = storeDidModeMap.get(storeCodeClean) || 'local';
       // 최고관리자('HASTE-HQS-ADMIN') 권한 특별 혜택: 릴리가 꺼져있거나 통신 에러가 나더라도 무조건 정상(1)으로 의사 점등 처리 (관제 및 테스트 프리패스)
       if (storeCodeClean === "HASTE-HQS-ADMIN") {
         return res.json({
@@ -1346,14 +1400,16 @@ router.get("/api/remote/status", async (req, res) => {
             serialport: 1,
             api: 1,
             thirdparty: 1,
-            did: didState.local ? 1 : 0,
-            remoteDid: didState.remote ? 1 : 0,
+            did: targetMode === 'local' ? 1 : 0,
+            remoteDid: targetMode === 'remote' ? 1 : 0,
             ws_connected: 1,
             serialport_connected: 1,
             local_api_connected: 1,
             thirdparty_connected: 1,
-            did_connected: didState.local ? 1 : 0,
-            remote_did_connected: didState.remote ? 1 : 0,
+            did_connected: targetMode === 'local' ? 1 : 0,
+            remote_did_connected: targetMode === 'remote' ? 1 : 0,
+            didMode: targetMode,
+            target_did_mode: targetMode
           },
         });
       }
@@ -1366,14 +1422,16 @@ router.get("/api/remote/status", async (req, res) => {
           serialport: 0,
           api: 0,
           thirdparty: 0,
-          did: didState.local ? 1 : 0,
-          remoteDid: didState.remote ? 1 : 0,
+          did: targetMode === 'local' ? 1 : 0,
+          remoteDid: targetMode === 'remote' ? 1 : 0,
           ws_connected: 0,
           serialport_connected: 0,
           local_api_connected: 0,
           thirdparty_connected: 0,
-          did_connected: didState.local ? 1 : 0,
-          remote_did_connected: didState.remote ? 1 : 0,
+          did_connected: targetMode === 'local' ? 1 : 0,
+          remote_did_connected: targetMode === 'remote' ? 1 : 0,
+          didMode: targetMode,
+          target_did_mode: targetMode
         },
       });
     }
@@ -1382,6 +1440,8 @@ router.get("/api/remote/status", async (req, res) => {
   // 2. 실서버(Cloud Run) 배포 환경인 경우: DB store_connections 테이블의 최근 핑백 데이터 조회
   try {
     const dbPool = await getDbPool();
+    const targetMode = storeDidModeMap.get(storeCodeClean) || 'local';
+    
     if (dbPool.isFallback) {
       return res.json({
         success: true,
@@ -1390,14 +1450,16 @@ router.get("/api/remote/status", async (req, res) => {
           serialport: 1,
           api: 1,
           thirdparty: 1,
-          did: didState.local ? 1 : 0,
-          remoteDid: didState.remote ? 1 : 0,
+          did: targetMode === 'local' ? 1 : 0,
+          remoteDid: targetMode === 'remote' ? 1 : 0,
           ws_connected: 1,
           serialport_connected: 1,
           local_api_connected: 1,
           thirdparty_connected: 1,
-          did_connected: didState.local ? 1 : 0,
-          remote_did_connected: didState.remote ? 1 : 0,
+          did_connected: targetMode === 'local' ? 1 : 0,
+          remote_did_connected: targetMode === 'remote' ? 1 : 0,
+          didMode: targetMode,
+          target_did_mode: targetMode
         },
       });
     }
@@ -1429,14 +1491,16 @@ router.get("/api/remote/status", async (req, res) => {
           serialport: serialVal,
           api: apiVal,
           thirdparty: machineVal,
-          did: didState.local ? 1 : 0,
-          remoteDid: didState.remote ? 1 : 0,
+          did: targetMode === 'local' ? 1 : 0,
+          remoteDid: targetMode === 'remote' ? 1 : 0,
           ws_connected: wsVal,
           serialport_connected: serialVal,
           local_api_connected: apiVal,
           thirdparty_connected: machineVal,
-          did_connected: didState.local ? 1 : 0,
-          remote_did_connected: didState.remote ? 1 : 0,
+          did_connected: targetMode === 'local' ? 1 : 0,
+          remote_did_connected: targetMode === 'remote' ? 1 : 0,
+          didMode: targetMode,
+          target_did_mode: targetMode
         },
       });
     }
@@ -1447,14 +1511,16 @@ router.get("/api/remote/status", async (req, res) => {
         serialport: 0,
         api: 0,
         thirdparty: 0,
-        did: didState.local ? 1 : 0,
-        remoteDid: didState.remote ? 1 : 0,
+        did: targetMode === 'local' ? 1 : 0,
+        remoteDid: targetMode === 'remote' ? 1 : 0,
         ws_connected: 0,
         serialport_connected: 0,
         local_api_connected: 0,
         thirdparty_connected: 0,
-        did_connected: didState.local ? 1 : 0,
-        remote_did_connected: didState.remote ? 1 : 0,
+        did_connected: targetMode === 'local' ? 1 : 0,
+        remote_did_connected: targetMode === 'remote' ? 1 : 0,
+        didMode: targetMode,
+        target_did_mode: targetMode
       },
     });
   } catch (err: any) {
@@ -1476,21 +1542,27 @@ router.post("/api/remote/status/update", async (req, res) => {
   const serial = status.serialConnected === true;
   const localApi = status.isOpen !== undefined; // status.isOpen이 undefined가 아니면 로컬 API 정상 통신 완료
   const machine = status.machineConnected === true;
-  const prevStatus = storeDidStatusMap.get(storeCodeClean) || {
-    local: false,
-    remote: false,
-  };
   const didLocal = status.didConnected === true;
-  // 원격 DID는 릴리 로컬 단말에서 상태를 직접 추적할 수 없으므로, 봇이 항상 false를 핑백하더라도 백엔드에서 기동 상태(true)를 기존 메모리 값으로 보존합니다.
-  const didRemote = status.remoteDidConnected === true || prevStatus.remote;
 
-  // [HASTE 임시 제어 우회 수정 지점] 메모리 캐시 맵에도 즉시 동기화 반영
-  storeDidStatusMap.set(storeCodeClean, { local: didLocal, remote: didRemote });
+  // 기기가 핑백한 물리 기동 상태를 홈페이지 설정 가동 모드에 양방향 역동기화 적용 (단, 점주 제어 명령 후 10초간은 덮어쓰기 유예)
+  const currentMode = didLocal ? 'local' : 'remote';
+  
+  const lastControlTime = storeDidLastControlTimeMap.get(storeCodeClean) || 0;
+  const isCooltimeActive = Date.now() - lastControlTime < 10000;
+
+  // 기기가 읽어가서 동기화할 최종 가동 모드 로드
+  const targetMode = storeDidModeMap.get(storeCodeClean) || 'local';
+  console.log(`\n📢 [HASTE 핑백 수신] 매장: ${storeCodeClean} ➔ didConnected: ${status.didConnected} ➔ 기기 하달 가동 지침 모드: ${targetMode}`);
 
   try {
     const dbPool = await getDbPool();
     if (dbPool.isFallback) {
-      return res.json({ success: true, message: "Fallback 모드로 수신 스킵" });
+      return res.json({ 
+        success: true, 
+        message: "Fallback 모드로 수신 스킵",
+        didMode: targetMode,
+        target_did_mode: targetMode
+      });
     }
 
     // 1. 등록 여부 조회
@@ -1513,7 +1585,11 @@ router.post("/api/remote/status/update", async (req, res) => {
       );
     }
 
-    return res.json({ success: true });
+    return res.json({ 
+      success: true,
+      didMode: targetMode,
+      target_did_mode: targetMode
+    });
   } catch (err: any) {
     console.error(
       "❌ [Status Update Error] Failed to update connection status:",
@@ -1915,8 +1991,8 @@ router.post("/api/remote/sales/toggle", async (req, res) => {
   }
 });
 
-// 디스코드 원격 중계 로컬 DID 실행 API
-router.post("/api/remote/did/open/local", async (req, res) => {
+// 디스코드 원격 중계 로컬 DID 실행 API (v3 호환성 매핑 추가)
+router.post(["/api/remote/did/open/local", "/api/remote/v3/did/open/local"], async (req, res) => {
   const { storeCode } = req.body;
   if (!storeCode) {
     return res
@@ -1930,9 +2006,19 @@ router.post("/api/remote/did/open/local", async (req, res) => {
   const originUrl = `${req.protocol}://${req.get("host")}`;
   const isLocalTestEnv = process.env.NODE_ENV !== "production";
 
+  // 홈페이지 설정 공시소에 매장의 타겟 DID 모드를 'local'로 전환 등록
+  storeDidModeMap.set(storeCodeClean, 'local');
+  storeDidLastControlTimeMap.set(storeCodeClean, Date.now()); // 제어 타임스탬프 갱신 (역동기화 덮어쓰기 방지)
+  console.log(`\n🎛️ [HASTE 제어 전환] 매장: ${storeCodeClean} ➔ 타겟 DID 모드를 'local' (로컬) 로 전환 공시 (10초 쿨타임 락 가동)`);
+
   if (isLocalTestEnv) {
     // [Case A] 로컬 개발 환경: 로컬 제어 코어(127.0.0.1:8080)로 즉시 100% 직송 (CORS 및 로컬 피드백 최적화)
     try {
+      console.log(`\n=========================================================`);
+      console.log(`⚡ [로컬 DID 실행 지시 송신] ➔ POST http://127.0.0.1:8080/v3/did/open/local`);
+      console.log(`🔑 인증 토큰: Bearer ${activeApiKey}`);
+      console.log(`=========================================================`);
+
       const response = await fetch("http://127.0.0.1:8080/v3/did/open/local", {
         method: "POST",
         headers: {
@@ -1940,17 +2026,25 @@ router.post("/api/remote/did/open/local", async (req, res) => {
           Authorization: `Bearer ${activeApiKey}`,
         },
       });
-      if (response.ok) {
-        storeDidStatusMap.set(storeCodeClean, { local: true, remote: false });
+      const data: any = await response.json().catch(() => ({}));
+      if (response.ok && data.success === true) {
+        console.log(`🟢 [로컬 DID 실행 지시 수신] ➔ HTTP ${response.status}`);
+        console.log(`📦 응답 바디:`, JSON.stringify(data));
+        console.log(`=========================================================\n`);
+
         return res.json({
           success: true,
           message:
-            "[Local Direct] HASTE 로컬 제어 코어로 로컬 DID 기동 신호가 즉시 반영되었습니다.",
+            `[Local Direct] HASTE 로컬 제어 코어로 로컬 DID 기동 지침이 전달되었습니다. (결과: ${data.message || '성공'})`,
         });
+      } else {
+        console.error(`❌ [Local Direct 실패] 릴리 로컬 API /v3/did/open/local 응답 거부 - HTTP: ${response.status}, success: ${data.success}, 사유: ${data.message || '알 수 없음'}`);
+        console.log(`📦 수신 거절 바디:`, JSON.stringify(data));
+        console.log(`=========================================================\n`);
       }
     } catch (err: any) {
-      console.log(
-        "[Local DID Open Legacy Direct Loopback Failed]",
+      console.error(
+        "❌ [Local DID Open Legacy Direct Loopback Failed]",
         err.message,
       );
     }
@@ -1964,11 +2058,10 @@ router.post("/api/remote/did/open/local", async (req, res) => {
     originUrl,
   );
   if (relaySuccess) {
-    storeDidStatusMap.set(storeCodeClean, { local: true, remote: false });
     return res.json({
       success: true,
       message:
-        "로컬 DID 기동 제어 신호가 HASTE HQ 보안 전산 중계 터널로 송출되었습니다.",
+        "로컬 DID 기동 설정 신호가 HASTE HQ 보안 전산 중계 터널로 송출되었습니다. 기기 기동 및 피드백 보고 시 대시보드 불빛이 점등됩니다.",
     });
   } else {
     return res.status(500).json({
@@ -1978,8 +2071,8 @@ router.post("/api/remote/did/open/local", async (req, res) => {
   }
 });
 
-// 디스코드 원격 중계 원격 DID 실행 API
-router.post("/api/remote/did/open/remote", async (req, res) => {
+// 디스코드 원격 중계 원격 DID 실행 API (v3 호환성 매핑 추가)
+router.post(["/api/remote/did/open/remote", "/api/remote/v3/did/open/remote"], async (req, res) => {
   const { storeCode, endpoint, payload } = req.body;
   if (!storeCode) {
     return res
@@ -1996,9 +2089,22 @@ router.post("/api/remote/did/open/remote", async (req, res) => {
   const targetEndpoint = endpoint || "/v3/did/open/remote";
   const targetPayload = payload || {};
 
+  // 홈페이지 설정 공시소에 매장의 타겟 DID 모드를 'remote'로 전환 등록
+  if (targetEndpoint === "/v3/did/open/remote") {
+    storeDidModeMap.set(storeCodeClean, 'remote');
+    storeDidLastControlTimeMap.set(storeCodeClean, Date.now()); // 제어 타임스탬프 갱신 (역동기화 덮어쓰기 방지)
+    console.log(`\n🎛️ [HASTE 제어 전환] 매장: ${storeCodeClean} ➔ 타겟 DID 모드를 'remote' (원격) 로 전환 공시 (10초 쿨타임 락 가동)`);
+  }
+
   if (isLocalTestEnv) {
     // [Case A] 로컬 개발 환경: 로컬 제어 코어(127.0.0.1:8080)로 즉시 100% 직송 (CORS 및 로컬 피드백 최적화)
     try {
+      console.log(`\n=========================================================`);
+      console.log(`⚡ [원격 DID 실행 지시 송신] ➔ POST http://127.0.0.1:8080${targetEndpoint}`);
+      console.log(`🔑 인증 토큰: Bearer ${activeApiKey}`);
+      console.log(`📦 전송 바디:`, JSON.stringify(targetPayload));
+      console.log(`=========================================================`);
+
       const response = await fetch(`http://127.0.0.1:8080${targetEndpoint}`, {
         method: "POST",
         headers: {
@@ -2010,18 +2116,24 @@ router.post("/api/remote/did/open/remote", async (req, res) => {
             ? JSON.stringify(targetPayload)
             : undefined,
       });
-      if (response.ok) {
-        if (targetEndpoint === "/v3/did/open/remote") {
-          storeDidStatusMap.set(storeCodeClean, { local: false, remote: true });
-        }
+      const data: any = await response.json().catch(() => ({}));
+      if (response.ok && data.success === true) {
+        console.log(`🟢 [원격 DID 실행 지시 수신] ➔ HTTP ${response.status}`);
+        console.log(`📦 응답 바디:`, JSON.stringify(data));
+        console.log(`=========================================================\n`);
+
         return res.json({
           success: true,
-          message: `[Local Direct] HASTE 로컬 제어 코어로 명령(${targetEndpoint})이 즉시 반영되었습니다.`,
+          message: `[Local Direct] HASTE 로컬 제어 코어로 명령(${targetEndpoint}) 설정이 반영되었습니다. (결과: ${data.message || '성공'})`,
         });
+      } else {
+        console.error(`❌ [Local Direct 실패] 릴리 로컬 API ${targetEndpoint} 응답 거부 - HTTP: ${response.status}, success: ${data.success}, 사유: ${data.message || '알 수 없음'}`);
+        console.log(`📦 수신 거절 바디:`, JSON.stringify(data));
+        console.log(`=========================================================\n`);
       }
     } catch (err: any) {
-      console.log(
-        "[Remote DID Open Legacy Direct Loopback Failed]",
+      console.error(
+        "❌ [Remote DID Open Legacy Direct Loopback Failed]",
         err.message,
       );
     }
@@ -2035,12 +2147,9 @@ router.post("/api/remote/did/open/remote", async (req, res) => {
     originUrl,
   );
   if (relaySuccess) {
-    if (targetEndpoint === "/v3/did/open/remote") {
-      storeDidStatusMap.set(storeCodeClean, { local: false, remote: true });
-    }
     return res.json({
       success: true,
-      message: `제어 신호(${targetEndpoint})가 HASTE HQ 보안 전산 중계 터널로 송출되었습니다.`,
+      message: `제어 신호(${targetEndpoint}) 설정이 HASTE HQ 보안 전산 중계 터널로 송출되었습니다. 기기 피드백 보고 시 대시보드 불빛이 점등됩니다.`,
     });
   } else {
     return res.status(500).json({
@@ -2060,5 +2169,6 @@ router.use(musicRouter);
 router.use(commentsRouter);
 router.use(rssRouter);
 router.use(storeVersionRouter);
+router.use(didCallbackRouter);
 
 export default router;

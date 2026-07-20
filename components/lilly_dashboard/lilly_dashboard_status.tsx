@@ -38,9 +38,13 @@ export function LillyDashboardStatus({
     thirdparty: false,
     did: false,
     remoteDid: false,
+    didMode: "local",
   });
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [isActionError, setIsActionError] = useState<boolean>(false);
+  const [showRawDebug, setShowRawDebug] = useState<boolean>(false);
+  const [rawStatusData, setRawStatusData] = useState<any>(null);
+  const [isFetchingStatus, setIsFetchingStatus] = useState<boolean>(false);
 
   const showFeedback = (msg: string, isErr: boolean = false) => {
     setActionMessage(msg);
@@ -74,33 +78,57 @@ export function LillyDashboardStatus({
   const storeGradeLabel = rawStoreGrade.toUpperCase();
 
   const fetchStatus = async () => {
+    setIsFetchingStatus(true);
+    const maxAttempts = 3;
+    const delayMs = 1500;
+
     try {
-      const response = await fetch(
-        `/api/remote/status?storeCode=${encodeURIComponent(storeCode)}`,
-      );
-      const data = await response.json();
-      if (data.success && data.status) {
-        setConnectionStatus({
-          ws: !!(data.status.ws ?? data.status.ws_connected),
-          serialport: !!(
-            data.status.serialport ?? data.status.serialport_connected
-          ),
-          api: !!(data.status.api ?? data.status.local_api_connected),
-          thirdparty: !!(
-            data.status.thirdparty ?? data.status.thirdparty_connected
-          ),
-          did: !!(data.status.did ?? data.status.did_connected),
-          remoteDid: !!(
-            data.status.remoteDid ?? data.status.remote_did_connected
-          ),
-        });
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const response = await fetch(
+            `/api/remote/status?storeCode=${encodeURIComponent(storeCode)}`,
+          );
+          if (!response.ok) {
+            throw new Error(`HTTP 에러: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          if (data.success && data.status) {
+            setRawStatusData(data.status);
+            setConnectionStatus({
+              ws: !!(data.status.ws ?? data.status.ws_connected),
+              serialport: !!(
+                data.status.serialport ?? data.status.serialport_connected
+              ),
+              api: !!(data.status.api ?? data.status.local_api_connected),
+              thirdparty: !!(
+                data.status.thirdparty ?? data.status.thirdparty_connected
+              ),
+              did: !!(data.status.did ?? data.status.did_connected),
+              remoteDid: !!(
+                data.status.remoteDid ?? data.status.remote_did_connected
+              ),
+              didMode: data.status.didMode || "local",
+            });
+            console.log(`🟢 [HASTE 상태 동기화 성공] 매장코드: ${storeCode} ➔ 시도: ${attempt}/${maxAttempts} 완료`);
+            return true;
+          }
+          throw new Error("데이터 규격 파싱 및 스키마 미합치");
+        } catch (err: any) {
+          console.warn(`⚠️ [HASTE 상태 동기화 실패] 매장코드: ${storeCode} ➔ 시도: ${attempt}/${maxAttempts} ➔ 사유: ${err.message}`);
+          if (attempt < maxAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+          }
+        }
       }
-    } catch (err) {
-      console.error("Failed to fetch store connection status:", err);
+      console.error(`🚨 [HASTE 상태 동기화 최종 실패] 매장코드: ${storeCode} ➔ 총 ${maxAttempts}회 재시도를 완료했으나 정보 취득에 실패했습니다.`);
+      return false;
+    } finally {
+      setIsFetchingStatus(false);
     }
   };
 
-  // 실시간 기기 연결 상태 API 온디맨드 단발성 연동 (타이머 일절 제거)
+  // 실시간 기기 연결 상태를 최초 마운트 및 매장 코드 변경 시 1회성으로 동기화
   useEffect(() => {
     fetchStatus();
   }, [storeCode]);
@@ -189,11 +217,10 @@ export function LillyDashboardStatus({
       return;
     }
     try {
-      // 낙관적 업데이트(Optimistic Update)로 버튼 비주얼 즉시 실시간 전환!
+      // 낙관적 업데이트(Optimistic Update) 시 didMode를 'local'로 전환합니다.
       setConnectionStatus((prev) => ({
         ...prev,
-        did: true,
-        remoteDid: false,
+        didMode: "local"
       }));
       const response = await fetch("/api/remote/v3/did/open/local", {
         method: "POST",
@@ -202,15 +229,17 @@ export function LillyDashboardStatus({
       });
       const data = await response.json();
       if (data.success) {
-        showFeedback("로컬 DID 화면이 정상 기동되었습니다.", false);
+        showFeedback("LOCAL DID START SUCCESS", false);
+        // [HASTE 임시 제어 우회 수정 지점] 타이머 없는 실시간 점등 동기화를 위해 제어 성공 직후 1회 갱신 격발
+        await fetchStatus();
       } else {
         showFeedback(
-          `로컬 DID 기동 실패: ${data.message || "알 수 없는 오류"}`,
+          `LOCAL DID START FAILED: ${data.message || "ERROR"}`,
           true,
         );
       }
     } catch (err) {
-      showFeedback("로컬 DID 실행 중 통신 오류가 발생했습니다.", true);
+      showFeedback("LOCAL DID CONNECTION ERROR", true);
     }
   };
 
@@ -222,28 +251,29 @@ export function LillyDashboardStatus({
       return;
     }
     try {
-      // 낙관적 업데이트(Optimistic Update)로 버튼 비주얼 즉시 실시간 전환!
+      // 낙관적 업데이트(Optimistic Update) 시 didMode를 'remote'로 전환합니다.
       setConnectionStatus((prev) => ({
         ...prev,
-        did: false,
-        remoteDid: true,
+        didMode: "remote"
       }));
-      const response = await fetch("/api/remote/v3/did/open/remote", {
+      const res = await fetch("/api/remote/v3/did/open/remote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ storeCode }),
       });
-      const data = await response.json();
+      const data = await res.json();
       if (data.success) {
-        showFeedback("원격 DID 화면이 정상 기동되었습니다.", false);
+        showFeedback("REMOTE DID START SUCCESS", false);
+        // [HASTE 임시 제어 우회 수정 지점] 타이머 없는 실시간 점등 동기화를 위해 제어 성공 직후 1회 갱신 격발
+        await fetchStatus();
       } else {
         showFeedback(
-          `원격 DID 기동 실패: ${data.message || "알 수 없는 오류"}`,
+          `REMOTE DID START FAILED: ${data.message || "ERROR"}`,
           true,
         );
       }
     } catch (err) {
-      showFeedback("원격 DID 실행 중 통신 오류가 발생했습니다.", true);
+      showFeedback("REMOTE DID CONNECTION ERROR", true);
     }
   };
 
@@ -281,10 +311,11 @@ export function LillyDashboardStatus({
               </h1>
               <button
                 onClick={fetchStatus}
-                className="p-1.5 rounded-lg bg-[#18181B]/80 border border-[#27272A]/80 text-[#A1A1AA] hover:text-[#C5A059] hover:border-[#C5A059]/50 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                disabled={isFetchingStatus}
+                className="p-1.5 rounded-lg bg-[#18181B]/80 border border-[#27272A]/80 text-[#A1A1AA] hover:text-[#C5A059] hover:border-[#C5A059]/50 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center shrink-0"
                 title="대시보드 새로고침"
               >
-                <RefreshCw className="size-3.5" />
+                <RefreshCw className={`size-3.5 ${isFetchingStatus ? "animate-spin text-[#C5A059]" : ""}`} />
               </button>
             </div>
             <p className="mt-1 text-xs sm:text-sm leading-5 text-[#A1A1AA] font-sans font-light">
@@ -292,9 +323,9 @@ export function LillyDashboardStatus({
               현황을 지능적으로 관리합니다.
             </p>
           </div>
-          {/* 버전 정보 우상단 은은하게 노출 (신보드 기원 버전 v1.0.0 정밀 적용!) */}
+          {/* 버전 정보 우상단 은은하게 노출 (신보드 기원 버전 v1.0.2 정밀 적용!) */}
           <div className="text-xs font-semibold text-[#A1A1AA] bg-[#18181B]/80 border border-[#27272A]/70 px-2 py-0.5 rounded-md backdrop-blur-xs font-mono">
-            v1.0.0
+            v1.0.2
           </div>
         </div>
         <div className="h-px bg-[#27272A]/50 w-full" />
@@ -375,14 +406,14 @@ export function LillyDashboardStatus({
             <div className="flex flex-row items-center justify-end gap-2.5">
               {/* 1. 판매 중 스위치 캡슐 */}
               <div
-                className={`w-[122px] h-10 flex items-center justify-between px-2.5 text-xs font-bold border rounded-xl shadow-sm select-none shrink-0 transition-all ${!hasControlPermission ? "opacity-40 cursor-not-allowed border-stone-800 text-stone-500" : isSelling ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" : "bg-rose-500/10 border-rose-500/30 text-rose-500 animate-pulse"}`}
+                className={`w-[122px] h-10 flex items-center justify-between px-2.5 text-xs font-bold border rounded-xl shadow-sm select-none shrink-0 transition-all ${(!hasControlPermission || isFetchingStatus) ? "opacity-40 cursor-not-allowed border-stone-800 text-stone-500" : isSelling ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" : "bg-rose-500/10 border-rose-500/30 text-rose-500 animate-pulse"}`}
               >
                 <span>{isSelling ? "판매 중" : "판매 중지"}</span>
                 <button
                   type="button"
                   onClick={handleSalesToggle}
-                  disabled={!hasControlPermission}
-                  className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border border-transparent transition-colors duration-200 ease-in-out outline-none ${!hasControlPermission ? "bg-stone-800 cursor-not-allowed" : "cursor-pointer"} ${isSelling ? "bg-emerald-600" : "bg-[#3F3F46]"}`}
+                  disabled={!hasControlPermission || isFetchingStatus}
+                  className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border border-transparent transition-colors duration-200 ease-in-out outline-none ${(!hasControlPermission || isFetchingStatus) ? "bg-stone-800 cursor-not-allowed" : "cursor-pointer"} ${isSelling ? "bg-emerald-600" : "bg-[#3F3F46]"}`}
                 >
                   <span
                     className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${isSelling ? "translate-x-4" : "translate-x-0"}`}
@@ -393,23 +424,21 @@ export function LillyDashboardStatus({
               {/* 2. 원격 DID 실행 버튼 */}
               <button
                 onClick={handleRemoteDidOpen}
-                disabled={!hasControlPermission}
+                disabled={!hasControlPermission || isFetchingStatus}
                 className={`w-[122px] h-10 px-2 text-xs font-bold rounded-xl shadow-sm shrink-0 transition-all flex items-center justify-center gap-1 ${
-                  !hasControlPermission
+                  (!hasControlPermission || isFetchingStatus)
                     ? "opacity-40 cursor-not-allowed bg-transparent text-stone-500 border border-stone-850"
                     : "cursor-pointer active:scale-95"
                 } ${
-                  hasControlPermission &&
-                  connectionStatus.remoteDid &&
-                  !connectionStatus.did
+                  hasControlPermission && connectionStatus.didMode === "remote"
                     ? "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500/20"
-                    : !hasControlPermission
+                    : (!hasControlPermission || isFetchingStatus)
                       ? ""
                       : "bg-transparent hover:bg-white/5 text-[#A1A1AA] hover:text-white border border-[#27272A]"
                 }`}
               >
                 <ExternalLink
-                  className={`size-3.5 shrink-0 ${hasControlPermission && connectionStatus.remoteDid && !connectionStatus.did ? "text-white" : "text-[#A1A1AA]"}`}
+                  className={`size-3.5 shrink-0 ${hasControlPermission && connectionStatus.didMode === "remote" ? "text-white" : "text-[#A1A1AA]"}`}
                 />
                 <span>원격 DID 실행</span>
               </button>
@@ -417,23 +446,21 @@ export function LillyDashboardStatus({
               {/* 3. 로컬 DID 실행 버튼 */}
               <button
                 onClick={handleLocalDidOpen}
-                disabled={!hasControlPermission}
+                disabled={!hasControlPermission || isFetchingStatus}
                 className={`w-[122px] h-10 px-2 text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1 ${
-                  !hasControlPermission
+                  (!hasControlPermission || isFetchingStatus)
                     ? "opacity-40 cursor-not-allowed bg-transparent text-stone-500 border border-stone-850"
                     : "cursor-pointer active:scale-95"
                 } ${
-                  hasControlPermission &&
-                  connectionStatus.did &&
-                  !connectionStatus.remoteDid
+                  hasControlPermission && connectionStatus.didMode === "local"
                     ? "bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500/20"
-                    : !hasControlPermission
+                    : (!hasControlPermission || isFetchingStatus)
                       ? ""
                       : "bg-transparent hover:bg-white/5 text-[#A1A1AA] hover:text-white border border-[#27272A]"
                 }`}
               >
                 <ExternalLink
-                  className={`size-3.5 shrink-0 ${hasControlPermission && connectionStatus.did && !connectionStatus.remoteDid ? "text-white" : "text-[#A1A1AA]"}`}
+                  className={`size-3.5 shrink-0 ${hasControlPermission && connectionStatus.didMode === "local" ? "text-white" : "text-[#A1A1AA]"}`}
                 />
                 <span>로컬 DID 실행</span>
               </button>
@@ -533,6 +560,27 @@ export function LillyDashboardStatus({
             </div>
           </div>
         </section>
+      </div>
+
+      {/* Lilly 로컬 상태 원본 데이터 디버그 패널 */}
+      <div className="mt-8 border-t border-[#27272A]/50 pt-5">
+        <button
+          onClick={() => setShowRawDebug(!showRawDebug)}
+          className="text-xs text-stone-500 hover:text-stone-300 transition-colors flex items-center gap-1.5 cursor-pointer select-none"
+        >
+          <span>{showRawDebug ? "▼" : "▶"} Lilly 로컬 API 원본 데이터 실시간 관제 (디버그 검증용)</span>
+        </button>
+        {showRawDebug && (
+          <div className="mt-3 p-4 bg-black/80 border border-[#27272A] rounded-xl">
+            <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-[#27272A]">
+              <span className="text-[11px] text-[#71717A] font-mono">http://127.0.0.1:8080/v3/status 프록시 응답</span>
+              <span className="text-[10px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-900 font-mono">LIVE SYNCED</span>
+            </div>
+            <pre className="text-[11px] font-mono text-emerald-400 overflow-x-auto leading-relaxed max-h-60">
+              {rawStatusData ? JSON.stringify(rawStatusData, null, 2) : "로딩 중이거나 데이터를 수신하지 못했습니다."}
+            </pre>
+          </div>
+        )}
       </div>
     </div>
   );

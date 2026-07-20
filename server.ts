@@ -83,6 +83,12 @@ app.use('/uploads/menu', express.static(path.join(process.cwd(), 'cafehaste_menu
 app.use('/uploads', express.static(EXTERNAL_DIR));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
+// [HASTE 임시 제어 우회 수정 지점]
+// 릴리 DID 원본 프로젝트에 속한 실제 고화질 동영상 및 이미지 리소스를 Express 정적 경로로 실시간 바인딩합니다.
+const LILLY_DID_PUBLIC_DIR = path.resolve(process.cwd(), "src/cafehaste-lilly/src/lilly-did/public");
+app.use('/media', express.static(path.join(LILLY_DID_PUBLIC_DIR, 'media')));
+app.use('/img', express.static(path.join(LILLY_DID_PUBLIC_DIR, 'img')));
+
 function isMenuImage(filename: string): boolean {
   const upper = filename.toUpperCase();
   return filename.startsWith('menu_') || 
@@ -247,6 +253,17 @@ app.use(adminRouter);
 
 // Service Boot Engine
 async function startServer() {
+  try {
+    const assetsPath = path.join(process.cwd(), 'dist/assets');
+    if (fs.existsSync(assetsPath)) {
+      console.log('[Debug Probe] Dist assets files list:', fs.readdirSync(assetsPath));
+    } else {
+      console.log('[Debug Probe] Dist assets folder does not exist!');
+    }
+  } catch (e: any) {
+    console.error('[Debug Probe Error] Failed to read dist/assets:', e.message);
+  }
+
   // On startup, align local backup JSON files to contain the upgraded Coffee Vanada Smart Menu if outdated
   try {
     const backupCats = readBackupCategories();
