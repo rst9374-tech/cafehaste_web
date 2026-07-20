@@ -42,11 +42,29 @@ for (const key of required) {
   }
 }
 
-// deploy 스크립트 실행 환경변수 문자열 조합
-const envVarsStr = `DB_HOST=${envVars.DB_HOST},DB_PORT=${envVars.DB_PORT},DB_USER=${envVars.DB_USER},DB_PASSWORD=${envVars.DB_PASSWORD},DB_NAME=${envVars.DB_NAME},DB_CONNECTION_LIMIT=${envVars.DB_CONNECTION_LIMIT},SUPABASE_URL=${envVars.SUPABASE_URL},SUPABASE_KEY=${envVars.SUPABASE_KEY},HASTE_SECRET_LIVE_KEY=${envVars.HASTE_SECRET_LIVE_KEY},NODE_ENV=production`;
+// deploy 스크립트 실행 환경변수 YAML 임시 생성
+const yamlPath = path.resolve(process.cwd(), 'env.yaml');
+let yamlContent = '';
+const varsToExport = {
+  DB_HOST: envVars.DB_HOST,
+  DB_PORT: envVars.DB_PORT,
+  DB_USER: envVars.DB_USER,
+  DB_PASSWORD: envVars.DB_PASSWORD,
+  DB_NAME: envVars.DB_NAME,
+  DB_CONNECTION_LIMIT: envVars.DB_CONNECTION_LIMIT,
+  SUPABASE_URL: envVars.SUPABASE_URL,
+  SUPABASE_KEY: envVars.SUPABASE_KEY,
+  HASTE_SECRET_LIVE_KEY: envVars.HASTE_SECRET_LIVE_KEY,
+  NODE_ENV: 'production'
+};
 
-// 배포 명령어 구성 (--quiet 비대화형 옵션 추가하여 프롬프트 무한대기 방지)
-const deployCmd = `gcloud run deploy cafehaste-web-sdb --source . --region asia-northeast1 --allow-unauthenticated --project cafehaste-zero --set-env-vars "${envVarsStr}" --port 3000 --quiet`;
+for (const [k, v] of Object.entries(varsToExport)) {
+  yamlContent += `${k}: "${String(v).replace(/"/g, '\\"')}"\n`;
+}
+fs.writeFileSync(yamlPath, yamlContent, 'utf-8');
+
+// 배포 명령어 구성 (--env-vars-file 옵션 적용)
+const deployCmd = `gcloud run deploy cafehaste-web-sdb --source . --region asia-northeast1 --allow-unauthenticated --project cafehaste-zero --env-vars-file env.yaml --port 3000 --quiet`;
 
 console.log('로컬 빌드(npm run build) 가동 중...');
 try {
@@ -54,6 +72,11 @@ try {
   console.log('빌드 성공! 구글 클라우드 런 배포 시작...');
   execSync(deployCmd, { stdio: 'inherit' });
   console.log('배포가 성공적으로 완료되었습니다.');
+  
+  // 임시 env.yaml 즉시 파쇄 (보안 및 Pruning)
+  if (fs.existsSync(yamlPath)) {
+    fs.unlinkSync(yamlPath);
+  }
 
   // [HASTE 임시 제어 우회 수정 지점] - 배포 성공 후 릴리즈 노트 md 파일 자동 생성 및 갱신 훅 기동
   try {
@@ -176,6 +199,10 @@ ${gitLogs.trim().split('\n').map(line => `    - ${line}`).join('\n')}
     console.warn('[Auto-Release Warning] 릴리즈 노트 자동 작성 중 경고가 발생했으나 배포를 중단하지는 않습니다:', releaseError.message);
   }
 } catch (error) {
+  // 에러 발생 시에도 임시 env.yaml 파쇄 보장
+  if (fs.existsSync(yamlPath)) {
+    fs.unlinkSync(yamlPath);
+  }
   console.error('배포 중 에러가 발생했습니다:', error);
   process.exit(1);
 }
