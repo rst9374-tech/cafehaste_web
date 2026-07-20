@@ -245,7 +245,37 @@ export const AdminStoreVersionTab: React.FC<AdminStoreVersionTabProps> = ({
       )}
 
       {/* Tab Header & Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pb-2 border-b border-stone-900 mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-900 mb-3">
+        {/* Search bar (Top) */}
+        <div className="flex items-center gap-1.5 max-w-[240px] bg-stone-950 border border-stone-850 rounded-xl p-0.5 px-2.5 shadow-3xs w-full">
+          <Search className="text-stone-500 shrink-0" size={14} />
+          <input
+            type="text"
+            value={searchKwd}
+            onChange={(e) => setSearchKwd(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setActiveKwd(searchKwd);
+                setCurrentPage(1);
+              }
+            }}
+            placeholder="버전명 검색..."
+            className="flex-1 bg-transparent text-[11px] font-bold text-stone-200 outline-none placeholder-stone-500 py-1.5 min-w-0"
+          />
+          {searchKwd && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchKwd('');
+                setActiveKwd('');
+                setCurrentPage(1);
+              }}
+              className="text-stone-400 hover:text-stone-300 text-[10px] font-bold px-1.5 py-0.5 rounded hover:bg-stone-900 cursor-pointer transition-colors"
+            >
+              초기화
+            </button>
+          )}
+        </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
           {/* [HASTE 임시 제어 우회 수정 지점] - 글로벌 예약전송 스위치 */}
@@ -312,37 +342,6 @@ export const AdminStoreVersionTab: React.FC<AdminStoreVersionTabProps> = ({
         {/* Versions List Table */}
         <div className={`col-span-1 ${selectedPost ? (isDeployOnly ? 'lg:col-span-9' : 'lg:col-span-6') : 'lg:col-span-12'} space-y-4`}>
           
-          {/* Search bar */}
-          <div className="flex items-center gap-1.5 max-w-sm bg-stone-950 border border-stone-800 rounded-xl p-0.5 px-2.5 shadow-3xs w-full">
-            <Search className="text-stone-500 shrink-0" size={14} />
-            <input
-              type="text"
-              value={searchKwd}
-              onChange={(e) => setSearchKwd(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setActiveKwd(searchKwd);
-                  setCurrentPage(1);
-                }
-              }}
-              placeholder="버전명 검색..."
-              className="flex-1 bg-transparent text-xs font-bold text-stone-200 outline-none placeholder-stone-500 py-1.5 min-w-0"
-            />
-            {searchKwd && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchKwd('');
-                  setActiveKwd('');
-                  setCurrentPage(1);
-                }}
-                className="text-stone-400 hover:text-stone-300 text-[10px] font-bold px-1.5 py-0.5 rounded hover:bg-stone-900 cursor-pointer transition-colors"
-              >
-                초기화
-              </button>
-            )}
-          </div>
-
           <div className="bg-stone-900 border border-stone-850 rounded-xl overflow-hidden shadow-2xs">
             {isLoading ? (
               <div className="py-20 flex flex-col items-center justify-center text-stone-455 gap-2">
