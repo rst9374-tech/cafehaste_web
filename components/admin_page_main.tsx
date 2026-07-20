@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Settings, ShieldCheck, User, Lock, RefreshCw, AlertOctagon, Layout, Database, Film, MessageSquare, Music, Disc, ChevronDown, ChevronUp, LogOut
@@ -15,6 +15,7 @@ import { AdminMenuTab } from './admin/admin_comp_menu';
 import { AdminMembersTab } from './admin/admin_comp_members';
 import { AdminPagination } from './admin/admin_comp_pagination';
 import { AdminLogin } from './admin/admin_comp_login';
+import { AdminStoreVersionTab } from './admin/admin_comp_storeversion';
 
 interface HasteAdminProps {
   heroDrafts: HeroDraft[];
@@ -107,7 +108,7 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
 
   // 3대 마스터 대메뉴 & 하부 서브 탭 로컬 상태 관리 (BOARDS/소통망 완전 소거)
   const [currentMainTab, setCurrentMainTab] = useState<'PAGES' | 'LEDGERS'>('PAGES');
-  const [subTabPages, setSubTabPages] = useState<'FILMS' | 'DRAFTS' | 'INQUIRY' | 'MENU' | 'MENU_ALL'>('FILMS');
+  const [subTabPages, setSubTabPages] = useState<'FILMS' | 'DRAFTS' | 'INQUIRY' | 'MENU' | 'MENU_ALL' | 'VERSION'>('FILMS');
   const [subTabLedgers, setSubTabLedgers] = useState<'FRANCHISE_INQUIRY' | 'MEMBERSHIP_LICENSES' | 'VALIDATOR' | 'KIOSK_CONFIG' | 'API_TUNNEL'>('FRANCHISE_INQUIRY');
 
   useEffect(() => {
@@ -139,6 +140,7 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
       if (subTabPages === 'FILMS') return { title: '필름 영화관 관리', desc: '본사 사이트에 노출되는 영화 홍보 필름과 아카이브 비디오 리스트를 제어합니다.' };
       if (subTabPages === 'DRAFTS' || subTabPages === 'MENU') return { title: '메인 디자인 관리', desc: '홈페이지 최상단 영웅 섹션의 슬라이드 드래프트 정보와 텍스트를 관리합니다.' };
       if (subTabPages === 'INQUIRY') return { title: '인테리어 관리', desc: '창업 희망자가 참고할 수 있는 본사 공인 인테리어 도면 및 카탈로그 사양을 편집합니다.' };
+      if (subTabPages === 'VERSION') return { title: '릴리즈 버전 관리대장', desc: '본사 및 매장 릴리 기기 버전의 SemVer 배포 내역과 업데이트 정책을 관리합니다.' };
       return { title: '음료 메뉴 관리', desc: '점포 주문용 키오스크 및 모바일 카트에 바인딩될 표준 음료 레시피와 단가를 총괄합니다.' };
     }
     if (currentMainTab === 'LEDGERS') {
@@ -293,7 +295,8 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
                       { id: 'FILMS', label: '필름 영화관' },
                       { id: 'DRAFTS', label: '메인 디자인' },
                       { id: 'INQUIRY', label: '인테리어 관리' },
-                      { id: 'MENU_ALL', label: '음료 메뉴 관리' }
+                      { id: 'MENU_ALL', label: '음료 메뉴 관리' },
+                      { id: 'VERSION', label: '버전 관리' }
                     ].map((sub) => {
                       const isActive = currentMainTab === 'PAGES' && subTabPages === sub.id;
                       return (
@@ -518,6 +521,12 @@ export const HasteAdmin: React.FC<HasteAdminProps> = ({
                     showTemporaryError={showTemporaryError}
                     renderPagination={renderPagination}
                     isMenuAll={true}
+                  />
+                )}
+                {subTabPages === 'VERSION' && (
+                  <AdminStoreVersionTab 
+                    showTemporaryToast={showTemporaryToast}
+                    showTemporaryError={showTemporaryError}
                   />
                 )}
               </>

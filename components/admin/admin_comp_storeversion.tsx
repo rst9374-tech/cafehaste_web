@@ -225,7 +225,7 @@ export const AdminStoreVersionTab: React.FC<AdminStoreVersionTabProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#070609]/95 border border-stone-900 rounded-2xl p-4 sm:p-6 text-stone-300 shadow-xs">
+    <div className="w-full bg-[#070609]/95 border border-stone-900 rounded-2xl p-2 sm:p-3 text-stone-300 shadow-xs">
       
       {/* [HASTE 임시 제어 우회 수정 지점] - 배포 성공 시 상단 초록색 알림 배너 노출 */}
       {successNotification && (
@@ -245,16 +245,7 @@ export const AdminStoreVersionTab: React.FC<AdminStoreVersionTabProps> = ({
       )}
 
       {/* Tab Header & Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-stone-900 mb-6">
-        <div>
-          <h2 className="text-lg font-serif font-semibold text-stone-100 flex items-center gap-2">
-            <FileCode className="text-[#C5A059]" size={20} />
-            HASTE AI 매장 자동 업데이트 버전 대장
-          </h2>
-          <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
-            전국 매장에 배포할 HASTE AI 프로그램 버전의 이력을 관리하고, 1클릭 원격 업데이트를 즉시 송출합니다.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pb-2 border-b border-stone-900 mb-3">
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
           {/* [HASTE 임시 제어 우회 수정 지점] - 글로벌 예약전송 스위치 */}
